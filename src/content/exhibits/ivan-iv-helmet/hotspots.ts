@@ -1,0 +1,40 @@
+import type { Hotspot } from '../../types'
+
+export const ivanIvHelmetHotspots: readonly Hotspot[] = [
+  {
+    id: 'pointed-crown',
+    number: 1,
+    label: 'Высокое навершие',
+    category: 'form',
+    position: [0, 3.05, 0.04],
+    cameraTarget: [0, 2.8, 0],
+    cameraPosition: [3.6, 3.15, 5.5],
+    description: 'Высокий конический силуэт заканчивается узким остриём и делает шлем визуально устремлённым вверх.',
+    observationQuestion: 'Как высокий конус меняет впечатление от защитной формы?',
+    evidenceIds: ['helmet-scan-form'],
+  },
+  {
+    id: 'gold-inscription',
+    number: 2,
+    label: 'Владельческая надпись',
+    category: 'context',
+    position: [0.7, 0.58, 0.42],
+    cameraTarget: [0.2, 0.65, 0],
+    cameraPosition: [3.4, 1.45, 5.0],
+    description: 'Золотая надпись по окружности связывает шлем с князем Иваном Васильевичем — будущим Иваном IV.',
+    observationQuestion: 'Почему имя владельца становится частью художественного оформления?',
+    evidenceIds: ['helmet-inscription'],
+  },
+  {
+    id: 'gilded-ornament',
+    number: 3,
+    label: 'Золотой орнамент',
+    category: 'decoration',
+    position: [-0.48, 1.72, 0.4],
+    cameraTarget: [-0.15, 1.7, 0],
+    cameraPosition: [-3.4, 2.05, 5.0],
+    description: 'Накладной золотой декор контрастирует с тёмным металлом и подчёркивает статус предмета.',
+    observationQuestion: 'Какие участки формы выделяет золотой декор?',
+    evidenceIds: ['helmet-gold-decoration'],
+  },
+] as const

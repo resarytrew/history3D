@@ -1,0 +1,42 @@
+# Анализ референсов
+
+Дата аудита: 1 сентября 2026. Изучены актуальные на момент аудита коммиты:
+
+- `s010s/prehistoric-animal-museum` — `e5e14d926125057b72705851a47a687144f85970`;
+- `img2threejs/img2threejs` — `9fbd0ca5bbcc3b13bebe712745d6784d33db0b85`.
+
+## Что берём из prehistoric-animal-museum
+
+Концептуально адаптируем самодостаточный пакет экспоната, eager registry для проверенных данных, отдельные landscape/portrait backgrounds, poster до WebGL, локализованные записи без fallback между языками, content validation и явную production boundary. На runtime-уровне важны latest-request-wins с `AbortController`, атомарный commit новой презентации, освобождение geometry/material/texture/skeleton, отмена animation loop и обработка потери WebGL-контекста.
+
+Не копируем крупный `App.tsx`, детский бренд, тексты, визуальные компоненты, модели, изображения, аудио, структуру коллекции животных и конкретные policy-пороговые значения без анализа. HISTORIA 3D сразу разделяет app shell, viewer, hotspots, narration, provenance и content.
+
+## Что адаптируем архитектурно
+
+- discriminated union для draft/review/published content;
+- package-local assets и provenance;
+- стабильные kebab-case IDs;
+- review content вне публичной публикации;
+- один viewer contract для разных источников модели;
+- автоматические проверки ссылок, обязательных полей и publication gates;
+- portrait background как самостоятельная композиция;
+- narration lifecycle, принадлежащий активному экспонату.
+
+## Что перепроектировано для исторического музея
+
+Животное заменено исследовательским объектом с chronology, geography, EvidenceLevel, Known/Inference/Reconstruction/Unknown, источниками на уровне тезиса, версиями реконструкции, авторством учебной группы и архитектурными режимами exterior/interior. Hotspot не просто подписывает деталь, а ведёт от наблюдения к объяснению.
+
+## Интеграция идей img2threejs
+
+`img2threejs` остаётся authoring-tooling, а не frontend dependency. Полезны принципы «наблюдение до вывода», декомпозиция macro/meso/micro, sculpt spec, явный список скрытых сторон, pass-by-pass build, multi-angle turntable, triangle budget, reference-vs-render review и детерминированная factory. Результатом pipeline становится обычный procedural factory или проверенный GLB, который runtime загружает через общий API.
+
+Одна фотография не подтверждает скрытую геометрию. Проекционная текстура, восстановленная сторона и guessed material обязательно маркируются как inference.
+
+## Юридическая граница
+
+`prehistoric-animal-museum` имеет лицензию AGPL-3.0-only. В HISTORIA 3D не копируется его код или музейный контент; используются только общие идеи и независимо написанная реализация. `img2threejs` имеет Apache-2.0: при будущем переносе его кода необходимо сохранить лицензию, notices и пометки изменённых файлов. Его бренд и демонстрационные модели не переносятся. Код HISTORIA 3D — MIT; лицензии runtime assets описываются отдельно.
+
+## Визуальный разбор
+
+Главный экран — один 16:9 stage, а не страница из секций. Приоритеты: церковь занимает центральную вертикаль; UI остаётся по краям; кремовая карточка слева имеет ширину около 360–410 px; нижняя лента компактна; controls имеют минимум 48 px; фон светлый, низкий и географически правдоподобный. Типографика: спокойный антиква-заголовок 48–62 px, интерфейсный sans 14–16 px, тёмно-зелёный `#173f34`, кремовый `#f4efe5`, золото только в знаке. Радиусы 18–28 px, мягкие тени без glassmorphism. На mobile stage остаётся сверху, сведения переходят в bottom sheet, carousel становится короткой лентой.
+

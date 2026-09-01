@@ -1,0 +1,40 @@
+import type { Hotspot } from '../../types'
+
+export const pokrovHotspots: readonly Hotspot[] = [
+  {
+    id: 'stone-carving',
+    number: 1,
+    label: 'Каменная резьба',
+    category: 'decoration',
+    position: [-0.55, 3.86, 1.86],
+    cameraTarget: [-0.45, 3.76, 0.55],
+    cameraPosition: [3.7, 4.7, 7.4],
+    description: 'На фасаде заметны рельефные элементы. В DEV-модели они переданы только условным ритмом.',
+    observationQuestion: 'Какие детали усиливают вертикальное движение фасада?',
+    evidenceIds: ['evidence-visible-vertical-rhythm', 'evidence-dev-proportions'],
+  },
+  {
+    id: 'arcature-band',
+    number: 2,
+    label: 'Аркатурно-колончатый пояс',
+    category: 'form',
+    position: [1.58, 2.78, 1.78],
+    cameraTarget: [0.9, 2.68, 0.45],
+    cameraPosition: [5.4, 3.5, 6.6],
+    description: 'Ряд небольших арок образует горизонтальный пояс, не отменяя общего вертикального ритма.',
+    observationQuestion: 'Почему горизонтальный пояс не делает силуэт тяжёлым?',
+    evidenceIds: ['evidence-visible-vertical-rhythm'],
+  },
+  {
+    id: 'perspective-portal',
+    number: 3,
+    label: 'Перспективный портал',
+    category: 'construction',
+    position: [0, 1.12, 1.92],
+    cameraTarget: [0, 1.08, 0.72],
+    cameraPosition: [3.7, 2.05, 5.6],
+    description: 'Вход выделен несколькими уступами. Сейчас это упрощённая процедурная проверка формы.',
+    observationQuestion: 'Как глубина входа меняет восприятие плоской стены?',
+    evidenceIds: ['evidence-dev-proportions'],
+  },
+] as const

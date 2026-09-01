@@ -1,0 +1,9 @@
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; min-width: 320px; height: 100%; margin: 0; }
+body { overflow: hidden; color: var(--historia-text); background: var(--historia-bg); font-family: var(--font-ui); }
+button, a { font: inherit; }
+button { color: inherit; }
+button:focus-visible, a:focus-visible, canvas:focus-visible { outline: 3px solid #f0c369; outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: 0.48; }
+.live-region { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); }
+

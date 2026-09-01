@@ -1,0 +1,11 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+coverage/
+.env.local
+.DS_Store
+assets/candidates/
+assets/source-references/
+.handoff/
+

@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-09-01",
+  "renderer": "deterministic CPU triangle projection for headless verification; production uses Three.WebGLRenderer",
+  "meshCount": 249,
+  "vertexCount": 72016,
+  "triangleCount": 30896,
+  "distinctProjectionCount": 4,
+  "distinctArtifactProjectionCount": 13,
+  "views": {
+    "front": {
+      "signature": "fe160896bfba170984d50b1a06e556b95e57f05c319c1b950f00e587d8a965a3",
+      "visibleTriangles": 14703,
+      "svg": "front.svg",
+      "screenshot": "front.png"
+    },
+    "right": {
+      "signature": "e0f4869fa6a2828b2d551adae6070d1ff9c090e9960acd204ff3573407b224ad",
+      "visibleTriangles": 14787,
+      "svg": "right.svg",
+      "screenshot": "right.png"
+    },
+    "rear": {
+      "signature": "c574d7f1ef423be58a6aad6175a4bb237cb140dc074391db2dcf8c99022edd1a",
+      "visibleTriangles": 14733,
+      "svg": "rear.svg",
+      "screenshot": "rear.png"
+    },
+    "left": {
+      "signature": "3fc03c21631280608fdc3f9a24d77a78f44845313b729b80fb94bfdfe8f4cca0",
+      "visibleTriangles": 14787,
+      "svg": "left.svg",
+      "screenshot": "left.png"
+    },
+    "pass-1-front": {
+      "signature": "8f90895c640c933ce509202677f464fdae0b50f15966fee13844770345c6ef82",
+      "visibleTriangles": 2840,
+      "svg": "pass-1-front.svg",
+      "screenshot": "pass-1-front.png"
+    },
+    "pass-1-three-quarter": {
+      "signature": "0e60bef2480e7715294fe3357cae74df8e3304c0737d23a41af9663f8b6d0e97",
+      "visibleTriangles": 2940,
+      "svg": "pass-1-three-quarter.svg",
+      "screenshot": "pass-1-three-quarter.png"
+    },
+    "pass-1-side": {
+      "signature": "6f8d87af685328e0d6f0f5f3359742a04382b6a43573786fe808c73231b57bda",
+      "visibleTriangles": 2844,
+      "svg": "pass-1-side.svg",
+      "screenshot": "pass-1-side.png"
+    },
+    "pass-1-rear": {
+      "signature": "4de513c645230b0ab9cbc9f9997db30f3ccbdff020f7ae4a0a8d40b7abeebfc6",
+      "visibleTriangles": 2840,
+      "svg": "pass-1-rear.svg",
+      "screenshot": "pass-1-rear.png"
+    },
+    "pass-2-front": {
+      "signature": "09017fa2b399041e2cb36b4f08254d9a8f1b2a00558ab67c072ceb1cc94ab841",
+      "visibleTriangles": 11537,
+      "svg": "pass-2-front.svg",
+      "screenshot": "pass-2-front.png"
+    },
+    "pass-2-three-quarter": {
+      "signature": "b911f8ee8e309320f047bd27b95f3eba3f5f71f0a7ad36ccf967517ef6d88e9d",
+      "visibleTriangles": 11748,
+      "svg": "pass-2-three-quarter.svg",
+      "screenshot": "pass-2-three-quarter.png"
+    },
+    "pass-2-side": {
+      "signature": "58033e91d159053038a86a5f89338692106ef2a76f03f5e7412d63cac1e6141f",
+      "visibleTriangles": 11641,
+      "svg": "pass-2-side.svg",
+      "screenshot": "pass-2-side.png"
+    },
+    "pass-2-rear": {
+      "signature": "6795a3fc9ce6da712a9327bb1f3dd605648c279a8b4c3a345f4c8c21f3f514b7",
+      "visibleTriangles": 11571,
+      "svg": "pass-2-rear.svg",
+      "screenshot": "pass-2-rear.png"
+    },
+    "pass-3-front": {
+      "signature": "fe160896bfba170984d50b1a06e556b95e57f05c319c1b950f00e587d8a965a3",
+      "visibleTriangles": 14703,
+      "svg": "pass-3-front.svg",
+      "screenshot": "pass-3-front.png"
+    },
+    "pass-3-three-quarter": {
+      "signature": "8638eeebe7d735d8193b598539a01fb35e3acb801533ff264d888227b0295419",
+      "visibleTriangles": 14912,
+      "svg": "pass-3-three-quarter.svg",
+      "screenshot": "pass-3-three-quarter.png"
+    },
+    "pass-3-side": {
+      "signature": "e0f4869fa6a2828b2d551adae6070d1ff9c090e9960acd204ff3573407b224ad",
+      "visibleTriangles": 14787,
+      "svg": "pass-3-side.svg",
+      "screenshot": "pass-3-side.png"
+    },
+    "pass-3-rear": {
+      "signature": "c574d7f1ef423be58a6aad6175a4bb237cb140dc074391db2dcf8c99022edd1a",
+      "visibleTriangles": 14733,
+      "svg": "pass-3-rear.svg",
+      "screenshot": "pass-3-rear.png"
+    }
+  }
+}
