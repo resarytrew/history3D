@@ -1,37 +1,15 @@
-import { CatmullRomCurve3, ExtrudeGeometry, Group, LatheGeometry, Shape, SphereGeometry, TubeGeometry, Vector2, Vector3, type BufferGeometry, type Material } from 'three'
+import { CatmullRomCurve3, Group, LatheGeometry, SphereGeometry, TubeGeometry, Vector2, Vector3, type BufferGeometry, type Material } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { group, mesh, onShell } from './createRussianShako1808'
 import { tube } from './shakoConstruction'
 import { D } from './shako1808Dimensions'
+import { addGrenade } from './shakoGrenade'
 const R = D.reconstruction, F = D.fact
 
 function mergeTubes(name: string, geometries: BufferGeometry[], material: Material) {
   const result = mesh(name, mergeGeometries(geometries)!, material)
   geometries.forEach((g) => g.dispose())
   return result
-}
-
-function addBadge(front: Group, clay: Material): void {
-  const badge = group('FrontBadge_OneFlameGrenade', front)
-  badge.userData = { material: 'Brass', confidence: 'RECONSTRUCTION', referenceLimitation: 'One-flame type is locked; detailed outline is not traced from a supplied badge image.' }
-  const w = R.badgeWidth, h = R.badgeHeight
-  const s = new Shape()
-  s.moveTo(0, 0)
-  s.bezierCurveTo(-w * 0.62, 0, -w * 0.65, h * 0.39, -w * 0.16, h * 0.43)
-  s.bezierCurveTo(-w * 0.43, h * 0.60, -w * 0.19, h * 0.65, -w * 0.22, h * 0.78)
-  s.bezierCurveTo(-w * 0.09, h * 0.72, w * 0.03, h * 0.79, w * 0.035, h)
-  s.bezierCurveTo(w * 0.32, h * 0.83, w * 0.18, h * 0.72, w * 0.26, h * 0.64)
-  s.bezierCurveTo(w * 0.38, h * 0.51, w * 0.23, h * 0.48, w * 0.16, h * 0.43)
-  s.bezierCurveTo(w * 0.65, h * 0.39, w * 0.62, 0, 0, 0)
-  badge.add(mesh('StampedOneFlameOutline', new ExtrudeGeometry(s, { depth: R.badgeDepth, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: R.badgeBevel, bevelThickness: R.badgeBevel, curveSegments: 20 }), clay))
-  const bomb = mesh('RoundedBombRelief', new SphereGeometry(1, 32, 16), clay)
-  bomb.scale.set(w * 0.41, h * 0.188, R.badgeDepth * 1.7)
-  bomb.position.set(0, h * 0.215, R.badgeDepth)
-  badge.add(bomb)
-  const vein = [new Vector3(0, h * 0.44, R.badgeDepth * 1.5), new Vector3(-w * 0.06, h * 0.58, R.badgeDepth * 1.8), new Vector3(w * 0.07, h * 0.76, R.badgeDepth * 1.2), new Vector3(w * 0.035, h * 0.91, R.badgeDepth)]
-  badge.add(tube('FlameFold', vein, R.badgeBevel, clay, 32))
-  badge.position.copy(onShell(0, R.badgeBottom, R.leatherThickness * 3))
-  badge.rotation.x = Math.atan((D.derived.topRadius - D.derived.bottomRadius) / F.shellHeight)
 }
 
 function addRepyok(front: Group, clay: Material): void {
@@ -58,16 +36,27 @@ function addRepyok(front: Group, clay: Material): void {
 
 function braid(front: boolean, clay: Material) {
   const geometries: BufferGeometry[] = []
+  const crossings = R.braidWaves * 2
+  const tracks: number[][] = [[-1, 0, 1]]
+  for (let step = 0; step < crossings; step++) {
+    const previous = tracks[step], pair = step % 2 === 0 ? [-1, 0] : [0, 1]
+    tracks.push(previous.map((track) => track === pair[0] ? pair[1] : track === pair[1] ? pair[0] : track))
+  }
   for (let strand = 0; strand < 3; strand++) {
     const points = Array.from({ length: D.topology.braidSegments + 1 }, (_, i) => {
       const t = i / D.topology.braidSegments, angle = -Math.PI / 2 + t * Math.PI + (front ? 0 : Math.PI)
-      const phase = t * Math.PI * 2 * R.braidWaves + strand * Math.PI * 2 / 3
+      const step = Math.min(crossings - 1, Math.floor(t * crossings)), local = t * crossings - step
+      const from = tracks[step][strand], to = tracks[step + 1][strand]
+      const blend = (1 - Math.cos(local * Math.PI)) / 2
+      const track = from + (to - from) * blend
+      const over = from === to ? 0 : (from < to ? 1 : -1) * (step % 2 === 0 ? 1 : -1)
       const y = R.braidTop - Math.sin(t * Math.PI) * (front ? R.frontBraidSag : R.braidSag)
-      const p = onShell(angle, y, R.braidOffset + Math.cos(phase * 2) * R.cordDiameter * 0.35)
-      p.y += Math.sin(phase) * R.braidRadius
+      const p = onShell(angle, y, R.braidOffset + over * Math.sin(local * Math.PI) ** 2 * R.cordDiameter * 0.56)
+      p.y += track * R.braidRadius * 0.57 + Math.sin(t * 53 + strand) * R.seamUndulation
       return p
     })
-    geometries.push(new TubeGeometry(new CatmullRomCurve3(points), D.topology.braidSegments, R.cordDiameter / 2, D.topology.cordRadial))
+    // Each plait is a yarn bundle; oversized tubes self-intersect on tight returns.
+    geometries.push(new TubeGeometry(new CatmullRomCurve3(points), D.topology.braidSegments, R.cordDiameter / 2, D.topology.braidRadial))
   }
   return mergeTubes(front ? 'FrontBraid' : 'RearBraid', geometries, clay)
 }
@@ -78,13 +67,13 @@ function tassel(name: string, anchor: Vector3, length: number, spread: number, c
   const end = anchor.clone().add(new Vector3(Math.sign(anchor.x) * R.tasselSpacing * 0.4, -length, spread))
   const geometries: BufferGeometry[] = []
   for (const phase of [0, Math.PI]) {
-    const points = Array.from({ length: 97 }, (_, i) => {
-      const t = i / 96, p = anchor.clone().lerp(end, t), a = t * Math.PI * 28 + phase
-      p.x += Math.cos(a) * R.cordDiameter / 4
-      p.z += Math.sin(a) * R.cordDiameter / 4
+    const points = Array.from({ length: 193 }, (_, i) => {
+      const t = i / 192, p = anchor.clone().lerp(end, t), a = t * Math.PI * 28 + phase
+      p.x += Math.cos(a) * R.cordDiameter / 4 + Math.sin(t * Math.PI) * R.cordDiameter * 0.9
+      p.z += Math.sin(a) * R.cordDiameter / 4 + Math.sin(t * Math.PI) * spread * 0.3
       return p
     })
-    geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 96, R.cordDiameter / 3, 5))
+    geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 192, R.cordDiameter / 3, 6))
   }
   result.add(mergeTubes('TwistedSuspension', geometries, clay))
   const hr = R.tasselHeadRadius, hh = R.tasselHeadHeight
@@ -94,13 +83,22 @@ function tassel(name: string, anchor: Vector3, length: number, spread: number, c
   ].reverse(), 24), clay)
   head.position.copy(end); result.add(head)
   const fringes: BufferGeometry[] = []
-  for (let i = 0; i < 24; i++) {
-    const a = i / 24 * Math.PI * 2
+  for (let i = 0; i < 42; i++) {
+    const a = i / 42 * Math.PI * 2 + Math.sin(i * 7) * 0.03
     const points = Array.from({ length: 9 }, (_, j) => {
-      const t = j / 8, r = hr * 0.6 + R.tasselFringeRadius * 0.5 * t
-      return end.clone().add(new Vector3(Math.sin(a + t * 0.2) * r, -hh - R.tasselFringeHeight * t, Math.cos(a + t * 0.2) * r))
+      const t = j / 8, r = hr * (0.48 + (i % 3) * 0.09) + R.tasselFringeRadius * 0.5 * t + Math.sin(t * 5 + i) * R.yarnRadius
+      return end.clone().add(new Vector3(Math.sin(a + t * 0.2) * r, -hh - R.tasselFringeHeight * t * (0.87 + 0.16 * Math.sin(i * 13.7)), Math.cos(a + t * 0.2) * r))
     })
-    fringes.push(new TubeGeometry(new CatmullRomCurve3(points), 8, R.cordDiameter / 5, 5))
+    fringes.push(new TubeGeometry(new CatmullRomCurve3(points), 8, R.cordDiameter / 8 * (0.9 + 0.12 * Math.sin(i * 4.1)), 5))
+  }
+  // Cross-wound yarn follows the oval head, breaking up the lathed silhouette.
+  for (let strand = 0; strand < 8; strand++) {
+    const points = Array.from({ length: 49 }, (_, i) => {
+      const t = i / 48, a = t * Math.PI * 8 + strand * Math.PI * 2 / 8
+      const r = hr * (t < 0.3 ? 0.7 + t : t > 0.7 ? 1 - (t - 0.7) * 0.35 / 0.3 : 1) + R.yarnRadius * (0.9 + 0.1 * Math.sin(a * 2))
+      return end.clone().add(new Vector3(Math.sin(a) * r, -hh * t, Math.cos(a) * r))
+    })
+    fringes.push(new TubeGeometry(new CatmullRomCurve3(points), 48, R.yarnRadius, 4))
   }
   result.add(mergeTubes('CottonFringe', fringes, clay))
   return result
@@ -108,7 +106,7 @@ function tassel(name: string, anchor: Vector3, length: number, spread: number, c
 
 export function addIdentity(root: Group, clay: Material): void {
   const front = root.getObjectByName('Front') as Group
-  addBadge(front, clay)
+  addGrenade(front, clay)
   addRepyok(front, clay)
   const cords = group('Ethishket', root)
   cords.add(braid(true, clay), braid(false, clay))

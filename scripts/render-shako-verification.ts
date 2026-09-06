@@ -12,6 +12,9 @@ await server.listen()
 const browser = await chromium.launch({ headless: true, args: ['--enable-webgl', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
 try {
   const page = await browser.newPage({ viewport: { width: 800, height: 900 }, deviceScaleFactor: 1 })
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()) })
   await page.addInitScript({ content: 'window.__name = (fn) => fn' })
   await page.route('**/__shako-review', (route) => route.fulfill({ contentType: 'text/html', body: '<html><body></body></html>' }))
   await page.goto(server.resolvedUrls!.local[0] + '__shako-review')
@@ -19,25 +22,22 @@ try {
     // Imports are resolved by the running Vite dev server, using the real Three.js WebGL renderer.
     const threeUrl = '/node_modules/three/build/three.module.js'
     const modelUrl = '/src/content/exhibits/russian-shako-1808/procedural/createRussianShako1808.ts'
-    const envUrl = '/node_modules/three/examples/jsm/environments/RoomEnvironment.js'
+    const envUrl = '/src/three/artifactStudio.ts'
     const T = await import(/* @vite-ignore */ threeUrl)
     const { createRussianShako1808ForPass } = await import(/* @vite-ignore */ modelUrl)
-    const { RoomEnvironment } = await import(/* @vite-ignore */ envUrl)
+    const { createArtifactEnvironment, createArtifactLights, artifactStudioExposure } = await import(/* @vite-ignore */ envUrl)
     document.body.innerHTML = ''
     document.body.style.cssText = 'margin:0;background:#eeeae2'
     const renderer = new T.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
     renderer.setSize(800, 900)
     renderer.toneMapping = T.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 0.85
+    renderer.toneMappingExposure = artifactStudioExposure
     document.body.append(renderer.domElement)
     const scene = new T.Scene()
     scene.background = new T.Color('#eeeae2')
-    const pmrem = new T.PMREMGenerator(renderer), room = new RoomEnvironment()
-    scene.environment = pmrem.fromScene(room, 0.04).texture
-    scene.environmentIntensity = 0.7
-    scene.add(new T.HemisphereLight('#e7efff', '#777063', 0.9))
-    const key = new T.DirectionalLight('#fff0da', 2); key.position.set(1, 2, 3); scene.add(key)
-    const fill = new T.DirectionalLight('#dce8ff', 1); fill.position.set(-2, 1, -1); scene.add(fill)
+    scene.environment = createArtifactEnvironment(renderer).texture
+    scene.add(createArtifactLights())
+    const shadowSun = new T.DirectionalLight('#ffe8c4', 0.35); shadowSun.position.set(8, 11, 7); scene.add(shadowSun)
     const root = createRussianShako1808ForPass(passNumber)
     scene.add(root)
     const camera = new T.PerspectiveCamera(34, 800 / 900, 0.001, 10)
@@ -47,7 +47,14 @@ try {
       camera.lookAt(target); renderer.render(scene, camera)
       return { drawCalls: renderer.info.render.calls, renderedTriangles: renderer.info.render.triangles }
     }
-    Object.assign(window, { shakoReview: review })
+    Object.assign(window, { shakoReview: review, shakoDetail: (part: string) => {
+      const points: Record<string, { target: number[], position: number[] }> = {
+        badge: { target: [0, 0.157, 0.127], position: [0.022, 0.18, 0.34] },
+        leather: { target: [0.074, 0.13, 0.08], position: [0.36, 0.27, 0.44] },
+        textile: { target: [-0.123, 0.125, 0], position: [-0.38, 0.17, 0.12] },
+      }
+      camera.position.fromArray(points[part].position); camera.lookAt(new T.Vector3().fromArray(points[part].target)); renderer.render(scene, camera)
+    } })
     Object.assign(window, { shakoThumbnail: () => {
       renderer.setSize(320, 240)
       camera.aspect = 320 / 240
@@ -88,6 +95,10 @@ try {
     }, { angle: degrees * Math.PI / 180, top: name === 'top' })
     await page.screenshot({ path: resolve(out, `pass-${pass}-${name}.png`) })
   }
+  if (pass === 5) for (const part of ['badge', 'leather', 'textile']) {
+    await page.evaluate((part) => (window as unknown as { shakoDetail: (part: string) => void }).shakoDetail(part), part)
+    await page.screenshot({ path: resolve(out, `fidelity-${part}.png`) })
+  }
   await writeFile(resolve(out, `pass-${pass}-metrics.json`), JSON.stringify({ ...metrics, renders }, null, 2) + '\n')
   if (pass === 5) {
     const assets = resolve('src/content/exhibits/russian-shako-1808')
@@ -100,5 +111,6 @@ try {
     await page.evaluate(() => { document.body.innerHTML = ''; document.body.style.background = '#dedbd2' })
     await page.screenshot({ path: resolve(assets, 'backgrounds/studio.png') })
   }
+  if (errors.length) throw new Error(`WebGL review errors:\n${errors.join('\n')}`)
   console.log(JSON.stringify(metrics, null, 2))
 } finally { await browser.close(); await server.close() }

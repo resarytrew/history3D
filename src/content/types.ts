@@ -166,6 +166,7 @@ export interface Exhibit {
     readonly safeAreaPadding: number
     readonly hotspotOcclusionTolerance?: number
     readonly sceneScale?: number
+    readonly lighting?: 'artifact-studio'
     readonly scaleComparison?: {
       readonly figurePosition: readonly [number, number, number]
       readonly cameraPosition: readonly [number, number, number]

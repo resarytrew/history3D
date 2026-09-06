@@ -15,7 +15,8 @@ export const shako1808Dimensions = {
     rimRoll: mm(2), surfaceOffset: mm(0.8), ridgeRadius: mm(0.8), secondRidgeInset: mm(3),
     rearSlitWidth: mm(3), rearCoverWidth: mm(28), buckleWidth: mm(22), buckleHeight: mm(25), buckleWire: mm(1.6),
     pocketTopWidth: mm(32), pocketBottomWidth: mm(19), pocketGap: mm(2),
-    badgeHeight: mm(73), badgeWidth: mm(36), badgeBottom: mm(39), badgeDepth: mm(1.7), badgeBevel: mm(0.6),
+    badgeHeight: mm(73), badgeWidth: mm(29), badgeBottom: mm(39), badgeDepth: mm(0.6), badgeBevel: mm(0.15),
+    badgeRelief: mm(1.4), yarnRadius: mm(0.28), seamUndulation: mm(0.18),
     repyokHeight: mm(78), repyokWidth: mm(43), repyokDepth: mm(10), repyokAboveRim: mm(30),
     repyokCentreWidth: mm(14), repyokCentreHeight: mm(25), wireRadius: mm(0.6),
     cordDiameter: mm(4.5), braidRadius: mm(6), braidTop: mm(151), braidSag: mm(64), frontBraidSag: mm(121),
@@ -26,7 +27,8 @@ export const shako1808Dimensions = {
     stitchRadius: mm(0.22), stitchLength: mm(1.4), stitchSpacing: mm(4), stitchInset: mm(1.5),
     feltBump: mm(0.16), leatherBump: mm(0.07), clothBump: mm(0.12),
   },
-  topology: { radial: 128, patch: 40, cordRadial: 6, braidSegments: 320, textureSize: 128 },
+  // The optional 150k detail budget is used for smooth close-up textile bends.
+  topology: { radial: 128, patch: 40, cordRadial: 6, braidRadial: 8, braidSegments: 640, textureSize: 256 },
 } as const
 
 export const D = shako1808Dimensions

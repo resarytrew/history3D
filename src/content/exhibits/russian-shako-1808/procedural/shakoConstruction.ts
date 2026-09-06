@@ -1,4 +1,4 @@
-import { CatmullRomCurve3, CylinderGeometry, Group, LatheGeometry, SphereGeometry, TubeGeometry, Vector2, Vector3, type Material } from 'three'
+import { CatmullRomCurve3, CylinderGeometry, Group, LatheGeometry, MeshStandardMaterial, SphereGeometry, TubeGeometry, Vector2, Vector3, type Material } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { group, mesh, onShell, patch, visorSurface } from './createRussianShako1808'
 import { D, shellRadiusAt } from './shako1808Dimensions'
@@ -109,13 +109,26 @@ export function addConstruction(root: Group, clay: Material): void {
   }, radialThickness, 32, 12), clay))
 }
 
-export function addStitches(root: Group, material: Material): void {
+export function addStitches(root: Group): void {
+  const material = new MeshStandardMaterial({ name: 'WaxedSeamThread', color: '#353127', roughness: 0.88 })
   const geometries = []
   for (const height of [F.lowerBandHeight - R.stitchInset, F.shellHeight - F.upperOverlap + R.stitchInset]) {
     const radius = shellRadiusAt(height), count = Math.floor(Math.PI * 2 * radius / R.stitchSpacing)
     for (let i = 0; i < count; i++) {
-      const angle = i / count * Math.PI * 2
-      const points = [onShell(angle, height, R.leatherThickness + R.surfaceOffset), onShell(angle + R.stitchLength / radius, height, R.leatherThickness + R.surfaceOffset)]
+      const angle = i / count * Math.PI * 2, y = height + Math.sin(i * 2.7) * R.seamUndulation
+      // Upper band is scaled inward to retain the locked outside diameter.
+      const offset = height > F.shellHeight / 2 ? R.stitchRadius : R.leatherThickness + R.stitchRadius
+      const points = [onShell(angle, y, offset), onShell(angle + R.stitchLength / radius, y + R.seamUndulation * Math.sin(i), offset)]
+      geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 1, R.stitchRadius, 4))
+    }
+  }
+  for (const side of [-Math.PI / 2, Math.PI / 2]) for (const arm of [-1, 1]) for (const edge of [0.09, 0.91]) {
+    for (let i = 1; i < 34; i++) {
+      const v = i / 35, span = R.stitchLength / (F.shellHeight - F.upperOverlap - F.lowerBandHeight)
+      const points = [v, v + span].map((t) => {
+        const p = reinforcementSurface(side, arm, edge + 0.006 * Math.sin(i * 3), t)
+        return p.add(radialThickness(p)).add(new Vector3(p.x, 0, p.z).normalize().multiplyScalar(R.stitchRadius * 0.5))
+      })
       geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 1, R.stitchRadius, 4))
     }
   }

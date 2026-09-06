@@ -127,8 +127,8 @@ export function createRussianShako1808ForPass(pass: ShakoPass): Group {
   root.add(mesh('Visor', patch((u, v) => visorSurface(1 - u, v), new Vector3(0, -D.reconstruction.visorThickness, 0)), clay))
   if (pass >= 2) addConstruction(root, clay)
   if (pass >= 3) addIdentity(root, clay)
-  const leather = pass >= 4 ? applyShakoMaterials(root) : clay
-  if (pass >= 5) addStitches(root, leather)
+  if (pass >= 4) applyShakoMaterials(root)
+  if (pass >= 5) addStitches(root)
   return root
 }
 

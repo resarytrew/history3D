@@ -9,5 +9,5 @@ export const shakoContentEn: ExhibitContent = {
     'Find the single flame above the round bomb. Then inspect the white oval repyok with its green centre.',
     'Look around the rear for the adjustment buckle. Count the tassels on the wearer’s right and left.',
   ],
-  explanation: 'The stiff felt body is reinforced with blackened leather; a separate visor projects forward. The brass single-flame grenade and white-and-green repyok represent the selected first-battalion private configuration. White cotton braids connect front and rear, with three tassels on the wearer’s right and one on the left. The construction follows the supplied specification; the exact badge outline, leather thickness and repyok size remain reconstruction assumptions pending human review.',
+  explanation: 'The stiff felt body is reinforced with blackened leather; a separate visor projects forward. The brass single-flame grenade and white-and-green repyok represent the selected first-battalion private configuration. White cotton braids connect front and rear, with three tassels on the wearer’s right and one on the left. The construction follows the supplied specification; the badge contour and flame ribs follow the supplied photograph, while its exact size and stamping depth, leather thickness and repyok size remain reconstruction assumptions pending human review.',
 }

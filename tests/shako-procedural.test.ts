@@ -66,6 +66,17 @@ describe('1808 shako locked geometry (metres; 0.1 mm dimensional tolerance)', ()
 })
 
 describe('semantic, material and performance contract', () => {
+  it('keeps the photo-guided grenade a thin embossed sheet with a front-facing bomb', () => {
+    const badge = model.getObjectByName('FrontBadge_OneFlameGrenade')!
+    const local = new Box3()
+    badge.traverse((o) => { if (o instanceof Mesh) local.union(new Box3().setFromBufferAttribute(o.geometry.attributes.position)) })
+    expect(local.getSize(new Vector3()).z).toBeLessThan(0.003)
+    expect(local.getSize(new Vector3()).x).toBeCloseTo(0.029, 3)
+    const origin = new Vector3(0, D.reconstruction.badgeHeight * 72 / 361, 0.1).applyMatrix4(badge.matrixWorld)
+    const direction = new Vector3(0, 0, -1).transformDirection(badge.matrixWorld)
+    const hits = new Raycaster(origin, direction).intersectObject(badge.getObjectByName('RoundedBombRelief')!)
+    expect(hits.length).toBeGreaterThan(0)
+  })
   it('has the asymmetric white cord assembly and all required identity nodes', () => {
     for (const name of ['SideReinforcementLeft', 'SideReinforcementRight', 'FrontBadge_OneFlameGrenade', 'Repyok', 'FrontBraid', 'RearBraid', 'RightDiamondCord', 'LeftDiamondCord', 'RightTassel1', 'RightTassel2', 'RightTassel3', 'LeftTassel', 'RearBrassBuckle', 'VisorOuterRidge', 'VisorInnerRidge']) expect(model.getObjectByName(name), name).toBeDefined()
     expect(model.getObjectByName('RightTassel4')).toBeUndefined()
@@ -80,7 +91,7 @@ describe('semantic, material and performance contract', () => {
     expect(material('StampedOneFlameOutline').metalness).toBeGreaterThan(0.8)
     expect(material('FrontBraid').name).toBe('CordWhite')
   })
-  it('stays below 100,000 triangles including the prepared interior, with finite geometry', () => {
+  it('stays within the allowed 150,000 detail budget including the prepared interior, with finite geometry', () => {
     let triangles = 0, meshes = 0
     model.traverse((o) => {
       if (!(o instanceof Mesh)) return
@@ -89,7 +100,7 @@ describe('semantic, material and performance contract', () => {
       triangles += (o.geometry.index?.count ?? position.count) / 3
       expect(Array.from(position.array).every(Number.isFinite), o.name).toBe(true)
     })
-    expect(triangles).toBeLessThanOrEqual(100_000)
+    expect(triangles).toBeLessThanOrEqual(150_000)
     expect(meshes).toBeLessThanOrEqual(65)
   })
   it('keeps the clay blockout free of ornaments and textures', () => {

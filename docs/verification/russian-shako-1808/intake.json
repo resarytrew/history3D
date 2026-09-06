@@ -3,29 +3,228 @@
   "framework": "M.C.M.T",
   "historicalInput": "User-supplied locked specification; no independent historical web research",
   "units": "metres",
-  "macro": {"height": 0.175, "topDiameter": 0.255, "diameterDifference": 0.045, "bottomDiameter": {"value": 0.210, "kind": "DERIVED", "formula": "0.255 - 0.045"}, "sides": "straight conical frustum, no concavity", "priority": ["silhouette", "proportions", "recessed top", "visor", "V reinforcements", "one-flame grenade", "repyok", "etishkhet", "rear adjustment", "materials", "microdetail"]},
+  "macro": {
+    "height": 0.175,
+    "topDiameter": 0.255,
+    "diameterDifference": 0.045,
+    "bottomDiameter": {
+      "value": 0.21,
+      "kind": "DERIVED",
+      "formula": "0.255 - 0.045"
+    },
+    "sides": "straight conical frustum, no concavity",
+    "priority": [
+      "silhouette",
+      "proportions",
+      "recessed top",
+      "visor",
+      "V reinforcements",
+      "one-flame grenade",
+      "repyok",
+      "etishkhet",
+      "rear adjustment",
+      "materials",
+      "microdetail"
+    ]
+  },
   "referenceConflicts": [
     "Sketch 1 includes other dimensions; locked text takes precedence.",
     "Photographs show a tall plume and coloured tassels; selected text configuration excludes the plume and calls for white cotton cords.",
     "Drawing 5 shows an eagle; selected badge is a one-flame grenade.",
     "Images 4 and 6 are duplicates, not independent evidence.",
-    "No supplied image clearly depicts the specified one-flame badge or complete 3-right/1-left cord assembly. Their detailed profiles remain RECONSTRUCTION, not a traced reference."
+    "The original six images did not clearly show the selected one-flame badge. The later archaeolog.ru photograph now guides its contour and ribs; see visualFidelityPass. Exact scale and the full cord pattern remain RECONSTRUCTION."
   ],
   "components": [
-    {"name": "FeltBody", "primitive": "open hollow conical frustum", "pbr": ["#171817", 0, 0.94], "microSurface": "subtle procedural bump; no modeled fuzz", "cutouts": "lower rear adjustment slit"},
-    {"name": "TopAssembly", "primitive": "lathed dish and rolled rim", "pbr": ["#101110", 0, 0.56], "recess": 0.025, "microSurface": "subtle leather bump"},
-    {"name": "UpperLeatherBand", "primitive": "thick conical ring", "height": 0.027, "pbr": ["#101110", 0, 0.56]},
-    {"name": "SideReinforcementLeft / Right", "primitive": "thick surface-conforming V ribbons", "width": 0.018, "topSeparation": 0.090, "thicknessKind": "RECONSTRUCTION", "pbr": ["#101110", 0, 0.56]},
-    {"name": "LowerBand", "primitive": "split thick conical ring", "height": 0.020, "pbr": ["#101110", 0, 0.56]},
-    {"name": "RearAdjustment", "primitive": "slit, leather patch, rounded rectangular buckle with one pin", "pbr": ["#b79a50", 0.88, 0.36], "hardEdges": "buckle and leather cut edges"},
-    {"name": "FrontOrnamentPocket", "primitive": "hollow trapezoidal leather patch open at top", "height": 0.080, "pbr": ["#101110", 0, 0.56]},
-    {"name": "Visor", "primitive": "closed curved semicircular parametric patch", "projection": 0.075, "drop": 0.050, "pbr": ["#111310", 0, 0.42], "microSurface": "fine leather grain; relief ridges are geometry"},
-    {"name": "Chinstrap", "primitive": "thick curved ribbon", "width": 0.018, "pbr": ["#101110", 0, 0.56]},
-    {"name": "FrontBadge_OneFlameGrenade", "primitive": "beveled extruded silhouette with round bomb and one vertical flame", "sizeKind": "RECONSTRUCTION", "pbr": ["#b79a50", 0.88, 0.36]},
-    {"name": "Repyok", "primitive": "flattened convex oval, dark back, wire supports", "sizeKind": "RECONSTRUCTION", "pbr": [["#e8e3d3", 0, 0.95], ["#28563c", 0, 0.95]]},
-    {"name": "Ethishket", "primitive": "three interwoven tube strands per braid, diamond cords, twisted hanging cords, tassels", "assembly": "front and rear braid, two diamonds, three right tassels, one left", "diameterKind": "RECONSTRUCTION", "pbr": ["#e6dfcc", 0, 0.92]},
-    {"name": "Interior", "primitive": "inner leather ring, linen cap and leather neck flap", "visibility": "hidden for exterior review; complete geometry available", "pbr": [["#463629", 0, 0.85], ["#b9ac8e", 0, 0.98]]}
+    {
+      "name": "FeltBody",
+      "primitive": "open hollow conical frustum",
+      "pbr": [
+        "#171817",
+        0,
+        0.94
+      ],
+      "microSurface": "subtle procedural bump; no modeled fuzz",
+      "cutouts": "lower rear adjustment slit"
+    },
+    {
+      "name": "TopAssembly",
+      "primitive": "lathed dish and rolled rim",
+      "pbr": [
+        "#101110",
+        0,
+        0.56
+      ],
+      "recess": 0.025,
+      "microSurface": "subtle leather bump"
+    },
+    {
+      "name": "UpperLeatherBand",
+      "primitive": "thick conical ring",
+      "height": 0.027,
+      "pbr": [
+        "#101110",
+        0,
+        0.56
+      ]
+    },
+    {
+      "name": "SideReinforcementLeft / Right",
+      "primitive": "thick surface-conforming V ribbons",
+      "width": 0.018,
+      "topSeparation": 0.09,
+      "thicknessKind": "RECONSTRUCTION",
+      "pbr": [
+        "#101110",
+        0,
+        0.56
+      ]
+    },
+    {
+      "name": "LowerBand",
+      "primitive": "split thick conical ring",
+      "height": 0.02,
+      "pbr": [
+        "#101110",
+        0,
+        0.56
+      ]
+    },
+    {
+      "name": "RearAdjustment",
+      "primitive": "slit, leather patch, rounded rectangular buckle with one pin",
+      "pbr": [
+        "#b79a50",
+        0.88,
+        0.36
+      ],
+      "hardEdges": "buckle and leather cut edges"
+    },
+    {
+      "name": "FrontOrnamentPocket",
+      "primitive": "hollow trapezoidal leather patch open at top",
+      "height": 0.08,
+      "pbr": [
+        "#101110",
+        0,
+        0.56
+      ]
+    },
+    {
+      "name": "Visor",
+      "primitive": "closed curved semicircular parametric patch",
+      "projection": 0.075,
+      "drop": 0.05,
+      "pbr": [
+        "#111310",
+        0,
+        0.42
+      ],
+      "microSurface": "fine leather grain; relief ridges are geometry"
+    },
+    {
+      "name": "Chinstrap",
+      "primitive": "thick curved ribbon",
+      "width": 0.018,
+      "pbr": [
+        "#101110",
+        0,
+        0.56
+      ]
+    },
+    {
+      "name": "FrontBadge_OneFlameGrenade",
+      "primitive": "beveled extruded silhouette with round bomb and one vertical flame",
+      "sizeKind": "RECONSTRUCTION",
+      "pbr": [
+        "#b79a50",
+        0.88,
+        0.36
+      ]
+    },
+    {
+      "name": "Repyok",
+      "primitive": "flattened convex oval, dark back, wire supports",
+      "sizeKind": "RECONSTRUCTION",
+      "pbr": [
+        [
+          "#e8e3d3",
+          0,
+          0.95
+        ],
+        [
+          "#28563c",
+          0,
+          0.95
+        ]
+      ]
+    },
+    {
+      "name": "Ethishket",
+      "primitive": "three interwoven tube strands per braid, diamond cords, twisted hanging cords, tassels",
+      "assembly": "front and rear braid, two diamonds, three right tassels, one left",
+      "diameterKind": "RECONSTRUCTION",
+      "pbr": [
+        "#e6dfcc",
+        0,
+        0.92
+      ]
+    },
+    {
+      "name": "Interior",
+      "primitive": "inner leather ring, linen cap and leather neck flap",
+      "visibility": "hidden for exterior review; complete geometry available",
+      "pbr": [
+        [
+          "#463629",
+          0,
+          0.85
+        ],
+        [
+          "#b9ac8e",
+          0,
+          0.98
+        ]
+      ]
+    }
   ],
-  "qualityContract": {"maxTrianglesTarget": 100000, "maxTrianglesAbsolute": 150000, "reviewAngles": [0, 45, 90, 135, 180, 270, "top"], "passes": ["clay blockout", "construction", "identity", "materials", "microdetails"], "historicalReview": "PENDING HUMAN REVIEW"},
-  "lighting": {"kind": "RECONSTRUCTION", "setup": "neutral light studio, fixed environment and two area approximations, identical focal length/distance at all azimuths", "notHistoricalEvidence": true}
+  "qualityContract": {
+    "maxTrianglesTarget": 100000,
+    "maxTrianglesAbsolute": 150000,
+    "reviewAngles": [
+      0,
+      45,
+      90,
+      135,
+      180,
+      270,
+      "top"
+    ],
+    "passes": [
+      "clay blockout",
+      "construction",
+      "identity",
+      "materials",
+      "microdetails"
+    ],
+    "historicalReview": "PENDING HUMAN REVIEW"
+  },
+  "lighting": {
+    "kind": "RECONSTRUCTION",
+    "setup": "neutral light studio, fixed environment and two area approximations, identical focal length/distance at all azimuths",
+    "notHistoricalEvidence": true
+  },
+  "visualFidelityPass": {
+    "date": "2026-09-06",
+    "skill": "https://github.com/img2threejs/img2threejs/blob/main/skills/generic-extract-skill.md",
+    "macro": "All FACT and DERIVED dimensions and historical assembly retained.",
+    "components": "Photo-guided one-flame grenade: broad ribbed flame, paired neck bands, shallow domed bomb; cream braided cotton, cross-wound tassel heads, sewn leather reinforcements.",
+    "materials": "Filtered fibre bump, metre-scaled leather/brass grain, separate felt sheen and lacquered visor; no copied archaeological corrosion.",
+    "topology": "145892 triangles, 54 meshes. Optional 150k allowance used for braid curvature and textile details.",
+    "references": {
+      "badge": "https://archaeolog.ru/media/smolensk/Бляха-накладка%20Гренада%20об%20одном%20огне.jpg",
+      "article": "https://www.reenactor.ru/ARH/PDF/Alexin-Ylianov.pdf",
+      "museumImage": "Provided museumgagarin.ru image could not be opened (navigation timeout); not used as evidence."
+    },
+    "limitations": "Photo proportions are visually reconstructed, not a scan or measured tracing; exact stamping depth/scale and braid pattern remain assumptions."
+  }
 }

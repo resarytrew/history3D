@@ -27,6 +27,7 @@ import type { Exhibit, Hotspot } from '../content/types'
 import { LatestRequestCoordinator } from '../state/latest-request'
 import { disposeObject3D } from './dispose'
 import { loadExhibitModel, type LoadedExhibitModel } from './model-runtime'
+import { artifactStudioExposure, createArtifactEnvironment, createArtifactLights } from './artifactStudio'
 
 export interface ProjectedHotspot {
   readonly id: string
@@ -91,6 +92,9 @@ export class ViewerController {
   private readonly camera = new PerspectiveCamera(34, 1, 0.05, 100)
   private readonly renderer: WebGLRenderer
   private readonly environmentTarget: WebGLRenderTarget
+  private artifactEnvironment: WebGLRenderTarget | null = null
+  private readonly artifactLights = createArtifactLights()
+  private readonly defaultLights = new Group()
   private readonly controls: OrbitControls
   private readonly coordinator = new LatestRequestCoordinator<LoadedExhibitModel>()
   private readonly hotspotRaycaster = new Raycaster()
@@ -149,7 +153,9 @@ export class ViewerController {
     sun.shadow.camera.bottom = -2
     const fill = new DirectionalLight(new Color(0xb8d5e5), 1.15)
     fill.position.set(-6, 5, 4)
-    this.scene.add(hemisphere, ambient, sun, fill, this.scaleFigure)
+    this.defaultLights.add(hemisphere, ambient, fill)
+    this.artifactLights.visible = false
+    this.scene.add(this.defaultLights, this.artifactLights, sun, this.scaleFigure)
 
     const shadow = new Mesh(
       new BoxGeometry(7.8, 0.02, 5.4),
@@ -223,6 +229,15 @@ export class ViewerController {
   }
 
   private configureCamera(exhibit: Exhibit): void {
+    const studio = exhibit.presentation.lighting === 'artifact-studio'
+    this.canvas.dataset.lighting = studio ? 'artifact-studio' : 'default'
+    if (studio) this.artifactEnvironment ??= createArtifactEnvironment(this.renderer)
+    this.scene.environment = studio ? this.artifactEnvironment!.texture : this.environmentTarget.texture
+    this.scene.environmentIntensity = 1
+    this.defaultLights.visible = !studio
+    this.artifactLights.visible = studio
+    this.sun.intensity = studio ? 0.35 : 4.1
+    this.renderer.toneMappingExposure = studio ? artifactStudioExposure : 1.08
     const sceneScale = exhibit.presentation.sceneScale ?? 1
     this.groundShadow.scale.setScalar(sceneScale)
     this.groundShadow.position.y = 0.02 * sceneScale
@@ -339,6 +354,7 @@ export class ViewerController {
     this.activeModel = null
     disposeObject3D(this.scene, this.renderer)
     this.environmentTarget.dispose()
+    this.artifactEnvironment?.dispose()
     this.renderer.dispose()
   }
 }
