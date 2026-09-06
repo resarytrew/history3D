@@ -1,5 +1,25 @@
 import { expect, test } from '@playwright/test'
 
+test('allows an underside inspection and returns to the initial view', async ({ page }, testInfo) => {
+  test.setTimeout(120_000)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/?exhibit=russian-shako-1808')
+  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0', { timeout: 30_000 })
+  const canvas = page.locator('canvas.viewer-canvas')
+  const box = (await canvas.boundingBox())!
+  const x = box.x + box.width * 0.85, y = box.y + box.height * 0.47
+  await page.mouse.move(x, y); await page.mouse.down()
+  await page.mouse.move(x, y - box.height * 0.26, { steps: 10 }); await page.mouse.up()
+  await expect(canvas).toHaveAttribute('data-orbit-changed', 'true')
+  await expect(page.locator('[data-hotspot-id="shako-repyok"]')).toBeHidden()
+  await page.screenshot({ path: `docs/verification/russian-shako-1808/1810/underside-${testInfo.project.name}.png` })
+  await page.getByRole('button', { name: 'Сбросить ракурс' }).click()
+  await expect(page.locator('[data-hotspot-id="shako-repyok"]')).toBeVisible()
+  await page.getByRole('button', { name: 'Источники', exact: true }).click()
+  await expect(page.getByRole('dialog')).toContainText('1810')
+  await expect(page.getByRole('dialog')).toContainText('Обмеры гренады')
+})
+
 test('detail markers follow the orbit and disappear on the back of the shako', async ({ page }, testInfo) => {
   test.setTimeout(120_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
@@ -20,11 +40,13 @@ test('detail markers follow the orbit and disappear on the back of the shako', a
   await page.mouse.move(startX - delta, y, { steps: 28 }); await page.mouse.up()
   await expect(badge).toBeHidden(); await expect(repyok).toBeHidden()
   await expect(page.locator('[data-hotspot-id="shako-cord"]')).toBeHidden()
-  await page.screenshot({ path: `docs/verification/russian-shako-1808/hero/markers-rear-${testInfo.project.name}.png` })
+  await page.screenshot({ path: `docs/verification/russian-shako-1808/1810/markers-rear-${testInfo.project.name}.png` })
   await page.getByRole('button', { name: 'Сбросить ракурс' }).click()
   await expect(badge).toBeVisible(); await expect(repyok).toBeVisible()
-  await expect.poll(() => badge.evaluate((button) => button.style.left)).toBe(before.x)
-  await expect.poll(() => badge.evaluate((button) => button.style.top)).toBe(before.y)
+  // OrbitControls round-trips through spherical coordinates; compare screen pixels,
+  // not decimal serialisations of otherwise identical floating-point positions.
+  await expect.poll(async () => Math.abs(parseFloat(await badge.evaluate((button) => button.style.left)) - parseFloat(before.x)) * bounds.width / 100).toBeLessThan(0.25)
+  await expect.poll(async () => Math.abs(parseFloat(await badge.evaluate((button) => button.style.top)) - parseFloat(before.y)) * bounds.height / 100).toBeLessThan(0.25)
 })
 
 test('shako loads in WebGL, exposes all six details and survives collection switching', async ({ page }, testInfo) => {
@@ -41,7 +63,7 @@ test('shako loads in WebGL, exposes all six details and survives collection swit
   await expect(canvas).toHaveAttribute('data-lighting', 'artifact-studio')
   await expect(page.locator('.viewer-poster')).toHaveClass(/is-hidden/, { timeout: 30_000 })
   await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0', { timeout: 30_000 })
-  await page.screenshot({ path: `docs/verification/russian-shako-1808/integration-${testInfo.project.name}.png` })
+  await page.screenshot({ path: `docs/verification/russian-shako-1808/1810/integration-${testInfo.project.name}.png` })
   const labels = ['Форма тульи', 'V-образное усиление', 'Гренада об одном огне', 'Репеёк', 'Этишкет', 'Козырёк']
   for (const [i, label] of labels.entries()) {
     const marker = page.getByRole('button', { name: `${i + 1}. ${label}`, exact: true })
@@ -59,7 +81,7 @@ test('shako loads in WebGL, exposes all six details and survives collection swit
     await compare.click()
     await expect(compare).toHaveAttribute('aria-pressed', 'true')
     await expect(page.locator('.hotspot-marker:visible')).toHaveCount(0)
-    await page.screenshot({ path: 'docs/verification/russian-shako-1808/scale-comparison.png' })
+    await page.screenshot({ path: 'docs/verification/russian-shako-1808/1810/scale-comparison.png' })
     await compare.click()
     await expect(compare).toHaveAttribute('aria-pressed', 'false')
   }

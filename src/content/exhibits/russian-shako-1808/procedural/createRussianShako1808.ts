@@ -78,9 +78,9 @@ function band(name: string, bottom: number, height: number, material: Material, 
 export function visorSurface(u: number, v: number, inset = 0): Vector3 {
   const a = (u - 0.5) * Math.PI
   const c = Math.cos(a), r = D.derived.bottomRadius
-  const extension = Math.max(0, D.fact.visorProjection - inset) * v * c
+  const extension = Math.max(0, D.converted.visorProjection - inset) * v * c
   return new Vector3(Math.sin(a) * (r + extension),
-    D.reconstruction.baseY - D.fact.visorDrop * v * c,
+    D.reconstruction.baseY - D.converted.visorDrop * v * c,
     Math.cos(a) * (r + extension))
 }
 
@@ -91,39 +91,42 @@ export function createRussianShako1808ForPass(pass: ShakoPass): Group {
   const clay = new MeshStandardMaterial({ name: 'Clay', color: '#a7a39a', roughness: 0.85 })
   const shell = group('Shell', root)
   const body = group('FeltBody', shell)
-  const h = D.fact.shellHeight, b = D.reconstruction.baseY, t = D.reconstruction.shellThickness
+  const h = D.converted.shellHeight, b = D.reconstruction.baseY, t = D.reconstruction.shellThickness
   const profile = (lo: number, hi: number) => [
     new Vector2(shellRadiusAt(lo) - t, b + lo), new Vector2(shellRadiusAt(lo), b + lo),
     new Vector2(shellRadiusAt(hi), b + hi), new Vector2(shellRadiusAt(hi) - t, b + hi),
     new Vector2(shellRadiusAt(lo) - t, b + lo),
   ]
-  body.add(mesh('FeltLowerWithRearSlit', new LatheGeometry(profile(0, D.fact.rearCoverHeight), D.topology.radial,
+  body.add(mesh('FeltLowerWithRearSlit', new LatheGeometry(profile(0, D.converted.rearCoverHeight), D.topology.radial,
     Math.PI + D.reconstruction.rearSlitWidth / D.derived.bottomRadius / 2,
     Math.PI * 2 - D.reconstruction.rearSlitWidth / D.derived.bottomRadius), clay))
-  body.add(mesh('FeltUpper', new LatheGeometry(profile(D.fact.rearCoverHeight, h - D.fact.upperOverlap), D.topology.radial), clay))
-  const underLeather = profile(h - D.fact.upperOverlap, h).map((p) => new Vector2(p.x - D.reconstruction.leatherThickness, p.y))
+  body.add(mesh('FeltUpper', new LatheGeometry(profile(D.converted.rearCoverHeight, h - D.converted.upperOverlap), D.topology.radial), clay))
+  const underLeather = profile(h - D.converted.upperOverlap, h)
   body.add(mesh('FeltUnderUpperLeather', new LatheGeometry(underLeather, D.topology.radial), clay))
-  // Upper overlap stays inside the locked outer rim diameter.
-  const upper = band('UpperLeatherBand', h - D.fact.upperOverlap, D.fact.upperOverlap, clay)
-  upper.scale.set(D.derived.topRadius / (D.derived.topRadius + D.reconstruction.leatherThickness), 1,
-    D.derived.topRadius / (D.derived.topRadius + D.reconstruction.leatherThickness))
+  // Leather wraps the felt; the document gives internal size, not the finished outside.
+  const upper = band('UpperLeatherBand', h - D.converted.upperOverlap, D.converted.upperOverlap, clay)
   shell.add(upper)
   const top = group('TopAssembly', shell)
-  const r = D.derived.topRadius, roll = D.reconstruction.rimRoll
+  const r = D.derived.outerTopRadius, roll = D.reconstruction.rimRoll
   top.add(mesh('OuterTopRim', new LatheGeometry([
     new Vector2(r - roll * 2, b + h - roll), new Vector2(r - roll, b + h),
     new Vector2(r, b + h - roll), new Vector2(r, b + h - roll * 2),
     new Vector2(r - roll * 2, b + h - roll),
   ], D.topology.radial), clay))
   top.add(mesh('DepressedTopSurface', new LatheGeometry([
-    new Vector2(0, b + h - D.fact.topRecess - t),
-    new Vector2(0, b + h - D.fact.topRecess),
-    new Vector2(r * 0.65, b + h - D.fact.topRecess),
-    new Vector2(r * 0.87, b + h - D.fact.topRecess + roll),
-    new Vector2(r - roll * 3, b + h - D.fact.topRecess * 0.6),
+    new Vector2(0, b + h - D.converted.topRecess - t),
+    new Vector2(0, b + h - D.converted.topRecess),
+    new Vector2(r * 0.65, b + h - D.converted.topRecess),
+    new Vector2(r * 0.87, b + h - D.converted.topRecess + roll),
+    new Vector2(r - roll * 3, b + h - D.converted.topRecess * 0.6),
     new Vector2(r - roll * 2, b + h - roll),
+    new Vector2(r - roll * 2 - t, b + h - roll - t),
+    new Vector2(r - roll * 3 - t, b + h - D.converted.topRecess * 0.6 - t),
+    new Vector2(r * 0.87, b + h - D.converted.topRecess + roll - t),
+    new Vector2(r * 0.65, b + h - D.converted.topRecess - t),
+    new Vector2(0, b + h - D.converted.topRecess - t),
   ].reverse(), D.topology.radial), clay))
-  root.add(band('LowerBand', 0, D.fact.lowerBandHeight, clay, D.reconstruction.rearSlitWidth / D.derived.bottomRadius))
+  root.add(band('LowerBand', 0, D.converted.lowerBandHeight, clay, D.reconstruction.rearSlitWidth / D.derived.bottomRadius))
   root.add(mesh('Visor', patch((u, v) => visorSurface(1 - u, v), new Vector3(0, -D.reconstruction.visorThickness, 0)), clay))
   if (pass >= 2) addConstruction(root, clay)
   if (pass >= 3) addIdentity(root, clay)

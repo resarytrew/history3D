@@ -13,6 +13,16 @@ describe('exhibit catalog', () => {
     const evidence = [...shako.reconstruction.known, ...shako.reconstruction.inferred, ...shako.reconstruction.unknown].map((e) => e.id)
     shako.hotspots.forEach((h) => h.evidenceIds.forEach((id) => expect(evidence).toContain(id)))
     expect(shako.reconstruction.inferred.find((e) => e.id === 'bottom-derived')?.kind).toBe('DERIVED')
+    expect(shako.chronology.from).toBe(1810)
+    expect(shako.chronology.to).toBe(1810)
+    for (const item of shako.reconstruction.known) {
+      expect(item.sourceRefs?.length).toBeGreaterThan(0)
+      for (const ref of item.sourceRefs ?? []) {
+        expect(shako.sources.some((source) => source.id === ref.sourceId)).toBe(true)
+        expect(item.sourceIds).toContain(ref.sourceId)
+        expect(ref.locator).toMatch(/с\./)
+      }
+    }
   })
   it('discovers a self-contained Pokrov package', () => {
     const exhibit = exhibitById.get('pokrov-na-nerli')

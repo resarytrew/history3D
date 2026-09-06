@@ -118,6 +118,8 @@ export class ViewerController {
     this.renderer.toneMappingExposure = 1.08
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = PCFShadowMap
+    // Static exhibits: orbiting the camera does not change their shadow maps.
+    this.renderer.shadowMap.autoUpdate = false
 
     const roomEnvironment = new RoomEnvironment()
     const environmentGenerator = new PMREMGenerator(this.renderer)
@@ -170,6 +172,7 @@ export class ViewerController {
 
   load(exhibit: Exhibit): void {
     this.exhibit = exhibit
+    this.projectionDirty = true
     this.transition = null
     this.activeModel?.dispose()
     this.activeModel = null
@@ -216,6 +219,7 @@ export class ViewerController {
 
   setScaleComparison(visible: boolean): void {
     this.scaleFigure.visible = visible
+    this.renderer.shadowMap.needsUpdate = true
     if (visible) this.callbacks.onHotspots([])
     this.projectionDirty = true
     const comparison = this.exhibit?.presentation.scaleComparison
@@ -227,6 +231,9 @@ export class ViewerController {
   }
 
   private configureCamera(exhibit: Exhibit): void {
+    this.renderer.shadowMap.needsUpdate = true
+    this.controls.minPolarAngle = exhibit.presentation.polarAngleRange?.[0] ?? 0.72
+    this.controls.maxPolarAngle = exhibit.presentation.polarAngleRange?.[1] ?? 1.56
     const studio = exhibit.presentation.lighting === 'artifact-studio'
     this.canvas.dataset.lighting = studio ? 'artifact-studio' : 'default'
     if (studio) this.artifactEnvironment ??= createArtifactEnvironment(this.renderer)
@@ -255,6 +262,7 @@ export class ViewerController {
   }
 
   private moveCamera(position: Vector3, target: Vector3): void {
+    this.projectionDirty = true
     if (this.reducedMotionQuery.matches) {
       this.camera.position.copy(position)
       this.controls.target.copy(target)
@@ -284,6 +292,7 @@ export class ViewerController {
 
   private readonly render = (time: number): void => {
     if (this.disposed) return
+    const transitioning = this.transition !== null
     if (this.transition) {
       const raw = Math.min(1, (time - this.transition.startedAt) / this.transition.duration)
       const eased = 1 - Math.pow(1 - raw, 3)
@@ -292,6 +301,10 @@ export class ViewerController {
       if (raw >= 1) this.transition = null
     }
     this.controls.update()
+    // Preserve full geometry and shading; redraw only when the view actually changes.
+    if (!this.projectionDirty && !transitioning && !(this.firstFramePending && this.activeModel)) return
+    // The display's shadow catcher is not part of the artifact or its underside.
+    this.groundShadow.visible = this.exhibit?.presentation.lighting !== 'artifact-studio' || this.camera.position.y > this.groundShadow.position.y
     this.renderer.render(this.scene, this.camera)
     if (this.firstFramePending && this.activeModel) {
       this.firstFramePending = false

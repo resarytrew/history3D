@@ -56,6 +56,7 @@ export interface EvidenceItem {
   readonly sourceIds: readonly string[]
   readonly confidence: 'high' | 'medium' | 'low' | 'unknown'
   readonly note?: string
+  readonly sourceRefs?: readonly { readonly sourceId: string; readonly locator: string; readonly basis: 'transcribed-document' | 'author-reconstruction' | 'archaeological-context' }[]
 }
 
 export interface Hotspot {
@@ -175,6 +176,7 @@ export interface Exhibit {
     readonly maxDistance: number
     readonly safeAreaPadding: number
     readonly hotspotOcclusionTolerance?: number
+    readonly polarAngleRange?: readonly [number, number]
     readonly sceneScale?: number
     readonly lighting?: 'artifact-studio'
     readonly scaleComparison?: {

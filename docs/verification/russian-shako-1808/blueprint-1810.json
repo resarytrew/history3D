@@ -1,0 +1,19 @@
+{
+  "method": "M.C.M.T",
+  "skill": "https://github.com/img2threejs/img2threejs/blob/main/skills/generic-extract-skill.md",
+  "version": "0.4.0",
+  "target": "Private musketeer, 1st battalion, 1810; no regiment attributed",
+  "macro": { "units": "metres", "size": "large", "measures": "converted from printed transcription; see evidence-1810.md", "shape": "felt frustum with separate leather layers, recessed crown and sloped visor" },
+  "components": [
+    { "name": "FeltBody", "primitive": "hollow lathed frustum", "cutouts": "rear adjustment slit", "pbr": ["#1b1c19", 0, 0.96] },
+    { "name": "Leather bands and reinforcements", "primitive": "closed conforming patches", "edges": "cut leather and sewn overlap", "pbr": ["#10100e", 0, 0.38] },
+    { "name": "Visor", "primitive": "closed curved patch", "edges": "embossed peripheral and root ridges", "pbr": ["#070807", 0, 0.29] },
+    { "name": "Grenade", "primitive": "thin contoured sheet and relief", "scale": "assumed", "pbr": ["#aa915e", 0.9, 0.41] },
+    { "name": "Repyok", "primitive": "lenticular wood core, wool face, flat dark backing", "pbr": [["#dfd9c9", 0, 0.96], ["#34533b", 0, 0.96]] },
+    { "name": "Ethishket", "primitive": "plaited and twisted curves, woven heads and fringe", "pbr": ["#e7dfcf", 0, 0.94] },
+    { "name": "Interior", "primitive": "leather ring, gathered linen shell, tucked leather fold", "pbr": [["#b9ac8e", 0, 0.98], ["#463629", 0, 0.85]] }
+  ],
+  "materials": { "condition": "maintained in service", "microdetail": "filtered normal/bump maps for grain and fibres; restrained handling sheen at edges", "corrosion": false, "measuredPbr": false },
+  "topology": { "minimumTriangles": 169076, "purposeOfAdditionalGeometry": "assembled liner gathers, folded neck flap, wooden repyok core", "noDummyGeometry": true },
+  "review": "historical-review; independent review pending"
+}

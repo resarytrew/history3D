@@ -27,10 +27,11 @@ function grain(seed: number, woven = false): DataTexture {
  */
 function workedSurface(material: MeshStandardMaterial, metal = false, felt = false): void {
   material.onBeforeCompile = (shader) => {
-    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWorkedPosition;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWorkedPosition = position;')
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWorkedPosition;\nvarying vec2 vWorkedUv;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWorkedPosition = position;\nvWorkedUv = uv;')
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>
 varying vec3 vWorkedPosition;
+varying vec2 vWorkedUv;
 float workedHash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
 float workedNoise(vec3 p) {
   vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -43,6 +44,12 @@ float workedNoise(vec3 p) {
     shader.fragmentShader = shader.fragmentShader.replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
 float workedMottle = workedNoise(vWorkedPosition * ${metal ? '1700.0' : '650.0'});
 roughnessFactor = clamp(roughnessFactor + (workedMottle - 0.5) * ${metal ? '0.055' : felt ? '0.035' : '0.10'}, 0.12, 1.0);
+${!metal && !felt ? `
+float edgeDistance = min(min(vWorkedUv.x, 1.0-vWorkedUv.x), min(vWorkedUv.y, 1.0-vWorkedUv.y));
+float handledEdge = (1.0-smoothstep(0.0, 0.028, edgeDistance)) * (0.35 + 0.65 * workedMottle);
+roughnessFactor = max(0.18, roughnessFactor - handledEdge * 0.045);
+diffuseColor.rgb *= 1.0 + handledEdge * 0.10;
+` : ''}
 ${felt ? 'diffuseColor.rgb *= 0.97 + 0.06 * workedNoise(vWorkedPosition * 2300.0);' : ''}
 `)
     shader.fragmentShader = shader.fragmentShader.replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
@@ -55,7 +62,7 @@ vec3 workedGradient = sign(workedDet) * (dFdx(workedHeight) * workedR1 + dFdy(wo
 normal = normalize(abs(workedDet) * normal - workedGradient);
 `)
   }
-  material.customProgramCacheKey = () => `worked-surface-${metal ? 'brass' : felt ? 'felt' : 'leather'}-3`
+  material.customProgramCacheKey = () => `worked-surface-${metal ? 'brass' : felt ? 'felt' : 'leather'}-4`
 }
 
 export function applyShakoMaterials(root: Group): MeshStandardMaterial {
@@ -69,7 +76,7 @@ export function applyShakoMaterials(root: Group): MeshStandardMaterial {
   const visorEdge = visor.clone(); visorEdge.name = 'VisorBoundEdge'; visorEdge.roughness = 0.34; visorEdge.clearcoat = 0.24
   workedSurface(visorEdge)
   workedSurface(leather); workedSurface(visor); workedSurface(brass, true); workedSurface(felt, false, true)
-  const cord = new MeshPhysicalMaterial({ name: 'CordWhite', color: '#dcd0b5', roughness: 0.94, sheen: 0.7, sheenColor: '#f0e7d5', sheenRoughness: 0.85, bumpMap: clothMap, bumpScale: D.reconstruction.clothBump * 1.5 })
+  const cord = new MeshPhysicalMaterial({ name: 'CordWhite', color: '#e7dfcf', roughness: 0.94, sheen: 0.7, sheenColor: '#f0e7d5', sheenRoughness: 0.85, bumpMap: clothMap, bumpScale: D.reconstruction.clothBump * 1.5 })
   cord.onBeforeCompile = (shader) => {
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
 float yarnPhase = vBumpMapUv.y * 150.796 + vBumpMapUv.x * 50.265;
@@ -123,8 +130,9 @@ diffuseColor.rgb *= 0.94 + 0.06 * woolWeave;
     o.material = semantic === 'Brass' ? (isBadge ? brass : hardware)
       : isCord ? (o.name === 'CottonFringe' || o.name === 'TwistedSuspension' || o.name === 'WovenHead' ? fineYarn : cord)
       : o.name === 'RepyokWhite' ? white : o.name === 'RepyokGreen' ? green
-      : o.name === 'DarkWoodBack' ? wood
-      : o.name === 'LinenLiner' ? linen : isInterior ? inner
+      : o.name === 'WoodenRepyokCore' ? wood
+      : o.name === 'RepyokBlackBacking' ? leather
+      : o.name === 'LinenLiner' ? linen : o.name.startsWith('LinenDrawstring') ? fineYarn : isInterior ? inner
       : o.name.startsWith('Felt') ? felt
       : o.name.startsWith('Visor') ? (o.name === 'Visor' ? visor : visorEdge) : leather
   })

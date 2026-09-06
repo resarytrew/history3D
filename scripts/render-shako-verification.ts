@@ -7,7 +7,8 @@ import { createServer } from 'vite'
 const pass = Number(process.argv.find((a) => a.startsWith('--pass='))?.split('=')[1] ?? 5)
 const hero = process.argv.includes('--hero')
 const before = process.argv.includes('--before')
-const out = resolve('docs/verification/russian-shako-1808', hero ? (before ? 'hero-before' : 'hero') : '.')
+const historical = process.argv.includes('--1810')
+const out = resolve('docs/verification/russian-shako-1808', historical ? '1810' : hero ? (before ? 'hero-before' : 'hero') : '.')
 await mkdir(out, { recursive: true })
 const server = await createServer({ server: { host: '127.0.0.1', port: 4187, hmr: false, watch: null }, logLevel: 'error' })
 await server.listen()
@@ -61,6 +62,12 @@ try {
         textile: { target: [-0.123, 0.125, 0], position: [-0.38, 0.17, 0.12] },
       }
       camera.position.fromArray(points[part].position); camera.lookAt(new T.Vector3().fromArray(points[part].target)); renderer.render(scene, camera)
+    } })
+    Object.assign(window, { shakoInterior: (section: boolean) => {
+      renderer.clippingPlanes = section ? [new T.Plane(new T.Vector3(-1, 0, 0), 0)] : []
+      camera.position.set(section ? 0.5 : 0.06, section ? 0.22 : -0.48, section ? 0.45 : 0.10)
+      camera.lookAt(new T.Vector3(0, 0.16, 0)); renderer.render(scene, camera)
+      renderer.clippingPlanes = []
     } })
     Object.assign(window, { shakoHero: (name: string) => {
       const repyok = new T.Box3().setFromObject(root.getObjectByName('Repyok')).getCenter(new T.Vector3())
@@ -144,6 +151,10 @@ try {
       await page.evaluate((name) => (window as unknown as { shakoHero: (name: string) => void }).shakoHero(name), name)
       await page.screenshot({ path: resolve(out, `${name}.png`) })
     }
+  }
+  if (historical) for (const name of ['bottom', 'section']) {
+    await page.evaluate((section) => (window as unknown as { shakoInterior: (section: boolean) => void }).shakoInterior(section), name === 'section')
+    await page.screenshot({ path: resolve(out, `pass-${pass}-${name}.png`) })
   }
   await writeFile(resolve(out, `pass-${pass}-metrics.json`), JSON.stringify({ ...metrics, renders }, null, 2) + '\n')
   if (pass === 5 && !before) {

@@ -12,45 +12,47 @@ afterAll(() => disposeObject3D(model))
 const bounds = (name: string) => new Box3().setFromObject(model.getObjectByName(name)!)
 const height = (name: string) => bounds(name).getSize(new Vector3()).y
 
-describe('1808 shako locked geometry (metres; 0.1 mm dimensional tolerance)', () => {
-  it('keeps shell height 175 mm and the complete outer top diameter 255 mm', () => {
-    expect(height('Shell')).toBeCloseTo(0.175, 4)
-    expect(bounds('OuterTopRim').getSize(new Vector3()).x).toBeCloseTo(0.255, 4)
+describe('1810 shako: converted specification, not artifact measurement', () => {
+  it('separates the large internal size from the finished leather diameter', () => {
+    expect(height('Shell')).toBeCloseTo(3.875 * 0.04445, 6)
+    expect(bounds('OuterTopRim').getSize(new Vector3()).x).toBeCloseTo((5.75 * 0.04445) + 2 * (D.reconstruction.shellThickness + D.reconstruction.leatherThickness), 6)
   })
-  it('generates the bottom felt ring at the DERIVED diameter of 210 mm', () => {
+  it('adds assumed felt thickness outside the documented internal bottom diameter', () => {
     const p = (model.getObjectByName('FeltLowerWithRearSlit') as Mesh).geometry.attributes.position
     const radii = Array.from({ length: p.count }, (_, i) => Math.abs(p.getY(i) - D.reconstruction.baseY) < 1e-6 ? Math.hypot(p.getX(i), p.getZ(i)) : 0)
-    expect(Math.max(...radii) * 2).toBeCloseTo(0.210, 4)
-    expect(D.derived.bottomDiameter).toBeCloseTo(D.fact.topDiameter - D.fact.diameterDifference, 9)
+    expect(Math.max(...radii) * 2).toBeCloseTo(4.75 * 0.04445 + 2 * D.reconstruction.shellThickness, 6)
+    expect(D.derived.bottomDiameter).toBeCloseTo(D.converted.topInternalDiameter - D.converted.diameterDifference + 2 * D.reconstruction.shellThickness, 9)
   })
-  it('has a 75 mm visor projection, 50 mm drop and actual 3.5 mm thickness', () => {
+  it('uses a three-inch visor projection, two-inch drop and assumed 3.5 mm thickness', () => {
     const b = bounds('Visor')
-    expect(b.max.z - D.derived.bottomRadius).toBeCloseTo(0.075, 4)
-    expect(D.reconstruction.baseY - b.min.y).toBeCloseTo(0.050 + 0.0035, 4)
+    expect(b.max.z - D.derived.bottomRadius).toBeCloseTo(3 * 0.0254, 6)
+    expect(D.reconstruction.baseY - b.min.y).toBeCloseTo(2 * 0.0254 + 0.0035, 4)
     const ray = new Raycaster(new Vector3(0, 1, 0.15), new Vector3(0, -1, 0))
     expect(ray.intersectObject(model.getObjectByName('Visor')!)).not.toHaveLength(0)
   })
-  it('generates surface-following straps 18 mm wide (0.2 mm chord tolerance)', () => {
+  it('generates surface-following straps seven lines wide (0.2 mm chord tolerance)', () => {
     for (const name of ['SideReinforcementLeft', 'SideReinforcementRight']) for (const arm of [-1, 1]) {
       const p = (model.getObjectByName(name)!.getObjectByName(`VArm${arm}`) as Mesh).geometry.attributes.position
       for (const row of [3, 16, 29]) {
         const width = new Vector3().fromBufferAttribute(p, row * 5).distanceTo(new Vector3().fromBufferAttribute(p, row * 5 + 4))
-        expect(Math.abs(width - 0.018)).toBeLessThan(0.0002)
+        expect(Math.abs(width - 7 * 0.00254)).toBeLessThan(0.0002)
       }
     }
-    expect(reinforcementSurface(0, -1, 0.5, 1).distanceTo(reinforcementSurface(0, 1, 0.5, 1))).toBeCloseTo(0.090, 4)
+    expect(reinforcementSurface(0, -1, 0.5, 1).distanceTo(reinforcementSurface(0, 1, 0.5, 1))).toBeCloseTo(2 * 0.04445, 6)
   })
-  it('has a 20 mm lower band, 27 mm upper overlap and 80 mm pocket', () => {
-    expect(height('LowerBand')).toBeCloseTo(0.020, 4)
-    expect(height('UpperLeatherBand')).toBeCloseTo(0.027, 4)
-    expect(height('FrontOrnamentPocket')).toBeCloseTo(0.080, 4)
-    expect(height('RearLeatherCover')).toBeCloseTo(0.050, 4)
+  it('uses converted bands and omits the grenadier plume pocket', () => {
+    expect(height('LowerBand')).toBeCloseTo(8 * 0.00254, 6)
+    expect(height('UpperLeatherBand')).toBeCloseTo(0.0254 + 0.00254, 6)
+    expect(model.getObjectByName('FrontOrnamentPocket')).toBeUndefined()
+    expect(height('RearLeatherCover')).toBeCloseTo(2 * 0.0254, 6)
   })
-  it('has a visible top centre recessed 25 mm, with outward-facing normals', () => {
+  it('has a visible top centre recessed one inch, with outward-facing normals', () => {
     const y = bounds('OuterTopRim').max.y
     const hits = new Raycaster(new Vector3(0.01, y + 0.1, 0), new Vector3(0, -1, 0)).intersectObject(model.getObjectByName('DepressedTopSurface')!)
     expect(hits.length).toBeGreaterThan(0)
-    expect(y - hits[0].point.y).toBeCloseTo(0.025, 4)
+    expect(y - hits[0].point.y).toBeCloseTo(0.0254, 6)
+    const underside = new Raycaster(new Vector3(0.01, 0.20, 0), new Vector3(0, 1, 0)).intersectObject(model.getObjectByName('DepressedTopSurface')!)
+    expect(underside.length).toBeGreaterThan(0)
   })
   it('models a real rear slit in the felt, not a painted seam', () => {
     const ray = new Raycaster(new Vector3(0, D.reconstruction.baseY + 0.025, -0.25), new Vector3(0, 0, 1), 0, 0.2)
@@ -58,15 +60,29 @@ describe('1808 shako locked geometry (metres; 0.1 mm dimensional tolerance)', ()
     ray.ray.origin.x = 0.01
     expect(ray.intersectObject(model.getObjectByName('FeltBody')!, true).length).toBeGreaterThan(0)
   })
-  it('prepares the full, hidden interior to the locked lengths', () => {
-    expect(model.getObjectByName('Interior')?.visible).toBe(false)
-    expect(height('LeatherSweatBand')).toBeCloseTo(0.037, 4)
-    expect(height('LinenLiner')).toBeCloseTo(0.135, 4)
-    expect(height('NeckFlap')).toBeCloseTo(0.168, 4)
+  it('exposes the assembled interior and distinguishes cut length from folded height', () => {
+    expect(model.getObjectByName('Interior')?.visible).toBe(true)
+    expect(height('LeatherSweatBand')).toBeCloseTo(1.5 * 0.0254, 6)
+    expect(model.getObjectByName('LinenLiner')!.userData.cutHeight).toBeCloseTo(3 * 0.04445, 6)
+    expect(height('LinenLiner')).toBeLessThan(D.converted.linerHeight)
+    expect(model.getObjectByName('NeckFlap')!.userData.cutHeight).toBeCloseTo(3.75 * 0.04445, 6)
+    expect(bounds('NeckFlap').min.y).toBeGreaterThan(D.reconstruction.baseY)
+    const fromBelow = new Raycaster(new Vector3(0.03, 0, 0), new Vector3(0, 1, 0))
+    expect(fromBelow.intersectObject(model.getObjectByName('LinenLiner')!)).not.toHaveLength(0)
   })
 })
 
 describe('semantic, material and performance contract', () => {
+  it('routes the chinstrap clear of the solid visor', () => {
+    const p = (model.getObjectByName('LeatherChinstrap') as Mesh).geometry.attributes.position
+    for (let i = 0; i < p.count; i++) {
+      const radius = Math.hypot(p.getX(i), p.getZ(i)), c = p.getZ(i) / radius
+      const v = (radius - D.derived.bottomRadius) / (D.converted.visorProjection * c)
+      if (c <= 0 || v <= 0 || v >= 1) continue
+      const top = D.reconstruction.baseY - D.converted.visorDrop * v * c
+      expect(p.getY(i) > top + 0.0001 || p.getY(i) < top - D.reconstruction.visorThickness - 0.0001, `vertex ${i}: y=${p.getY(i)}, visor=${top}, radius=${radius}`).toBe(true)
+    }
+  })
   it('keeps the photo-guided grenade a thin embossed sheet with a front-facing bomb', () => {
     const badge = model.getObjectByName('FrontBadge_OneFlameGrenade')!
     const local = new Box3()
@@ -90,15 +106,15 @@ describe('semantic, material and performance contract', () => {
     for (const name of ['SideReinforcementLeft', 'SideReinforcementRight', 'FrontBadge_OneFlameGrenade', 'Repyok', 'FrontBraid', 'RearBraid', 'RightDiamondCord', 'LeftDiamondCord', 'RightTassel1', 'RightTassel2', 'RightTassel3', 'LeftTassel', 'RearBrassBuckle', 'VisorOuterRidge', 'VisorInnerRidge']) expect(model.getObjectByName(name), name).toBeDefined()
     expect(model.getObjectByName('RightTassel4')).toBeUndefined()
     expect(model.getObjectByName('LeftTassel')!.userData.suspensionLength).toBeLessThan(model.getObjectByName('RightTassel3')!.userData.suspensionLength)
-    for (const name of ['Plume', 'Eagle', 'Cockade', 'BrassScales']) expect(model.getObjectByName(name)).toBeUndefined()
+    for (const name of ['Plume', 'Eagle', 'Cockade', 'BrassScales', 'LeftChinstrapBuckle', 'RightFixedAttachment']) expect(model.getObjectByName(name)).toBeUndefined()
   })
-  it('seats the upper flame in front of the complete leather pocket thickness', () => {
+  it('seats the thin grenade outside the felt without an invented pocket step', () => {
     const badge = model.getObjectByName('FrontBadge_OneFlameGrenade')!
     for (const y of [0.057, 0.061, 0.065]) {
       const origin = new Vector3(0, y, 0.1).applyMatrix4(badge.matrixWorld)
       const ray = new Raycaster(origin, new Vector3(0, 0, -1).transformDirection(badge.matrixWorld))
       const badgeHit = ray.intersectObject(badge, true)[0]
-      const pocketHit = ray.intersectObject(model.getObjectByName('FrontOrnamentPocket')!, true)[0]
+      const pocketHit = ray.intersectObject(model.getObjectByName('FeltBody')!, true)[0]
       expect(badgeHit).toBeDefined(); expect(pocketHit).toBeDefined()
       expect(badgeHit.distance).toBeLessThan(pocketHit.distance)
     }
@@ -120,8 +136,8 @@ describe('semantic, material and performance contract', () => {
       triangles += (o.geometry.index?.count ?? position.count) / 3
       expect(Array.from(position.array).every(Number.isFinite), o.name).toBe(true)
     })
-    expect(triangles).toBeGreaterThanOrEqual(145_892)
-    expect(triangles).toBeLessThanOrEqual(200_000)
+    expect(triangles).toBeGreaterThanOrEqual(169_076)
+    expect(triangles).toBeLessThanOrEqual(300_000)
     expect(meshes).toBeLessThanOrEqual(65)
   })
   it('keeps the clay blockout free of ornaments and textures', () => {

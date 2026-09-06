@@ -4,7 +4,7 @@ import { group, mesh, onShell } from './createRussianShako1808'
 import { tube } from './shakoConstruction'
 import { D } from './shako1808Dimensions'
 import { addGrenade } from './shakoGrenade'
-const R = D.reconstruction, F = D.fact
+const R = D.reconstruction, F = D.converted
 
 function mergeTubes(name: string, geometries: BufferGeometry[], material: Material) {
   const result = mesh(name, mergeGeometries(geometries)!, material)
@@ -14,7 +14,7 @@ function mergeTubes(name: string, geometries: BufferGeometry[], material: Materi
 
 function addRepyok(front: Group, clay: Material): void {
   const repyok = group('Repyok', front)
-  repyok.position.copy(onShell(0, F.shellHeight, R.leatherThickness + R.pocketGap * 0.65))
+  repyok.position.copy(onShell(0, F.shellHeight, R.leatherThickness + R.repyokDepth * 0.2))
   repyok.position.y += R.repyokAboveRim
   repyok.rotation.x = Math.atan((D.derived.topRadius - D.derived.bottomRadius) / F.shellHeight)
   repyok.userData.confidence = 'RECONSTRUCTION / PROXY DIMENSIONS'
@@ -29,7 +29,7 @@ function addRepyok(front: Group, clay: Material): void {
       const irregular = 1 + Math.sin(a * 3) * 0.002 * r
       const x = Math.cos(a) * R.repyokWidth / 2 * r * irregular
       const y = Math.sin(a) * R.repyokHeight / 2 * r * irregular
-      const amplitude = R.repyokDepth * (back ? -0.22 : 0.78)
+      const amplitude = R.repyokDepth * (back ? 0 : 0.78)
       const z = amplitude * Math.pow(Math.max(0, 1 - r * r), 0.72)
       const dzdr = amplitude * -1.44 * r * Math.pow(Math.max(0.002, 1 - r * r), -0.28)
       const normal = new Vector3(-dzdr * Math.cos(a) / (R.repyokWidth / 2), -dzdr * Math.sin(a) / (R.repyokHeight / 2), 1).normalize().multiplyScalar(back ? -1 : 1)
@@ -45,7 +45,9 @@ function addRepyok(front: Group, clay: Material): void {
     geometry.setAttribute('position', new Float32BufferAttribute(positions, 3)); geometry.setAttribute('uv', new Float32BufferAttribute(uv, 2)); geometry.setAttribute('normal', new Float32BufferAttribute(normals, 3)); geometry.setIndex(indices)
     return geometry
   }
-  repyok.add(mesh('DarkWoodBack', cap(0, 1, true), clay), mesh('RepyokWhite', cap(greenRatio, 1), clay), mesh('RepyokGreen', cap(0, greenRatio), clay))
+  const core = mesh('WoodenRepyokCore', cap(0, 1), clay)
+  core.scale.set(0.98, 0.98, 0.92)
+  repyok.add(core, mesh('RepyokBlackBacking', cap(0, 1, true), clay), mesh('RepyokWhite', cap(greenRatio, 1), clay), mesh('RepyokGreen', cap(0, greenRatio), clay))
   for (const sign of [-1, 1]) {
     const wire = tube(`WireAttachment${sign}`, [new Vector3(sign * R.repyokWidth * 0.17, 0, -R.repyokDepth * 0.20), new Vector3(sign * R.repyokWidth * 0.2, -R.repyokHeight / 2, -R.repyokDepth * 0.20), new Vector3(sign * R.repyokWidth * 0.14, -R.repyokHeight * 0.72, -R.repyokDepth * 0.20)], R.wireRadius, clay, 20)
     wire.userData.material = 'Brass'
@@ -142,6 +144,15 @@ export function addIdentity(root: Group, clay: Material): void {
   cords.add(braid(true, clay), braid(false, clay))
   for (const [sideName, sign] of [['Right', -1], ['Left', 1]] as const) {
     const anchor = onShell(sign * Math.PI / 2, R.braidTop, R.braidOffset)
+    // Small cord ties pass through the upper leather overlap (p.60).
+    // Their exact knot and hole spacing are reconstruction values.
+    const tie = [
+      onShell(sign * Math.PI / 2 - 0.018, R.braidTop, R.leatherThickness),
+      anchor.clone().add(new Vector3(0, 0.002, 0.002)),
+      onShell(sign * Math.PI / 2 + 0.018, R.braidTop, R.leatherThickness),
+      onShell(sign * Math.PI / 2, R.braidTop - 0.002, 0),
+    ]
+    cords.add(tube(`${sideName}CordAttachment`, tie, R.yarnRadius * 2.5, clay, 36, true))
     const diamond = [new Vector3(0, 0, 0), new Vector3(0, -R.diamondHeight / 2, R.diamondWidth / 2), new Vector3(0, -R.diamondHeight, 0), new Vector3(0, -R.diamondHeight / 2, -R.diamondWidth / 2)].map((p) => p.add(anchor))
     cords.add(tube(`${sideName}DiamondCord`, diamond, R.cordDiameter / 3, clay, 32, true))
     if (sign < 0) {

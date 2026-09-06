@@ -1,9 +1,9 @@
-import { CatmullRomCurve3, CylinderGeometry, Group, LatheGeometry, MeshStandardMaterial, SphereGeometry, TubeGeometry, Vector2, Vector3, type Material } from 'three'
+import { CatmullRomCurve3, CylinderGeometry, Group, MeshStandardMaterial, SphereGeometry, TubeGeometry, Vector3, type Material } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { group, mesh, onShell, patch, visorSurface } from './createRussianShako1808'
 import { D, shellRadiusAt } from './shako1808Dimensions'
 
-const R = D.reconstruction, F = D.fact
+const R = D.reconstruction, F = D.converted
 export const radialThickness = (p: Vector3): Vector3 => new Vector3(p.x, 0, p.z).normalize().multiplyScalar(R.leatherThickness)
 export function tube(name: string, points: Vector3[], radius: number, material: Material, segments = 64, closed = false) {
   return mesh(name, new TubeGeometry(new CatmullRomCurve3(points, closed, 'centripetal'), segments, radius, D.topology.cordRadial, closed), material)
@@ -45,68 +45,83 @@ export function addConstruction(root: Group, clay: Material): void {
   const rear = group('Rear', root)
   const slit = group('RearAdjustmentSlit', rear)
   slit.userData = { construction: 'Actual opening in FeltLowerWithRearSlit and LowerBand', height: F.rearCoverHeight }
-  const cover = mesh('RearLeatherCover', patch((u, v) => onShell(Math.PI + (u - 0.5) * R.rearCoverWidth / shellRadiusAt(v * F.rearCoverHeight), v * F.rearCoverHeight, R.surfaceOffset), radialThickness), clay)
+  const cover = mesh('RearLeatherCover', patch((u, v) => {
+    const x = (u - 0.5) * F.rearCoverWidth
+    const top = F.rearCoverHeight - F.rearCoverWidth / 2 + Math.sqrt(Math.max(0, (F.rearCoverWidth / 2) ** 2 - x * x))
+    return onShell(Math.PI + x / shellRadiusAt(v * top), v * top, R.surfaceOffset)
+  }, radialThickness, 48, 24), clay)
   rear.add(cover)
   const rearBuckle = buckle('RearBrassBuckle', R.buckleWidth, R.buckleHeight, clay)
   rearBuckle.position.copy(onShell(Math.PI, F.lowerBandHeight / 2, R.leatherThickness * 3))
   rearBuckle.rotation.y = Math.PI
   rear.add(rearBuckle)
-  const tongue = mesh('RearBuckleTongue', patch((u, v) => onShell(Math.PI + (u - 0.5) * R.rearCoverWidth * 1.8 / shellRadiusAt(v * F.lowerBandHeight), v * F.lowerBandHeight, R.leatherThickness * 2), radialThickness), clay)
+  const tongue = mesh('RearBuckleTongue', patch((u, v) => onShell(Math.PI + (u - 0.5) * F.rearCoverWidth * 1.8 / shellRadiusAt(v * F.lowerBandHeight), v * F.lowerBandHeight, R.leatherThickness * 2), radialThickness), clay)
   rear.add(tongue)
 
-  const front = group('Front', root)
-  const pocket = group('FrontOrnamentPocket', front)
-  const pocketSurface = (u: number, v: number) => {
-    const y = F.shellHeight - F.pocketHeight + F.pocketHeight * v
-    const width = R.pocketBottomWidth + (R.pocketTopWidth - R.pocketBottomWidth) * v
-    return onShell((u - 0.5) * width / shellRadiusAt(y), y, R.leatherThickness + R.pocketGap * v)
-  }
-  pocket.add(mesh('PocketFace', patch(pocketSurface, radialThickness), clay))
-  for (const u of [0, 1]) {
-    pocket.add(mesh(`PocketSide${u}`, patch((s, v) => {
-      const p = pocketSurface(u, v)
-      return p.add(new Vector3(p.x, 0, p.z).normalize().multiplyScalar(-R.pocketGap * v * s))
-    }, radialThickness, 2, 16), clay))
-  }
-  pocket.userData = { height: F.pocketHeight, opening: 'top', gap: R.pocketGap }
+  // p.51 restricts the 1 3/4 vershok plume pocket to grenadiers.
+  // The generalised account on p.57 is not evidence to add it to this musketeer.
+  group('Front', root)
 
-  for (const [name, inset] of [['VisorOuterRidge', R.secondRidgeInset], ['VisorInnerRidge', F.visorRidgeInset]] as const) {
-    const points = Array.from({ length: 65 }, (_, i) => visorSurface(i / 64, 1, inset).add(new Vector3(0, R.ridgeRadius, 0)))
+  for (const [name, fraction] of [['VisorOuterRidge', 1 - F.visorRidgeInset / F.visorProjection], ['VisorInnerRidge', 0.035]] as const) {
+    const points = Array.from({ length: 97 }, (_, i) => visorSurface(i / 96, fraction).add(new Vector3(0, R.ridgeRadius * 0.3, 0)))
     root.add(tube(name, points, R.ridgeRadius, clay))
   }
   const chin = group('Chinstrap', root)
   chin.add(mesh('LeatherChinstrap', patch((u, v) => {
     const a = (u - 0.5) * Math.PI, c = Math.cos(a)
-    const r = D.derived.bottomRadius - R.chinstrapInset
-    return new Vector3(Math.sin(a) * r, R.baseY + F.lowerBandHeight / 2 - R.chinstrapDrop * c + (v - 0.5) * F.chinstrapWidth, Math.cos(a) * r)
+    const endHeight = F.lowerBandHeight + R.chinstrapButtonRadius
+    const r = shellRadiusAt(endHeight) + R.leatherThickness * 2
+    // The sling hangs inside the head opening, not across the solid visor.
+    const sideClearance = 0.020 * Math.sin(Math.PI * c)
+    return new Vector3(Math.sin(a) * (r + sideClearance), R.baseY + endHeight - R.chinstrapDrop * c + (v - 0.5) * F.chinstrapWidth, c * 0.025)
   }, radialThickness, 64, 3), clay))
-  for (const side of [-1, 1]) {
-    const button = mesh(side < 0 ? 'RightFixedAttachment' : 'LeftFasteningButton', new SphereGeometry(R.chinstrapButtonRadius, 16, 8), clay)
+  for (const side of [1]) {
+    const button = mesh('LeftFasteningButton', new SphereGeometry(R.chinstrapButtonRadius, 24, 12), clay)
     button.scale.set(0.35, 1, 1)
-    button.position.copy(onShell(side * Math.PI / 2, F.lowerBandHeight / 2, R.leatherThickness * 2))
+    button.position.copy(onShell(side * Math.PI / 2, F.lowerBandHeight + R.chinstrapButtonRadius, R.leatherThickness * 2))
     button.userData.material = 'Brass'
     chin.add(button)
   }
-  const chinBuckle = buckle('LeftChinstrapBuckle', R.buckleWidth, R.buckleHeight, clay)
-  chinBuckle.position.copy(onShell(Math.PI / 2, F.lowerBandHeight / 2, R.leatherThickness * 3))
-  chinBuckle.rotation.y = Math.PI / 2
-  chin.add(chinBuckle)
+  const fixed = mesh('RightSewnAttachment', patch((u, v) => onShell(-Math.PI / 2 + (u - 0.5) * F.chinstrapWidth / D.derived.bottomRadius, F.lowerBandHeight / 2 + v * F.lowerBandHeight, R.leatherThickness), radialThickness, 12, 8), clay)
+  chin.add(fixed)
 
   const interior = group('Interior', root)
-  interior.visible = false
-  interior.userData = { preparedFor: 'future internal/exploded view', dimensions: 'FACT; folds and thickness RECONSTRUCTION' }
-  const inner = D.derived.bottomRadius - R.shellThickness - R.leatherThickness
-  const sweat = mesh('LeatherSweatBand', new CylinderGeometry(inner, inner, F.sweatbandHeight, 64, 1, true), clay)
+  interior.userData = { dimensions: 'Cut dimensions from p.51; assembled folds and thickness reconstructed', state: 'neck flap tucked inside' }
+  const inner = D.derived.bottomRadius - R.shellThickness - 0.001
+  const sweatTop = shellRadiusAt(F.sweatbandHeight) - R.shellThickness - 0.001
+  const sweat = mesh('LeatherSweatBand', new CylinderGeometry(sweatTop, inner, F.sweatbandHeight, 128, 8, true), clay)
   sweat.position.y = R.baseY + F.sweatbandHeight / 2
   interior.add(sweat)
-  interior.add(mesh('LinenLiner', new LatheGeometry([
-    new Vector2(inner, R.baseY), new Vector2(inner, R.baseY + F.linerHeight * 0.65),
-    new Vector2(inner * 0.75, R.baseY + F.linerHeight * 0.92), new Vector2(0, R.baseY + F.linerHeight),
-  ], 64), clay))
+  const liner = mesh('LinenLiner', patch((u, v) => {
+    const a = u * Math.PI * 2
+    const gather = Math.sin(a * 24 + Math.sin(a * 5) * 0.3) * 0.0035 * Math.sin(v * Math.PI)
+    const r = sweatTop * (1 - v * v * 0.88) + gather
+    return new Vector3(Math.sin(a) * r, R.baseY + F.sweatbandHeight + v * 0.092 + Math.sin(a * 24) * v * 0.0015, Math.cos(a) * r)
+  }, (p) => new Vector3(p.x, 0, p.z).normalize().multiplyScalar(0.0004), D.topology.interiorRadial, D.topology.interiorRows), clay)
+  liner.userData.cutHeight = F.linerHeight
+  interior.add(liner)
+  const drawstring = tube('LinenDrawstring', Array.from({ length: 97 }, (_, i) => {
+    const a = i / 96 * Math.PI * 2
+    return new Vector3(Math.sin(a) * sweatTop * 0.12, R.baseY + F.sweatbandHeight + 0.091, Math.cos(a) * sweatTop * 0.12)
+  }), 0.00065, clay, 128, true)
+  interior.add(drawstring)
+  const drawstringY = R.baseY + F.sweatbandHeight + 0.091
+  const tie = tube('LinenDrawstringTie', [
+    new Vector3(0, drawstringY, sweatTop * 0.12),
+    new Vector3(0.008, drawstringY - 0.002, 0.018),
+    new Vector3(-0.005, drawstringY - 0.003, 0.021),
+    new Vector3(0, drawstringY, sweatTop * 0.12),
+    new Vector3(-0.007, drawstringY - 0.016, 0.015),
+  ], 0.00065, clay, 48)
+  interior.add(tie)
   interior.add(mesh('NeckFlap', patch((u, v) => {
-    const a = Math.PI / 2 + u * Math.PI, r = inner * (1 + v * 0.06)
-    return new Vector3(Math.sin(a) * r, R.baseY - v * F.neckFlapHeight, Math.cos(a) * r)
-  }, radialThickness, 32, 12), clay))
+    const a = Math.PI / 2 + u * Math.PI
+    // Stored cut length is folded into a U, rather than an impossible hanging sheet.
+    const y = Math.sin(v * Math.PI) * F.neckFlapHeight / Math.PI
+    const r = shellRadiusAt(y) - R.shellThickness - 0.002 - v * 0.0015
+    return new Vector3(Math.sin(a) * r, R.baseY + 0.002 + y, Math.cos(a) * r)
+  }, (p) => new Vector3(p.x, 0, p.z).normalize().multiplyScalar(0.0006), 96, 48), clay))
+  interior.getObjectByName('NeckFlap')!.userData.cutHeight = F.neckFlapHeight
 }
 
 export function addStitches(root: Group): void {
@@ -116,8 +131,7 @@ export function addStitches(root: Group): void {
     const radius = shellRadiusAt(height), count = Math.floor(Math.PI * 2 * radius / R.stitchSpacing)
     for (let i = 0; i < count; i++) {
       const angle = i / count * Math.PI * 2, y = height + Math.sin(i * 2.7) * R.seamUndulation
-      // Upper band is scaled inward to retain the locked outside diameter.
-      const offset = height > F.shellHeight / 2 ? R.stitchRadius : R.leatherThickness + R.stitchRadius
+      const offset = R.leatherThickness + R.stitchRadius
       const points = [onShell(angle, y, offset), onShell(angle + R.stitchLength / radius, y + R.seamUndulation * Math.sin(i), offset)]
       geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 1, R.stitchRadius, 4))
     }
@@ -133,18 +147,27 @@ export function addStitches(root: Group): void {
     }
   }
   // Existing leather edges only: no invented fittings or decorative seam patterns.
-  for (const front of [true, false]) for (const sign of [-1, 1]) {
-    const length = front ? F.pocketHeight : F.rearCoverHeight
+  for (const sign of [-1, 1]) {
+    const length = F.rearCoverHeight - F.rearCoverWidth / 2
     const count = Math.floor(length / R.stitchSpacing)
     for (let i = 1; i < count - 1; i++) {
       const points = [i / count, i / count + R.stitchLength / length].map((v) => {
-        const y = front ? F.shellHeight - F.pocketHeight + length * v : length * v
-        const width = front ? R.pocketBottomWidth + (R.pocketTopWidth - R.pocketBottomWidth) * v : R.rearCoverWidth
-        const angle = (front ? 0 : Math.PI) + sign * (width / 2 - R.stitchInset) / shellRadiusAt(y)
-        return onShell(angle, y, R.leatherThickness + (front ? R.leatherThickness + R.pocketGap * v : R.surfaceOffset) + R.stitchRadius * 0.5)
+        const y = length * v
+        const angle = Math.PI + sign * (F.rearCoverWidth / 2 - R.stitchInset) / shellRadiusAt(y)
+        return onShell(angle, y, R.leatherThickness + R.surfaceOffset + R.stitchRadius * 0.5)
       })
       geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 1, R.stitchRadius, 4))
     }
+  }
+  // Rounded upper seam of the rear cover, matching its actual semicircular cut.
+  for (let i = 0; i < 21; i++) {
+    const radius = F.rearCoverWidth / 2 - R.stitchInset
+    const points = [i / 21, (i + 0.45) / 21].map((t) => {
+      const a = t * Math.PI, x = Math.cos(a) * radius
+      const y = F.rearCoverHeight - F.rearCoverWidth / 2 + Math.sin(a) * radius
+      return onShell(Math.PI + x / shellRadiusAt(y), y, R.surfaceOffset + R.leatherThickness + R.stitchRadius)
+    })
+    geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 2, R.stitchRadius, 4))
   }
   const merged = mergeGeometries(geometries)
   if (merged) root.add(mesh('BandStitching', merged, material))

@@ -7,14 +7,11 @@ import { D, shellRadiusAt } from './shako1808Dimensions'
 const R = D.reconstruction
 export const grenadeReference = 'https://archaeolog.ru/media/smolensk/Бляха-накладка%20Гренада%20об%20одном%20огне.jpg'
 
-/** Subtle sheet bend follows the cone and steps onto the existing leather pocket. */
+/** Musketeer 1810: sheet follows felt, without the grenadier plume pocket. */
 export function badgeSeat(x: number, localY: number): number {
   const height = R.badgeBottom + localY
   const radius = shellRadiusAt(height)
-  const t = Math.max(0, Math.min(1, (height - (D.fact.shellHeight - D.fact.pocketHeight) + R.badgePocketBend) / R.badgePocketBend))
-  // PocketFace starts one leather thickness off the felt and has its own full thickness.
-  const pocket = t * t * (3 - 2 * t) * (R.leatherThickness * 2 + R.pocketGap * Math.max(0, (height - (D.fact.shellHeight - D.fact.pocketHeight)) / D.fact.pocketHeight))
-  return Math.sqrt(Math.max(0, radius * radius - x * x)) - radius + pocket
+  return Math.sqrt(Math.max(0, radius * radius - x * x)) - radius
 }
 
 /** Front photograph proportions: 145 px bomb diameter, 361 px overall height.
@@ -93,7 +90,7 @@ export function addGrenade(front: Group, material: Material): void {
     if (!(object instanceof Mesh)) return
     if (object.name === 'StampedOneFlameOutline') {
       const original = object.geometry
-      const subdivided = new TessellateModifier(R.badgePocketBend * 0.10, 8).modify(original)
+      const subdivided = new TessellateModifier(R.badgeMaxEdge, 8).modify(original)
       object.geometry = mergeVertices(subdivided, 0.0000001)
       subdivided.dispose()
       original.dispose()
@@ -104,5 +101,5 @@ export function addGrenade(front: Group, material: Material): void {
   })
   badge.userData.contactGap = R.badgeContactGap
   badge.position.copy(onShell(0, R.badgeBottom, R.badgeContactGap))
-  badge.rotation.x = Math.atan((D.derived.topRadius - D.derived.bottomRadius) / D.fact.shellHeight)
+  badge.rotation.x = Math.atan((D.derived.topRadius - D.derived.bottomRadius) / D.converted.shellHeight)
 }
