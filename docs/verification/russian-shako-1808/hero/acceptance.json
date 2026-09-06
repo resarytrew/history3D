@@ -1,0 +1,51 @@
+{
+  "version": "0.3.0",
+  "historicalReview": "PENDING HUMAN REVIEW",
+  "sourceBasedReconstruction": true,
+  "developmentOnly": true,
+  "trianglesBefore": 145892,
+  "trianglesAfter": 169076,
+  "meshesBefore": 54,
+  "meshesAfter": 54,
+  "drawCalls": 51,
+  "budgetDecision": "User explicitly superseded the pasted 120k ceiling: do not reduce triangle count; use detail as needed. Current measured review guard is 200k, not a historical constraint.",
+  "dimensions": "FACT/DERIVED geometry unchanged; existing tolerances retained.",
+  "proxyChanges": {
+    "repyok": "78x43 -> 58x35 mm, continuous lenticular cloth, 8 mm depth, lower insertion",
+    "grenade": "0.6 -> 0.45 mm sheet, 1.4 -> 0.95 mm relief, centre flame highest, sheet follows cone and pocket",
+    "cord": "4.5 -> 3.2 mm strand diameter, finer braid with slight thickness variation",
+    "tassels": "6 -> 4.6 mm head radius, 12 -> 10 mm head height, lighter fringe",
+    "stitches": "0.44 -> 0.24 mm thread diameter, reduced contrast, pocket/rear edge stitching"
+  },
+  "visualReview": {
+    "front": "PASS",
+    "threeQuarter": "PASS",
+    "side": "PASS",
+    "rear": "PASS",
+    "repyokFrontSideThreeQuarter": "PASS",
+    "badgeFrontSideThreeQuarter": "PASS",
+    "eightMaterialCloseups": "PASS",
+    "heroResearchMacro": "PASS"
+  },
+  "hotspots": {
+    "binding": "Raycast onto semantic detail meshes on load",
+    "tracking": "Projection writes DOM positions synchronously in rendered frames; no 80 ms throttle or React state delay",
+    "visibility": "Front-facing normal plus visible-mesh occlusion and clip-space check; hidden Interior excluded",
+    "tests": "48 orbit angles, initial anchors, reverse-side insignia, hidden/visible blocker"
+  },
+  "remainingUncertainties": [
+    "Exact repyok size and mounting details remain RECONSTRUCTION",
+    "Exact grenade dimensions, stamping profile and attribution remain unmeasured",
+    "Braid pattern, textile sag, thicknesses, material parameters and hand-made variations remain interpretive"
+  ],
+  "checks": {
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "unit": "34 passed",
+    "lockedDimensions": "PASS with original tolerances",
+    "render": "27 fixed images, no WebGL/JS errors",
+    "e2eMarkers": "desktop + mobile PASS; front insignia hidden at rear, restored to exact original coordinates after reset",
+    "e2eIntegration": "desktop + mobile PASS; six hotspots, orbit, reset, scale comparison, language and collection switching",
+    "e2eFull": "16 passed + 1 intentional desktop skip; one Ivan IV helmet initial-load timeout passed on isolated unchanged retry (0.9 s). All 17 applicable scenarios verified."
+  }
+}

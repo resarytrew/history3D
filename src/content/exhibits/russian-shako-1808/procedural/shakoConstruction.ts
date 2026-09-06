@@ -110,7 +110,7 @@ export function addConstruction(root: Group, clay: Material): void {
 }
 
 export function addStitches(root: Group): void {
-  const material = new MeshStandardMaterial({ name: 'WaxedSeamThread', color: '#353127', roughness: 0.88 })
+  const material = new MeshStandardMaterial({ name: 'WaxedSeamThread', color: '#25241f', roughness: 0.88 })
   const geometries = []
   for (const height of [F.lowerBandHeight - R.stitchInset, F.shellHeight - F.upperOverlap + R.stitchInset]) {
     const radius = shellRadiusAt(height), count = Math.floor(Math.PI * 2 * radius / R.stitchSpacing)
@@ -128,6 +128,20 @@ export function addStitches(root: Group): void {
       const points = [v, v + span].map((t) => {
         const p = reinforcementSurface(side, arm, edge + 0.006 * Math.sin(i * 3), t)
         return p.add(radialThickness(p)).add(new Vector3(p.x, 0, p.z).normalize().multiplyScalar(R.stitchRadius * 0.5))
+      })
+      geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 1, R.stitchRadius, 4))
+    }
+  }
+  // Existing leather edges only: no invented fittings or decorative seam patterns.
+  for (const front of [true, false]) for (const sign of [-1, 1]) {
+    const length = front ? F.pocketHeight : F.rearCoverHeight
+    const count = Math.floor(length / R.stitchSpacing)
+    for (let i = 1; i < count - 1; i++) {
+      const points = [i / count, i / count + R.stitchLength / length].map((v) => {
+        const y = front ? F.shellHeight - F.pocketHeight + length * v : length * v
+        const width = front ? R.pocketBottomWidth + (R.pocketTopWidth - R.pocketBottomWidth) * v : R.rearCoverWidth
+        const angle = (front ? 0 : Math.PI) + sign * (width / 2 - R.stitchInset) / shellRadiusAt(y)
+        return onShell(angle, y, R.leatherThickness + (front ? R.leatherThickness + R.pocketGap * v : R.surfaceOffset) + R.stitchRadius * 0.5)
       })
       geometries.push(new TubeGeometry(new CatmullRomCurve3(points), 1, R.stitchRadius, 4))
     }

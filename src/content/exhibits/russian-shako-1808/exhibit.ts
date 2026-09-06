@@ -13,11 +13,11 @@ export const russianShako1808: Exhibit = {
   chronology: { label: 'Образец 1808 года · кампания 1812 года', from: 1808, to: 1812 },
   geography: { region: 'Российская империя', culture: 'Русская армейская пехота' },
   reconstruction: shakoReconstruction,
-  model: { kind: 'procedural', factoryId: 'russian-shako-1808-v1', developmentOnly: true, approximateTriangles: 145_892 },
+  model: { kind: 'procedural', factoryId: 'russian-shako-1808-v1', developmentOnly: true, approximateTriangles: 169_076 },
   presentation: {
     initialYaw: 0, cameraPosition: [0.37, 0.32, 0.79], cameraTarget: [0, 0.17, 0],
     minDistance: 0.3, maxDistance: 1.6, safeAreaPadding: 0.12,
-    hotspotOcclusionTolerance: 0.008,
+    hotspotOcclusionTolerance: 0.00035,
     sceneScale: 0.08,
     lighting: 'artifact-studio',
     scaleComparison: { figurePosition: [-0.55, 0, 0], cameraPosition: [1.4, 1.4, 3.4], cameraTarget: [-0.2, 0.85, 0] },

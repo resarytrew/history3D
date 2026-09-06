@@ -34,5 +34,6 @@
     "Microscopic textile fibres are represented by subtle procedural bump rather than individual geometric fibres",
     "Interior is prepared but hidden in the normal exterior viewer"
   ],
-  "version": "0.2.0"
+  "version": "0.2.0",
+  "supersededBy": "hero/acceptance.json (0.3.0)"
 }

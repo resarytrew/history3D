@@ -226,5 +226,15 @@
       "museumImage": "Provided museumgagarin.ru image could not be opened (navigation timeout); not used as evidence."
     },
     "limitations": "Photo proportions are visually reconstructed, not a scan or measured tracing; exact stamping depth/scale and braid pattern remain assumptions."
+  },
+  "heroRefinement": {
+    "version": "0.3.0",
+    "latestInstructions": "Preserve detail; user explicitly removed pasted triangle reduction requirement. Fix marker drift and occlusion.",
+    "macro": "Locked dimensions and historical assembly unchanged",
+    "components": "Smaller continuous lenticular repyok, shallow conformed stamped grenade, finer ivory braid and lighter tassels",
+    "materials": "Restrained microstructure, distinct felt/leather/lacquered leather, muted brass family, thinner lower-contrast stitching",
+    "topology": "169076 triangles, 54 meshes; user requested no reduction; semantic nodes retained",
+    "review": "hero/README.md",
+    "historicalStatus": "PENDING HUMAN REVIEW"
   }
 }

@@ -12,7 +12,6 @@ import {
   PCFShadowMap,
   PMREMGenerator,
   PerspectiveCamera,
-  Raycaster,
   Scene,
   ShadowMaterial,
   SphereGeometry,
@@ -28,13 +27,9 @@ import { LatestRequestCoordinator } from '../state/latest-request'
 import { disposeObject3D } from './dispose'
 import { loadExhibitModel, type LoadedExhibitModel } from './model-runtime'
 import { artifactStudioExposure, createArtifactEnvironment, createArtifactLights } from './artifactStudio'
+import { bindSurfaceAnchor, projectSurfaceHotspots, type SurfaceAnchor, type ProjectedHotspot } from './hotspotProjection'
+export type { ProjectedHotspot } from './hotspotProjection'
 
-export interface ProjectedHotspot {
-  readonly id: string
-  readonly x: number
-  readonly y: number
-  readonly visible: boolean
-}
 
 interface ViewerCallbacks {
   readonly onReady: () => void
@@ -97,7 +92,7 @@ export class ViewerController {
   private readonly defaultLights = new Group()
   private readonly controls: OrbitControls
   private readonly coordinator = new LatestRequestCoordinator<LoadedExhibitModel>()
-  private readonly hotspotRaycaster = new Raycaster()
+  private readonly surfaceAnchors = new Map<string, SurfaceAnchor>()
   private readonly resizeObserver: ResizeObserver
   private readonly scaleFigure = createScaleFigure()
   private readonly groundShadow: Mesh
@@ -106,7 +101,7 @@ export class ViewerController {
   private activeModel: LoadedExhibitModel | null = null
   private exhibit: Exhibit | null = null
   private transition: CameraTransition | null = null
-  private projectionAt = 0
+  private projectionDirty = true
   private disposed = false
   private firstFramePending = false
   private interactionStartCamera: Vector3 | null = null
@@ -180,6 +175,7 @@ export class ViewerController {
     this.activeModel = null
     this.scaleFigure.visible = false
     this.callbacks.onHotspots([])
+    this.surfaceAnchors.clear()
     delete this.canvas.dataset.orbitChanged
     this.firstFramePending = true
     void this.coordinator
@@ -190,6 +186,8 @@ export class ViewerController {
           this.activeModel = loaded
           loaded.root.rotation.y = exhibit.presentation.initialYaw
           this.scene.add(loaded.root)
+          for (const hotspot of exhibit.hotspots) this.surfaceAnchors.set(hotspot.id, bindSurfaceAnchor(loaded.root, hotspot))
+          this.projectionDirty = true
           this.configureCamera(exhibit)
         },
         (stale) => stale.dispose(),
@@ -219,7 +217,7 @@ export class ViewerController {
   setScaleComparison(visible: boolean): void {
     this.scaleFigure.visible = visible
     if (visible) this.callbacks.onHotspots([])
-    this.projectionAt = 0
+    this.projectionDirty = true
     const comparison = this.exhibit?.presentation.scaleComparison
     if (comparison && this.exhibit) {
       this.controls.maxDistance = visible ? vectorFromTuple(comparison.cameraPosition).length() * 1.2 : this.exhibit.presentation.maxDistance
@@ -279,6 +277,7 @@ export class ViewerController {
     const width = Math.max(1, parent?.clientWidth ?? this.canvas.clientWidth)
     const height = Math.max(1, parent?.clientHeight ?? this.canvas.clientHeight)
     this.renderer.setSize(width, height, false)
+    this.projectionDirty = true
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
   }
@@ -298,31 +297,15 @@ export class ViewerController {
       this.firstFramePending = false
       this.callbacks.onReady()
     }
-    if (time - this.projectionAt > 80) {
-      this.projectionAt = time
+    if (this.projectionDirty) {
+      this.projectionDirty = false
       this.publishHotspots()
     }
   }
 
   private publishHotspots(): void {
     if (!this.exhibit || !this.activeModel || this.scaleFigure.visible) return
-    const positions = this.exhibit.hotspots.map((hotspot) => {
-      const world = vectorFromTuple(hotspot.position)
-      this.activeModel?.root.localToWorld(world)
-      const cameraToAnchor = world.clone().sub(this.camera.position)
-      const anchorDistance = cameraToAnchor.length()
-      this.hotspotRaycaster.set(this.camera.position, cameraToAnchor.normalize())
-      const firstHit = this.hotspotRaycaster.intersectObject(this.activeModel!.root, true)[0]
-      const occluded = Boolean(firstHit && firstHit.distance < anchorDistance - (this.exhibit!.presentation.hotspotOcclusionTolerance ?? 0.13))
-      const projected = world.clone().project(this.camera)
-      return {
-        id: hotspot.id,
-        x: (projected.x * 0.5 + 0.5) * 100,
-        y: (-projected.y * 0.5 + 0.5) * 100,
-        visible: !occluded && projected.z < 1 && Math.abs(projected.x) < 1.1 && Math.abs(projected.y) < 1.1,
-      }
-    })
-    this.callbacks.onHotspots(positions)
+    this.callbacks.onHotspots(projectSurfaceHotspots(this.activeModel.root, this.camera, this.exhibit.hotspots, this.surfaceAnchors, this.exhibit.presentation.hotspotOcclusionTolerance ?? 0.13))
   }
 
   private readonly handleControlsStart = (): void => {
@@ -330,6 +313,7 @@ export class ViewerController {
   }
 
   private readonly handleControlsChange = (): void => {
+    this.projectionDirty = true
     if (this.interactionStartCamera && this.camera.position.distanceToSquared(this.interactionStartCamera) > 0.0001) {
       this.canvas.dataset.orbitChanged = 'true'
     }

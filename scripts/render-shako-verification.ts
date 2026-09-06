@@ -5,7 +5,9 @@ import { chromium } from '@playwright/test'
 import { createServer } from 'vite'
 
 const pass = Number(process.argv.find((a) => a.startsWith('--pass='))?.split('=')[1] ?? 5)
-const out = resolve('docs/verification/russian-shako-1808')
+const hero = process.argv.includes('--hero')
+const before = process.argv.includes('--before')
+const out = resolve('docs/verification/russian-shako-1808', hero ? (before ? 'hero-before' : 'hero') : '.')
 await mkdir(out, { recursive: true })
 const server = await createServer({ server: { host: '127.0.0.1', port: 4187, hmr: false, watch: null }, logLevel: 'error' })
 await server.listen()
@@ -18,7 +20,7 @@ try {
   await page.addInitScript({ content: 'window.__name = (fn) => fn' })
   await page.route('**/__shako-review', (route) => route.fulfill({ contentType: 'text/html', body: '<html><body></body></html>' }))
   await page.goto(server.resolvedUrls!.local[0] + '__shako-review')
-  const metrics = await page.evaluate(async (passNumber) => {
+  const metrics = await page.evaluate(async ({ passNumber, hero }) => {
     // Imports are resolved by the running Vite dev server, using the real Three.js WebGL renderer.
     const threeUrl = '/node_modules/three/build/three.module.js'
     const modelUrl = '/src/content/exhibits/russian-shako-1808/procedural/createRussianShako1808.ts'
@@ -40,6 +42,11 @@ try {
     const shadowSun = new T.DirectionalLight('#ffe8c4', 0.35); shadowSun.position.set(8, 11, 7); scene.add(shadowSun)
     const root = createRussianShako1808ForPass(passNumber)
     scene.add(root)
+    if (hero) {
+      scene.environmentRotation.y = 0.25
+      const grazing = new T.DirectionalLight('#f4eee1', 0.4)
+      grazing.name = 'HeroReviewRakingLight'; grazing.position.set(3, 1, 4); scene.add(grazing)
+    }
     const camera = new T.PerspectiveCamera(34, 800 / 900, 0.001, 10)
     const target = new T.Vector3(0, 0.16, 0), radius = 0.91
     const review = (angle: number, top = false) => {
@@ -54,6 +61,36 @@ try {
         textile: { target: [-0.123, 0.125, 0], position: [-0.38, 0.17, 0.12] },
       }
       camera.position.fromArray(points[part].position); camera.lookAt(new T.Vector3().fromArray(points[part].target)); renderer.render(scene, camera)
+    } })
+    Object.assign(window, { shakoHero: (name: string) => {
+      const repyok = new T.Box3().setFromObject(root.getObjectByName('Repyok')).getCenter(new T.Vector3())
+      const badge = new T.Box3().setFromObject(root.getObjectByName('FrontBadge_OneFlameGrenade')).getCenter(new T.Vector3())
+      const frame = (target: InstanceType<typeof T.Vector3>, offset: number[]) => {
+        camera.position.copy(target).add(new T.Vector3().fromArray(offset)); camera.lookAt(target); renderer.render(scene, camera)
+      }
+      if (name.startsWith('repyok-')) {
+        const angle = name.endsWith('side') ? Math.PI / 2 : name.endsWith('three-quarter') ? Math.PI / 4 : 0
+        frame(repyok, [Math.sin(angle) * 0.16, 0.008, Math.cos(angle) * 0.16]); return
+      }
+      if (name.startsWith('badge-')) {
+        const angle = name.endsWith('side') ? Math.PI * 0.47 : name.endsWith('three-quarter') ? Math.PI / 4 : 0
+        frame(badge, [Math.sin(angle) * 0.20, 0.012, Math.cos(angle) * 0.20]); return
+      }
+      const close: Record<string, { target: number[], offset: number[] }> = {
+        '01-shell-material-close': { target: [0.061, 0.18, 0.100], offset: [0.100, 0.01, 0.18] },
+        '02-leather-band-close': { target: [0.035, 0.24, 0.121], offset: [0.1, 0.045, 0.19] },
+        '03-visor-close': { target: [0.032, 0.052, 0.15], offset: [0.13, 0.20, 0.21] },
+        '04-grenade-close': { target: badge.toArray(), offset: [0.065, 0.025, 0.20] },
+        '05-repyok-close': { target: repyok.toArray(), offset: [0.055, 0.012, 0.16] },
+        '06-etishkhet-close': { target: [0.073, 0.139, 0.10], offset: [0.15, 0.025, 0.16] },
+        '07-tassel-close': { target: [-0.14, 0.075, 0], offset: [-0.15, 0.025, 0.075] },
+        '08-rear-buckle-close': { target: [0, 0.10, -0.112], offset: [-0.075, 0.02, -0.145] },
+      }
+      if (close[name]) { frame(new T.Vector3().fromArray(close[name].target), close[name].offset); return }
+      if (name === 'distance-macro') { frame(badge, [0.035, 0.02, 0.19]); return }
+      // A 0.86 m distance frames approximately 60% height; research uses half that distance.
+      const distance = name === 'distance-research' ? 0.43 : 0.86
+      frame(new T.Vector3(0, 0.164, 0), [Math.sin(Math.PI / 6) * distance, distance * 0.14, Math.cos(Math.PI / 6) * distance])
     } })
     Object.assign(window, { shakoThumbnail: () => {
       renderer.setSize(320, 240)
@@ -86,7 +123,7 @@ try {
       lowerBand: sizeOf('LowerBand').y * 1000,
     }
     return { pass: passNumber, triangles, visibleTriangles, meshes, dimensionsMm, boundingBox: { min: box.min.toArray(), max: box.max.toArray(), size: box.getSize(new T.Vector3()).toArray() }, ...review(0) }
-  }, pass)
+  }, { passNumber: pass, hero })
   const views = { front: 0, 'front-right': 45, right: 90, 'rear-right': 135, rear: 180, left: 270, top: 0 }
   const renders: Record<string, unknown> = {}
   for (const [name, degrees] of Object.entries(views)) {
@@ -99,8 +136,17 @@ try {
     await page.evaluate((part) => (window as unknown as { shakoDetail: (part: string) => void }).shakoDetail(part), part)
     await page.screenshot({ path: resolve(out, `fidelity-${part}.png`) })
   }
+  if (hero) {
+    const names = ['repyok-front', 'repyok-three-quarter', 'repyok-side', 'badge-front', 'badge-three-quarter', 'badge-side',
+      '01-shell-material-close', '02-leather-band-close', '03-visor-close', '04-grenade-close', '05-repyok-close', '06-etishkhet-close', '07-tassel-close', '08-rear-buckle-close',
+      'distance-hero', 'distance-research', 'distance-macro']
+    for (const name of names) {
+      await page.evaluate((name) => (window as unknown as { shakoHero: (name: string) => void }).shakoHero(name), name)
+      await page.screenshot({ path: resolve(out, `${name}.png`) })
+    }
+  }
   await writeFile(resolve(out, `pass-${pass}-metrics.json`), JSON.stringify({ ...metrics, renders }, null, 2) + '\n')
-  if (pass === 5) {
+  if (pass === 5 && !before) {
     const assets = resolve('src/content/exhibits/russian-shako-1808')
     await mkdir(resolve(assets, 'images'), { recursive: true })
     await mkdir(resolve(assets, 'backgrounds'), { recursive: true })

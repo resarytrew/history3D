@@ -2,6 +2,7 @@ import { Box3, Mesh, MeshStandardMaterial, Raycaster, Vector3 } from 'three'
 import { afterAll, describe, expect, it } from 'vitest'
 import { createRussianShako1808, createRussianShako1808ForPass } from '../src/content/exhibits/russian-shako-1808/procedural/createRussianShako1808'
 import { reinforcementSurface } from '../src/content/exhibits/russian-shako-1808/procedural/shakoConstruction'
+import { badgeSeat } from '../src/content/exhibits/russian-shako-1808/procedural/shakoGrenade'
 import { D } from '../src/content/exhibits/russian-shako-1808/procedural/shako1808Dimensions'
 import { disposeObject3D } from '../src/three/dispose'
 
@@ -69,7 +70,15 @@ describe('semantic, material and performance contract', () => {
   it('keeps the photo-guided grenade a thin embossed sheet with a front-facing bomb', () => {
     const badge = model.getObjectByName('FrontBadge_OneFlameGrenade')!
     const local = new Box3()
-    badge.traverse((o) => { if (o instanceof Mesh) local.union(new Box3().setFromBufferAttribute(o.geometry.attributes.position)) })
+    badge.traverse((o) => {
+      if (!(o instanceof Mesh)) return
+      const positions = o.geometry.attributes.position
+      for (let i = 0; i < positions.count; i++) {
+        const p = new Vector3().fromBufferAttribute(positions, i)
+        p.z -= badgeSeat(p.x, p.y)
+        local.expandByPoint(p)
+      }
+    })
     expect(local.getSize(new Vector3()).z).toBeLessThan(0.003)
     expect(local.getSize(new Vector3()).x).toBeCloseTo(0.029, 3)
     const origin = new Vector3(0, D.reconstruction.badgeHeight * 72 / 361, 0.1).applyMatrix4(badge.matrixWorld)
@@ -83,6 +92,17 @@ describe('semantic, material and performance contract', () => {
     expect(model.getObjectByName('LeftTassel')!.userData.suspensionLength).toBeLessThan(model.getObjectByName('RightTassel3')!.userData.suspensionLength)
     for (const name of ['Plume', 'Eagle', 'Cockade', 'BrassScales']) expect(model.getObjectByName(name)).toBeUndefined()
   })
+  it('seats the upper flame in front of the complete leather pocket thickness', () => {
+    const badge = model.getObjectByName('FrontBadge_OneFlameGrenade')!
+    for (const y of [0.057, 0.061, 0.065]) {
+      const origin = new Vector3(0, y, 0.1).applyMatrix4(badge.matrixWorld)
+      const ray = new Raycaster(origin, new Vector3(0, 0, -1).transformDirection(badge.matrixWorld))
+      const badgeHit = ray.intersectObject(badge, true)[0]
+      const pocketHit = ray.intersectObject(model.getObjectByName('FrontOrnamentPocket')!, true)[0]
+      expect(badgeHit).toBeDefined(); expect(pocketHit).toBeDefined()
+      expect(badgeHit.distance).toBeLessThan(pocketHit.distance)
+    }
+  })
   it('separates matte felt, leather, cotton and brass; keeps the chinstrap leather', () => {
     const material = (name: string) => (model.getObjectByName(name) as Mesh).material as MeshStandardMaterial
     expect(material('FeltUpper').roughness).toBeGreaterThan(material('UpperLeatherBand').roughness)
@@ -91,7 +111,7 @@ describe('semantic, material and performance contract', () => {
     expect(material('StampedOneFlameOutline').metalness).toBeGreaterThan(0.8)
     expect(material('FrontBraid').name).toBe('CordWhite')
   })
-  it('stays within the allowed 150,000 detail budget including the prepared interior, with finite geometry', () => {
+  it('keeps the user-requested detail level within a measured 200,000 review budget including the prepared interior, with finite geometry', () => {
     let triangles = 0, meshes = 0
     model.traverse((o) => {
       if (!(o instanceof Mesh)) return
@@ -100,7 +120,8 @@ describe('semantic, material and performance contract', () => {
       triangles += (o.geometry.index?.count ?? position.count) / 3
       expect(Array.from(position.array).every(Number.isFinite), o.name).toBe(true)
     })
-    expect(triangles).toBeLessThanOrEqual(150_000)
+    expect(triangles).toBeGreaterThanOrEqual(145_892)
+    expect(triangles).toBeLessThanOrEqual(200_000)
     expect(meshes).toBeLessThanOrEqual(65)
   })
   it('keeps the clay blockout free of ornaments and textures', () => {

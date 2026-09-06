@@ -1,0 +1,63 @@
+{
+  "pass": 5,
+  "triangles": 145892,
+  "visibleTriangles": 143668,
+  "meshes": 54,
+  "dimensionsMm": {
+    "shellHeight": 174.99999701976776,
+    "topDiameter": 254.99999523162842,
+    "bottomDiameter": 210.00000768620558,
+    "visorProjection": 75.00000330945458,
+    "vStrapWidth": 17.985447072276415,
+    "lowerBand": 20.000003278255463
+  },
+  "boundingBox": {
+    "min": [
+      -0.14606253802776337,
+      0.02199999988079071,
+      -0.12786227464675903
+    ],
+    "max": [
+      0.14603698253631592,
+      0.324,
+      0.18000000715255737
+    ],
+    "size": [
+      0.2920995205640793,
+      0.3020000001192093,
+      0.3078622817993164
+    ]
+  },
+  "drawCalls": 51,
+  "renderedTriangles": 143668,
+  "renders": {
+    "front": {
+      "drawCalls": 51,
+      "renderedTriangles": 143668
+    },
+    "front-right": {
+      "drawCalls": 51,
+      "renderedTriangles": 143668
+    },
+    "right": {
+      "drawCalls": 51,
+      "renderedTriangles": 143668
+    },
+    "rear-right": {
+      "drawCalls": 51,
+      "renderedTriangles": 143668
+    },
+    "rear": {
+      "drawCalls": 51,
+      "renderedTriangles": 143668
+    },
+    "left": {
+      "drawCalls": 51,
+      "renderedTriangles": 143668
+    },
+    "top": {
+      "drawCalls": 51,
+      "renderedTriangles": 143668
+    }
+  }
+}

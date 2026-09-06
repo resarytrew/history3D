@@ -59,6 +59,11 @@ export interface Hotspot {
   readonly label: string
   readonly category: 'form' | 'construction' | 'decoration' | 'context'
   readonly position: readonly [number, number, number]
+  readonly surface?: {
+    readonly objectName: string
+    readonly normal: readonly [number, number, number]
+    readonly searchDistance: number
+  }
   readonly cameraTarget: readonly [number, number, number]
   readonly cameraPosition?: readonly [number, number, number]
   readonly description: string

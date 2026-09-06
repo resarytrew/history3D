@@ -1,5 +1,32 @@
 import { expect, test } from '@playwright/test'
 
+test('detail markers follow the orbit and disappear on the back of the shako', async ({ page }, testInfo) => {
+  test.setTimeout(120_000)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/?exhibit=russian-shako-1808')
+  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0', { timeout: 30_000 })
+  const canvas = page.locator('canvas.viewer-canvas'), bounds = (await canvas.boundingBox())!
+  const badge = page.locator('[data-hotspot-id="shako-grenade"]')
+  const repyok = page.locator('[data-hotspot-id="shako-repyok"]')
+  await expect(badge).toBeVisible(); await expect(repyok).toBeVisible()
+  const before = await badge.evaluate((button) => ({ x: button.style.left, y: button.style.top }))
+  // OrbitControls uses viewport height to convert pointer delta to a full revolution.
+  const startX = bounds.x + bounds.width * 0.9, y = bounds.y + bounds.height * 0.44
+  const initialAzimuth = Math.atan2(0.37, 0.79)
+  const delta = (Math.PI - initialAzimuth) / (Math.PI * 2) * bounds.height
+  await page.mouse.move(startX, y); await page.mouse.down()
+  await page.mouse.move(startX - delta * 0.1, y, { steps: 4 })
+  await expect.poll(() => badge.evaluate((button) => button.style.left)).not.toBe(before.x)
+  await page.mouse.move(startX - delta, y, { steps: 28 }); await page.mouse.up()
+  await expect(badge).toBeHidden(); await expect(repyok).toBeHidden()
+  await expect(page.locator('[data-hotspot-id="shako-cord"]')).toBeHidden()
+  await page.screenshot({ path: `docs/verification/russian-shako-1808/hero/markers-rear-${testInfo.project.name}.png` })
+  await page.getByRole('button', { name: 'Сбросить ракурс' }).click()
+  await expect(badge).toBeVisible(); await expect(repyok).toBeVisible()
+  await expect.poll(() => badge.evaluate((button) => button.style.left)).toBe(before.x)
+  await expect.poll(() => badge.evaluate((button) => button.style.top)).toBe(before.y)
+})
+
 test('shako loads in WebGL, exposes all six details and survives collection switching', async ({ page }, testInfo) => {
   test.setTimeout(120_000)
   const errors: string[] = []
@@ -13,7 +40,7 @@ test('shako loads in WebGL, exposes all six details and survives collection swit
   await expect(canvas).toHaveAttribute('data-renderer', 'webgl', { timeout: 30_000 })
   await expect(canvas).toHaveAttribute('data-lighting', 'artifact-studio')
   await expect(page.locator('.viewer-poster')).toHaveClass(/is-hidden/, { timeout: 30_000 })
-  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0')
+  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0', { timeout: 30_000 })
   await page.screenshot({ path: `docs/verification/russian-shako-1808/integration-${testInfo.project.name}.png` })
   const labels = ['Форма тульи', 'V-образное усиление', 'Гренада об одном огне', 'Репеёк', 'Этишкет', 'Козырёк']
   for (const [i, label] of labels.entries()) {
@@ -31,7 +58,7 @@ test('shako loads in WebGL, exposes all six details and survives collection swit
     const compare = page.getByRole('button', { name: 'Сравнить масштаб', exact: true })
     await compare.click()
     await expect(compare).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.locator('.hotspot-marker')).toHaveCount(0)
+    await expect(page.locator('.hotspot-marker:visible')).toHaveCount(0)
     await page.screenshot({ path: 'docs/verification/russian-shako-1808/scale-comparison.png' })
     await compare.click()
     await expect(compare).toHaveAttribute('aria-pressed', 'false')

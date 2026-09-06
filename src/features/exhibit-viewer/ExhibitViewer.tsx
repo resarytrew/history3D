@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type { Exhibit, Hotspot } from '../../content/types'
 import { ViewerController, type ProjectedHotspot } from '../../three/ViewerController'
 import { useUi } from '../../i18n/ui'
@@ -22,12 +22,16 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
     const controllerRef = useRef<ViewerController | null>(null)
     const [ready, setReady] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [projected, setProjected] = useState<readonly ProjectedHotspot[]>([])
-
-    const hotspotById = useMemo(
-      () => new Map(exhibit.hotspots.map((hotspot) => [hotspot.id, hotspot])),
-      [exhibit.hotspots],
-    )
+    const hotspotLayerRef = useRef<HTMLDivElement>(null)
+    // Write projection in the renderer's frame; React state would introduce a frame of lag.
+    const publishProjection = (positions: readonly ProjectedHotspot[]) => {
+      const byId = new Map(positions.map((position) => [position.id, position]))
+      hotspotLayerRef.current?.querySelectorAll<HTMLButtonElement>('[data-hotspot-id]').forEach((button) => {
+        const position = byId.get(button.dataset.hotspotId!)
+        button.hidden = !position?.visible
+        if (position) { button.style.left = `${position.x}%`; button.style.top = `${position.y}%` }
+      })
+    }
 
     useImperativeHandle(ref, () => ({
       reset: () => controllerRef.current?.reset(),
@@ -43,17 +47,17 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
         controller = new ViewerController(canvas, {
           onReady: () => setReady(true),
           onError: (message) => {
-            setProjected([])
+            publishProjection([])
             setError(message)
           },
-          onHotspots: setProjected,
+          onHotspots: publishProjection,
         })
       } catch (cause) {
         const detail = cause instanceof Error ? cause.message : 'Неизвестная ошибка инициализации viewer.'
         canvas.dataset.renderer = 'unavailable'
         canvas.dataset.rendererError = detail
         setError(`3D-viewer не запущен — показан poster экспоната. ${detail}`)
-        setProjected([])
+        publishProjection([])
         return
       }
       controllerRef.current = controller
@@ -67,7 +71,7 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
       if (!controllerRef.current) return
       setReady(false)
       setError(null)
-      setProjected([])
+      publishProjection([])
       controllerRef.current.load(exhibit)
     }, [exhibit])
 
@@ -77,23 +81,20 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
           <img src={exhibit.assets.poster} alt="" />
         </picture>
         <canvas ref={canvasRef} className={`viewer-canvas ${error ? 'is-unavailable' : ''}`} tabIndex={0} aria-label={ui.viewerLabel} />
-        <div className="hotspot-layer" aria-label="Точки исследования">
-          {projected.map((position) => {
-            const hotspot = hotspotById.get(position.id)
-            if (!hotspot || !position.visible) return null
-            return (
+        <div ref={hotspotLayerRef} className="hotspot-layer" aria-label="Точки исследования">
+          {exhibit.hotspots.map((hotspot) => (
               <button
                 key={hotspot.id}
                 type="button"
                 className={`hotspot-marker ${selectedHotspotId === hotspot.id ? 'is-active' : ''}`}
-                style={{ left: `${position.x}%`, top: `${position.y}%` }}
+                data-hotspot-id={hotspot.id}
+                hidden
                 aria-label={`${hotspot.number}. ${hotspot.label}`}
                 onClick={() => onSelectHotspot(hotspot)}
               >
                 {hotspot.number}
               </button>
-            )
-          })}
+          ))}
         </div>
         {!ready && !error && <div className="viewer-loading" role="status">{ui.preparing}</div>}
         {error && <div className="viewer-error" role="alert">{error}</div>}
