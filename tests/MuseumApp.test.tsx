@@ -12,6 +12,17 @@ vi.mock('../src/features/exhibit-viewer/ExhibitViewer', () => ({
 }))
 
 describe('MuseumApp', () => {
+  it('switches collections without losing the ancient Rus carousel', async () => {
+    const user = userEvent.setup()
+    render(<MuseumApp />)
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Коллекция' }), 'russian-empire')
+    expect(screen.getByRole('heading', { name: 'Пехотный кивер' })).toBeInTheDocument()
+    expect(screen.getByText('Историческая 3D-реконструкция')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Шлем Ивана IV' })).not.toBeInTheDocument()
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Коллекция' }), 'ancient-rus')
+    expect(screen.getByRole('button', { name: 'Шлем Ивана IV' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Покрова на Нерли' })).toBeInTheDocument()
+  })
   it('opens the observation-first research flow', async () => {
     const user = userEvent.setup()
     render(<MuseumApp />)

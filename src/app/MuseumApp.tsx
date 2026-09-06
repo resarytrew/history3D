@@ -1,8 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Brand } from '../components/Brand'
 import { Icon } from '../components/Icon'
-import { ancientRusCollection } from '../content/collections/ancient-rus'
-import { getExhibit } from '../content/catalog'
+import { collections, getExhibit } from '../content/catalog'
 import type { Hotspot, Locale } from '../content/types'
 import { ExhibitCarousel } from '../features/exhibit-carousel/ExhibitCarousel'
 import { ExhibitInfo } from '../features/exhibit-info/ExhibitInfo'
@@ -20,9 +19,13 @@ const ExhibitViewer = lazy(async () => {
 
 function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; readonly setLocale: (locale: Locale) => void }) {
   const ui = useUi()
-  const [activeExhibitId, setActiveExhibitId] = useState(ancientRusCollection.defaultExhibitId)
+  const [activeExhibitId, setActiveExhibitId] = useState(() => {
+    const requested = new URLSearchParams(window.location.search).get('exhibit')
+    return requested && getExhibit(requested) ? requested : collections[0].defaultExhibitId
+  })
   const exhibit = getExhibit(activeExhibitId)
   if (!exhibit) throw new Error('Default exhibit is missing from the catalog')
+  const collection = collections.find((item) => item.id === exhibit.collectionId) ?? collections[0]
   const content = exhibit.content[locale] ?? exhibit.content.ru
   if (!content) throw new Error(`Exhibit ${exhibit.id} has no usable content record`)
 
@@ -35,7 +38,7 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
   const [liveMessage, setLiveMessage] = useState('')
   const narration = useNarration(content.narration, locale)
   const thumbnails = Object.fromEntries(
-    ancientRusCollection.entries.flatMap((entry) => {
+    collection.entries.flatMap((entry) => {
       const entryExhibit = entry.exhibitId ? getExhibit(entry.exhibitId) : undefined
       return entryExhibit ? [[entry.id, entryExhibit.assets.thumbnail]] : []
     }),
@@ -48,12 +51,12 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
   const selectHotspot = useCallback((hotspot: Hotspot) => {
     setSelectedHotspot(hotspot)
     viewerRef.current?.focusHotspot(hotspot)
-  }, [])
+  }, [setSelectedHotspot])
 
   const closeSources = useCallback(() => {
     setSourcesOpen(false)
     window.requestAnimationFrame(() => sourcesTriggerRef.current?.focus())
-  }, [])
+  }, [setSourcesOpen])
 
   const toggleCompare = () => {
     const next = !compareScale
@@ -71,15 +74,19 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
     else await document.exitFullscreen?.()
   }
 
-  const selectCollectionEntry = (entryId: string) => {
-    const entry = ancientRusCollection.entries.find((item) => item.id === entryId)
-    if (entry?.exhibitId) {
+  const selectExhibit = (id: string) => {
       narration.stop()
       setSelectedHotspot(null)
       setResearchOpen(false)
       setSourcesOpen(false)
       setCompareScale(false)
-      setActiveExhibitId(entry.exhibitId)
+      setActiveExhibitId(id)
+  }
+
+  const selectCollectionEntry = (entryId: string) => {
+    const entry = collection.entries.find((item) => item.id === entryId)
+    if (entry?.exhibitId) {
+      selectExhibit(entry.exhibitId)
     } else {
       setLiveMessage(ui.draftMessage)
       window.setTimeout(() => setLiveMessage(''), 4200)
@@ -87,7 +94,7 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
   }
 
   return (
-    <main className="museum-shell">
+    <main className={`museum-shell ${exhibit.reconstruction.type === 'source-based-reconstruction' ? 'studio-exhibit' : ''}`}>
       <picture className="scene-background" aria-hidden="true">
         <source media="(max-width: 720px), (orientation: portrait)" srcSet={exhibit.assets.backgrounds.portrait} />
         <img src={exhibit.assets.backgrounds.landscape} alt="" />
@@ -95,7 +102,15 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
       <div className="scene-vignette" aria-hidden="true" />
 
       <header className="museum-header">
-        <Brand subtitle={ui.ancientRus} />
+        <div className="collection-navigation">
+          <Brand subtitle={content.collectionLabel} />
+          <select className="collection-select" aria-label={locale === 'ru' ? 'Коллекция' : 'Collection'} value={collection.id} onChange={(event) => {
+            const next = collections.find((item) => item.id === event.target.value)
+            if (next) selectExhibit(next.defaultExhibitId)
+          }}>
+            {collections.map((item) => <option key={item.id} value={item.id}>{locale === 'en' ? (getExhibit(item.defaultExhibitId)?.content.en?.collectionLabel ?? item.title) : item.title}</option>)}
+          </select>
+        </div>
         <div className="top-controls">
           <button className="top-button language-button" type="button" onClick={() => {
             setSelectedHotspot(null)
@@ -118,7 +133,7 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
           <picture className="viewer-poster"><img src={exhibit.assets.poster} alt="" /></picture>
         </div>
       )}>
-        <ExhibitViewer key={exhibit.id} ref={viewerRef} exhibit={exhibit} selectedHotspotId={selectedHotspot?.id ?? null} onSelectHotspot={selectHotspot} />
+        <ExhibitViewer ref={viewerRef} exhibit={exhibit} selectedHotspotId={selectedHotspot?.id ?? null} onSelectHotspot={selectHotspot} />
       </Suspense>
 
       <div className="left-panel-wrap">
@@ -131,6 +146,7 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
             <ExhibitInfo
               content={content}
               isScan={exhibit.reconstruction.type === 'scan'}
+              isSourceBased={exhibit.reconstruction.type === 'source-based-reconstruction'}
               narrationState={narration.state}
               onNarration={() => void narration.toggle()}
               onResearch={() => setResearchOpen(true)}
@@ -140,10 +156,10 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
         )}
       </div>
 
-      {selectedHotspot && <HotspotCard hotspot={selectedHotspot} onClose={resetView} />}
+      {selectedHotspot && <HotspotCard key={selectedHotspot.id} hotspot={selectedHotspot} observationFirst={exhibit.reconstruction.type === 'source-based-reconstruction'} onClose={resetView} />}
 
       <ExhibitCarousel
-        collection={ancientRusCollection}
+        collection={collection}
         activeId={exhibit.id}
         thumbnails={thumbnails}
         onSelect={selectCollectionEntry}
@@ -151,11 +167,11 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
 
       <aside className="exhibit-mode" aria-label={ui.exhibitMode}>
         <span><Icon name="eye" /></span>
-        <div><strong>{ui.exhibitMode}</strong><p>{exhibit.category === 'armor' ? `${content.categoryLabel} • 360°` : ui.exterior}</p></div>
+        <div><strong>{ui.exhibitMode}</strong><p>{exhibit.category !== 'architecture' ? `${content.categoryLabel} • 360°` : ui.exterior}</p></div>
       </aside>
 
       <div className="development-notice">
-        {exhibit.reconstruction.type === 'scan' ? '3D-СКАН • CC BY 4.0' : 'DEV_ONLY • не научная реконструкция'}
+        {exhibit.reconstruction.type === 'scan' ? '3D-СКАН • CC BY 4.0' : exhibit.reconstruction.type === 'source-based-reconstruction' ? ui.pendingHistoricalReview : 'DEV_ONLY • не научная реконструкция'}
       </div>
       <div className="live-region" aria-live="polite">{liveMessage}</div>
       {liveMessage && <div className="toast" role="status">{liveMessage}</div>}

@@ -18,6 +18,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "verify:3d": "tsx scripts/render-pokrov-verification.ts",
+    "verify:shako": "tsx scripts/render-shako-verification.ts",
     "validate:content": "tsx scripts/validate-content.ts"
   },
   "dependencies": {

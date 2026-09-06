@@ -2,6 +2,7 @@ import { Box3, Group, Mesh, Vector3 } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import type { ExhibitModel, GlbExhibitModel } from '../content/types'
 import { disposeObject3D } from './dispose'
+import { proceduralModelRegistry } from './proceduralModelRegistry'
 
 export interface LoadedExhibitModel {
   readonly root: Group
@@ -10,12 +11,12 @@ export interface LoadedExhibitModel {
 
 async function loadProcedural(factoryId: string, signal: AbortSignal): Promise<Group> {
   signal.throwIfAborted()
-  if (factoryId !== 'pokrov-na-nerli-procedural-v2') {
+  if (!Object.hasOwn(proceduralModelRegistry, factoryId)) {
     throw new Error(`Unknown procedural factory: ${factoryId}`)
   }
-  const { createPokrovNaNerliModel } = await import('../content/exhibits/pokrov-na-nerli/procedural/createPokrovNaNerliModel')
+  const factory = await proceduralModelRegistry[factoryId]()
   signal.throwIfAborted()
-  return createPokrovNaNerliModel()
+  return factory()
 }
 
 async function loadGlb(model: GlbExhibitModel, signal: AbortSignal): Promise<Group> {

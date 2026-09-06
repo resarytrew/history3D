@@ -30,8 +30,8 @@ export function ProvenanceDrawer({ exhibit, open, onClose }: ProvenanceDrawerPro
         <p className="eyebrow">{ui.reconstructionPassport}</p>
         <h2 id="provenance-title">{ui.sourcesAccuracy}</h2>
         <div className="accuracy-summary">
-          <strong>{ui.interpretive}</strong>
-          <span>{ui.technicalReview}</span>
+          <strong>{exhibit.reconstruction.type === 'source-based-reconstruction' ? ui.historicalReconstruction : exhibit.reconstruction.type === 'scan' ? '3D-скан' : ui.interpretive}</strong>
+          <span>{exhibit.status === 'historical-review' ? ui.pendingHistoricalReview : ui.technicalReview}</span>
           <p>{exhibit.reconstruction.summary}</p>
         </div>
         {(Object.keys(evidenceLabels) as Array<keyof typeof evidenceLabels>).map((key) => (

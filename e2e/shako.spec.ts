@@ -1,0 +1,57 @@
+import { expect, test } from '@playwright/test'
+
+test('shako loads in WebGL, exposes all six details and survives collection switching', async ({ page }, testInfo) => {
+  test.setTimeout(120_000)
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/?exhibit=russian-shako-1808')
+  await expect(page.getByRole('heading', { name: 'Пехотный кивер' })).toBeVisible()
+  const canvas = page.locator('canvas.viewer-canvas')
+  const originalCanvas = await canvas.elementHandle()
+  await expect(canvas).toHaveAttribute('data-renderer', 'webgl', { timeout: 30_000 })
+  await expect(page.locator('.viewer-poster')).toHaveClass(/is-hidden/, { timeout: 30_000 })
+  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0')
+  await page.screenshot({ path: `docs/verification/russian-shako-1808/integration-${testInfo.project.name}.png` })
+  const labels = ['Форма тульи', 'V-образное усиление', 'Гренада об одном огне', 'Репеёк', 'Этишкет', 'Козырёк']
+  for (const [i, label] of labels.entries()) {
+    const marker = page.getByRole('button', { name: `${i + 1}. ${label}`, exact: true })
+    await expect(marker).toBeVisible()
+    await marker.click()
+    await expect(page.locator('.hotspot-card')).toBeVisible()
+    await expect(page.locator('.hotspot-card details')).not.toHaveAttribute('open')
+    await page.locator('.hotspot-card summary').click()
+    await expect(page.locator('.hotspot-card details p')).toBeVisible()
+    await page.getByRole('button', { name: 'Сбросить ракурс' }).click()
+    await expect(page.locator('.hotspot-card')).toHaveCount(0)
+  }
+  if (testInfo.project.name === 'chromium') {
+    const compare = page.getByRole('button', { name: 'Сравнить масштаб', exact: true })
+    await compare.click()
+    await expect(compare).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.locator('.hotspot-marker')).toHaveCount(0)
+    await page.screenshot({ path: 'docs/verification/russian-shako-1808/scale-comparison.png' })
+    await compare.click()
+    await expect(compare).toHaveAttribute('aria-pressed', 'false')
+  }
+  const bounds = (await canvas.boundingBox())!
+  await page.mouse.move(bounds.x + bounds.width * 0.6, bounds.y + bounds.height * 0.4)
+  await page.mouse.down()
+  await page.mouse.move(bounds.x + bounds.width * 0.9, bounds.y + bounds.height * 0.4, { steps: 12 })
+  await page.mouse.up()
+  await expect(canvas).toHaveAttribute('data-orbit-changed', 'true')
+  await page.getByRole('button', { name: 'Источники', exact: true }).click()
+  await expect(page.getByRole('dialog')).toContainText('DERIVED')
+  await expect(page.getByRole('dialog')).toContainText('UNKNOWN')
+  await page.getByRole('button', { name: 'Закрыть', exact: true }).click()
+  await page.getByRole('combobox', { name: 'Коллекция' }).selectOption('ancient-rus')
+  await page.getByRole('button', { name: 'Шлем Ивана IV', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Шлем Ивана IV' })).toBeVisible()
+  await page.getByRole('combobox', { name: 'Коллекция' }).selectOption('russian-empire')
+  await expect(page.getByRole('heading', { name: 'Пехотный кивер' })).toBeVisible()
+  await expect(page.locator('.viewer-poster')).toHaveClass(/is-hidden/, { timeout: 30_000 })
+  expect(await originalCanvas!.evaluate((element) => element.isConnected)).toBe(true)
+  await page.getByRole('button', { name: 'Переключить язык' }).click()
+  await expect(page.getByRole('heading', { name: 'Infantry shako' })).toBeVisible()
+  expect(errors).toEqual([])
+})

@@ -4,8 +4,10 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   workers: 1,
+  timeout: 60_000,
   retries: process.env.CI ? 2 : 0,
   use: {
+    launchOptions: { args: ['--enable-webgl', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
     baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
   },
@@ -16,6 +18,6 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
+    { name: 'mobile', use: { ...devices['iPhone 13'], deviceScaleFactor: 1, browserName: 'chromium' } },
   ],
 })

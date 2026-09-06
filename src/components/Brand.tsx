@@ -1,6 +1,6 @@
 export function Brand({ subtitle = 'Древняя Русь' }: { readonly subtitle?: string }) {
   return (
-    <div className="brand" aria-label="HISTORIA 3D, Древняя Русь">
+    <div className="brand" aria-label={`HISTORIA 3D, ${subtitle}`}>
       <svg className="brand-mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
         <g stroke="currentColor" strokeWidth="2.5">
           <ellipse cx="32" cy="19" rx="12" ry="17" />

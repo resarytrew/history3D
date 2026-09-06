@@ -4,6 +4,7 @@ import type { Locale } from '../content/types'
 
 const messages = {
   ru: {
+    historicalReconstruction: 'Историческая 3D-реконструкция', pendingHistoricalReview: 'ОЖИДАЕТ ПРОВЕРКИ ИСТОРИКОМ',
     ancientRus: 'Древняя Русь', listen: 'Слушать', pause: 'Пауза', resume: 'Продолжить',
     research: 'Исследовать', sources: 'Источники', reconstruction: '3D-реконструкция',
     observationFirst: 'Сначала наблюдение', explanation: 'Показать объяснение', afterObservation: 'После наблюдения',
@@ -17,6 +18,7 @@ const messages = {
     draftMessage: 'Этот экспонат находится в исследовательском черновике. Исторические данные ещё не опубликованы.',
   },
   en: {
+    historicalReconstruction: 'Historical 3D reconstruction', pendingHistoricalReview: 'PENDING HUMAN HISTORICAL REVIEW',
     ancientRus: 'Ancient Rus', listen: 'Listen', pause: 'Pause', resume: 'Resume',
     research: 'Explore', sources: 'Sources', reconstruction: '3D reconstruction',
     observationFirst: 'Observe first', explanation: 'Show explanation', afterObservation: 'After observing',

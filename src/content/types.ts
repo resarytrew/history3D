@@ -9,6 +9,7 @@ export type ReviewStatus =
   | 'published'
 
 export type ExhibitCategory =
+  | 'uniform'
   | 'weapon'
   | 'armor'
   | 'architecture'
@@ -26,7 +27,7 @@ export type EvidenceLevel =
   | 'source-based-reconstruction'
   | 'interpretive-reconstruction'
 
-export type ClaimKind = 'FACT' | 'INFERENCE' | 'RECONSTRUCTION' | 'UNKNOWN'
+export type ClaimKind = 'FACT' | 'DERIVED' | 'INFERENCE' | 'RECONSTRUCTION' | 'UNKNOWN'
 
 export interface HistoricalSource {
   readonly id: string
@@ -163,6 +164,13 @@ export interface Exhibit {
     readonly minDistance: number
     readonly maxDistance: number
     readonly safeAreaPadding: number
+    readonly hotspotOcclusionTolerance?: number
+    readonly sceneScale?: number
+    readonly scaleComparison?: {
+      readonly figurePosition: readonly [number, number, number]
+      readonly cameraPosition: readonly [number, number, number]
+      readonly cameraTarget: readonly [number, number, number]
+    }
   }
   readonly hotspots: readonly Hotspot[]
   readonly content: Readonly<Partial<Record<Locale, ExhibitContent>>>

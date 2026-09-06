@@ -5,13 +5,14 @@ import { useUi } from '../../i18n/ui'
 interface ExhibitInfoProps {
   readonly content: ExhibitContent
   readonly isScan?: boolean
+  readonly isSourceBased?: boolean
   readonly narrationState: 'idle' | 'playing' | 'paused' | 'unavailable'
   readonly onNarration: () => void
   readonly onResearch: () => void
   readonly onSources: () => void
 }
 
-export function ExhibitInfo({ content, isScan = false, narrationState, onNarration, onResearch, onSources }: ExhibitInfoProps) {
+export function ExhibitInfo({ content, isScan = false, isSourceBased = false, narrationState, onNarration, onResearch, onSources }: ExhibitInfoProps) {
   const ui = useUi()
   const narrationLabel = narrationState === 'playing' ? ui.pause : narrationState === 'paused' ? ui.resume : ui.listen
   return (
@@ -19,7 +20,7 @@ export function ExhibitInfo({ content, isScan = false, narrationState, onNarrati
       <p className="eyebrow">{content.categoryLabel} <span>•</span> {content.periodLabel}</p>
       <h1 id="exhibit-title">{content.title}</h1>
       <div className="reconstruction-badge">
-        <Icon name="cube" />{isScan ? '3D-скан' : ui.reconstruction} <span>{isScan ? 'CC BY' : 'DEV'}</span>
+        <Icon name="cube" />{isScan ? '3D-скан' : isSourceBased ? ui.historicalReconstruction : ui.reconstruction} <span>{isScan ? 'CC BY' : isSourceBased ? 'REVIEW' : 'DEV'}</span>
       </div>
       <p className="research-prompt">{content.researchPrompt}</p>
       <div className="info-actions">

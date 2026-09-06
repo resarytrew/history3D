@@ -38,8 +38,6 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
     useEffect(() => {
       const canvas = canvasRef.current
       if (!canvas) return
-      setReady(false)
-      setError(null)
       let controller: ViewerController
       try {
         controller = new ViewerController(canvas, {
@@ -59,11 +57,18 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
         return
       }
       controllerRef.current = controller
-      controller.load(exhibit)
       return () => {
         controllerRef.current = null
         controller.dispose()
       }
+    }, [])
+
+    useEffect(() => {
+      if (!controllerRef.current) return
+      setReady(false)
+      setError(null)
+      setProjected([])
+      controllerRef.current.load(exhibit)
     }, [exhibit])
 
     return (

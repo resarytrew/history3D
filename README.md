@@ -25,6 +25,8 @@ npm run verify:3d
 
 `npm run verify:3d` validates the scene graph and writes front/right/rear/left plus three refinement-pass captures to `docs/verification/pokrov-na-nerli/`.
 
+Кивер образца 1808 года доступен в коллекции «Российская империя» или по `/?exhibit=russian-shako-1808`. `npm run verify:shako` сохраняет семь фиксированных WebGL-ракурсов и метрики; `-- --pass=1` показывает clay blockout. [Данные, допущения и проверка кивера](docs/verification/russian-shako-1808/README.md). Историческая проверка человеком ожидается.
+
 Manual 3D acceptance: use a hardware-accelerated desktop browser, open the local dev URL, confirm the canvas has `data-renderer="webgl"`, drag horizontally across the church to expose the side/rear, zoom with the wheel, and use reset to restore the initial camera. Development remounts are StrictMode-safe: normal cleanup disposes Three.js resources without forcibly losing the canvas context.
 
 `npm run build` создаёт review-сборку с временной моделью. `npm run build:production` применяет строгий publication gate и намеренно не пропустит `DEV_ONLY` или неопубликованный экспонат.

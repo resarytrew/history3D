@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-06",
+  "model": "RussianShako1808",
+  "historicalReview": "PENDING HUMAN REVIEW",
+  "productionPublished": false,
+  "gates": {
+    "intake_mcmt": "PASS — intake.json, supplied specification takes precedence over conflicting pictures",
+    "clay_silhouette": "PASS — straight flared frustum, seven fixed views, no ornaments in pass 1",
+    "locked_dimensions": "PASS — geometry tests, 175 / 255 / 210 / 75 / 18 / 20 mm within tolerance",
+    "construction": "PASS — thick visor and V strips, pocket opening, rear slit and single-pin buckle, interior prepared",
+    "identity_assembly": "PASS — single-flame grenade, oval white-green repyok, two braids, two diamonds, right 3 / left 1 tassels",
+    "identity_reference_fidelity": "PENDING HUMAN REVIEW — exact selected badge and complete cord pattern not supplied in readable reference form",
+    "materials": "PASS — separate felt, leather, brass, cotton, cloth and linen; no artificial aging",
+    "interaction": "PASS — six hotspots, observation before explanation, orbit, reset, scale comparison and collection switching on desktop/mobile",
+    "optimization": "PASS — 74144 total triangles, 54 meshes; 71920 visible triangles, 51 model draw calls in studio",
+    "fixed_camera_review": "PASS — 35 renders across five passes, plus integrated desktop/mobile views"
+  },
+  "checks": {
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "unit": "28 passed",
+    "build": "PASS — review mode, existing publication gate remains in force",
+    "e2e_full": "15 passed; 1 intentional desktop skip for a mobile-only test",
+    "e2e_shako": "desktop and mobile pass"
+  },
+  "remainingAssumptions": [
+    "Exact badge contour, relief and dimensions",
+    "Braid trajectories and weave detail; cord diameter and suspension lengths",
+    "Repyok proxy dimensions",
+    "Leather and visor thicknesses, pocket gap, unmeasured buckle sizes",
+    "Chinstrap drape, internal folds, micro-curvature and PBR parameters"
+  ],
+  "knownVisualLimitations": [
+    "Badge and cord pattern are plausible procedural interpretations, not verified tracings of the selected historical examples",
+    "Microscopic textile fibres are represented by subtle procedural bump rather than individual geometric fibres",
+    "Interior is prepared but hidden in the normal exterior viewer"
+  ]
+}

@@ -96,6 +96,8 @@ export class ViewerController {
   private readonly hotspotRaycaster = new Raycaster()
   private readonly resizeObserver: ResizeObserver
   private readonly scaleFigure = createScaleFigure()
+  private readonly groundShadow: Mesh
+  private readonly sun: DirectionalLight
   private readonly reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
   private activeModel: LoadedExhibitModel | null = null
   private exhibit: Exhibit | null = null
@@ -137,6 +139,7 @@ export class ViewerController {
     const hemisphere = new HemisphereLight(new Color(0xc9e4f2), new Color(0x6f6653), 1.55)
     const ambient = new AmbientLight(new Color(0xfff4df), 0.58)
     const sun = new DirectionalLight(new Color(0xffe8c4), 4.1)
+    this.sun = sun
     sun.position.set(8, 11, 7)
     sun.castShadow = true
     sun.shadow.mapSize.set(1536, 1536)
@@ -152,6 +155,7 @@ export class ViewerController {
       new BoxGeometry(7.8, 0.02, 5.4),
       new ShadowMaterial({ color: 0x0d241e, opacity: 0.22 }),
     )
+    this.groundShadow = shadow
     shadow.position.y = 0.02
     shadow.receiveShadow = true
     this.scene.add(shadow)
@@ -165,6 +169,12 @@ export class ViewerController {
 
   load(exhibit: Exhibit): void {
     this.exhibit = exhibit
+    this.transition = null
+    this.activeModel?.dispose()
+    this.activeModel = null
+    this.scaleFigure.visible = false
+    this.callbacks.onHotspots([])
+    delete this.canvas.dataset.orbitChanged
     this.firstFramePending = true
     void this.coordinator
       .run(
@@ -202,9 +212,28 @@ export class ViewerController {
 
   setScaleComparison(visible: boolean): void {
     this.scaleFigure.visible = visible
+    if (visible) this.callbacks.onHotspots([])
+    this.projectionAt = 0
+    const comparison = this.exhibit?.presentation.scaleComparison
+    if (comparison && this.exhibit) {
+      this.controls.maxDistance = visible ? vectorFromTuple(comparison.cameraPosition).length() * 1.2 : this.exhibit.presentation.maxDistance
+      if (visible) this.moveCamera(vectorFromTuple(comparison.cameraPosition), vectorFromTuple(comparison.cameraTarget))
+      else this.reset()
+    }
   }
 
   private configureCamera(exhibit: Exhibit): void {
+    const sceneScale = exhibit.presentation.sceneScale ?? 1
+    this.groundShadow.scale.setScalar(sceneScale)
+    this.groundShadow.position.y = 0.02 * sceneScale
+    this.sun.shadow.camera.left = -7 * sceneScale
+    this.sun.shadow.camera.right = 7 * sceneScale
+    this.sun.shadow.camera.top = 10 * sceneScale
+    this.sun.shadow.camera.bottom = -2 * sceneScale
+    this.sun.shadow.camera.updateProjectionMatrix()
+    this.scaleFigure.position.copy(vectorFromTuple(exhibit.presentation.scaleComparison?.figurePosition ?? [-2.15, 0.08, 0.72]))
+    this.camera.near = Math.min(0.05, exhibit.presentation.minDistance / 20)
+    this.camera.updateProjectionMatrix()
     this.camera.position.copy(vectorFromTuple(exhibit.presentation.cameraPosition))
     this.controls.target.copy(vectorFromTuple(exhibit.presentation.cameraTarget))
     this.controls.minDistance = exhibit.presentation.minDistance
@@ -261,7 +290,7 @@ export class ViewerController {
   }
 
   private publishHotspots(): void {
-    if (!this.exhibit || !this.activeModel) return
+    if (!this.exhibit || !this.activeModel || this.scaleFigure.visible) return
     const positions = this.exhibit.hotspots.map((hotspot) => {
       const world = vectorFromTuple(hotspot.position)
       this.activeModel?.root.localToWorld(world)
@@ -269,7 +298,7 @@ export class ViewerController {
       const anchorDistance = cameraToAnchor.length()
       this.hotspotRaycaster.set(this.camera.position, cameraToAnchor.normalize())
       const firstHit = this.hotspotRaycaster.intersectObject(this.activeModel!.root, true)[0]
-      const occluded = Boolean(firstHit && firstHit.distance < anchorDistance - 0.13)
+      const occluded = Boolean(firstHit && firstHit.distance < anchorDistance - (this.exhibit!.presentation.hotspotOcclusionTolerance ?? 0.13))
       const projected = world.clone().project(this.camera)
       return {
         id: hotspot.id,

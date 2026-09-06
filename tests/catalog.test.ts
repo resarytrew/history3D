@@ -1,8 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { ancientRusCollection } from '../src/content/collections/ancient-rus'
-import { exhibitById, exhibits } from '../src/content/catalog'
+import { collections, exhibitById, exhibits } from '../src/content/catalog'
 
 describe('exhibit catalog', () => {
+  it('places the source-based shako in its own collection with six grounded hotspots', () => {
+    const shako = exhibitById.get('russian-shako-1808')!
+    expect(shako.collectionId).toBe('russian-empire')
+    expect(shako.status).toBe('historical-review')
+    expect(shako.reconstruction.type).toBe('source-based-reconstruction')
+    expect(shako.hotspots).toHaveLength(6)
+    expect(collections.find((c) => c.id === shako.collectionId)?.entries[0].exhibitId).toBe(shako.id)
+    const evidence = [...shako.reconstruction.known, ...shako.reconstruction.inferred, ...shako.reconstruction.unknown].map((e) => e.id)
+    shako.hotspots.forEach((h) => h.evidenceIds.forEach((id) => expect(evidence).toContain(id)))
+    expect(shako.reconstruction.inferred.find((e) => e.id === 'bottom-derived')?.kind).toBe('DERIVED')
+  })
   it('discovers a self-contained Pokrov package', () => {
     const exhibit = exhibitById.get('pokrov-na-nerli')
     expect(exhibit).toBeDefined()
