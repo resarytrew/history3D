@@ -39,7 +39,7 @@ test('opens a hotspot, resets camera and opens sources', async ({ page }) => {
     await expect(page.getByRole('alert')).toContainText('3D-viewer не запущен')
   }
   await page.getByRole('button', { name: 'Источники' }).click()
-  await expect(page.getByRole('dialog', { name: 'Источники и достоверность' })).toBeVisible()
+  await expect(page.getByRole('dialog', { name: 'Как восстановлена модель?' })).toBeVisible()
 })
 
 test('orbit changes the camera when WebGL is available', async ({ page }) => {
@@ -58,12 +58,12 @@ test('orbit changes the camera when WebGL is available', async ({ page }) => {
 })
 
 test('keeps explanation behind an observation step', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?exhibit=russian-shako-1808')
   await page.getByRole('button', { name: 'Исследовать' }).click()
   await expect(page.getByText('Сначала наблюдение')).toBeVisible()
-  await expect(page.getByText(/Впечатление создаёт/)).toBeHidden()
-  await page.getByRole('button', { name: 'Показать объяснение' }).click()
-  await expect(page.getByText(/Впечатление создаёт/)).toBeVisible()
+  await expect(page.getByText(/Высокий корпус кивера делали/)).toBeHidden()
+  await page.getByRole('button', { name: 'Сверить с историками' }).click()
+  await expect(page.getByText(/Высокий корпус кивера делали/)).toBeVisible()
 })
 
 test('uses a separate mobile composition and remains keyboard accessible', async ({ page, isMobile }) => {

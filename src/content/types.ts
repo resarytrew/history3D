@@ -42,6 +42,11 @@ export interface HistoricalSource {
   readonly inventoryNumber?: string
   readonly accessDate: `${number}-${number}-${number}`
   readonly note?: string
+  /** Visitor-facing copy. The research note remains available for the data record. */
+  readonly visitorTitle?: string
+  readonly visitorDescription?: string
+  readonly visitorStatus?: string
+  readonly visitorAction?: string
 }
 
 export interface EvidenceItem {

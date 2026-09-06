@@ -11,7 +11,12 @@ interface ProvenanceDrawerProps {
 
 export function ProvenanceDrawer({ exhibit, open, onClose }: ProvenanceDrawerProps) {
   const ui = useUi()
-  const evidenceLabels = { known: ui.confirmed, inferred: ui.inferred, uncertain: ui.uncertain, unknown: ui.unknown } as const
+  const evidenceSections = [
+    { id: 'known', label: ui.confirmed, symbol: '●', title: ui.confirmed, items: exhibit.reconstruction.known },
+    { id: 'inferred', label: ui.inferred, symbol: '◐', title: ui.reconstructedDetail, items: exhibit.reconstruction.inferred },
+    { id: 'uncertain', label: ui.uncertain, symbol: '◐', title: ui.uncertain, items: exhibit.reconstruction.uncertain },
+    { id: 'unknown', label: ui.unknown, symbol: '○', title: ui.unknown, items: exhibit.reconstruction.unknown },
+  ].filter((section) => section.items.length > 0)
   const closeRef = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (!open) return
@@ -34,21 +39,23 @@ export function ProvenanceDrawer({ exhibit, open, onClose }: ProvenanceDrawerPro
           <span>{exhibit.status === 'historical-review' ? ui.pendingHistoricalReview : ui.technicalReview}</span>
           <p>{exhibit.reconstruction.summary}</p>
         </div>
-        {(Object.keys(evidenceLabels) as Array<keyof typeof evidenceLabels>).map((key) => (
-          <section className={`evidence-section evidence-${key}`} key={key}>
-            <h3>{evidenceLabels[key]}</h3>
+        {evidenceSections.map((section) => (
+          <section className={`evidence-section evidence-${section.id}`} key={section.id}>
+            <h3><span className="evidence-symbol" title={section.title} aria-label={section.title}>{section.symbol}</span>{section.label}</h3>
             <ul>
-              {exhibit.reconstruction[key].map((item) => <li key={item.id}><span>{item.kind}</span>{item.statement}</li>)}
+              {section.items.map((item) => <li key={item.id}>{item.statement}</li>)}
             </ul>
           </section>
         ))}
         <section className="source-list">
-          <h3>Источники</h3>
+          <h3>{ui.reconstructionSources}</h3>
           {exhibit.sources.map((source) => (
             <article key={source.id}>
-              <strong>{source.title}</strong>
-              {source.author && <span>{source.author}</span>}
-              {source.url ? <a href={source.url} target="_blank" rel="noreferrer">{ui.openSource}</a> : <em>{ui.sourceNeedsReview}</em>}
+              <strong>{source.visitorTitle ?? source.title}</strong>
+              {source.visitorDescription && <p>{source.visitorDescription}</p>}
+              {!source.visitorDescription && source.author && <span>{source.author}</span>}
+              {source.visitorStatus && <em>{source.visitorStatus}</em>}
+              {source.url ? <a href={source.url} target="_blank" rel="noreferrer">{source.visitorAction ?? ui.openSource}</a> : <em>{ui.sourceNeedsReview}</em>}
             </article>
           ))}
         </section>

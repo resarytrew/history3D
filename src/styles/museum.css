@@ -139,7 +139,8 @@
 .exhibit-info h1 { margin: 20px 0 14px; font-family: var(--font-display); font-size: clamp(39px, 3.1vw, 58px); font-weight: 560; line-height: .98; letter-spacing: -.035em; }
 .reconstruction-badge { width: max-content; display: flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid var(--historia-border); border-radius: 8px; font-size: 13px; font-weight: 650; color: #58645f; }
 .reconstruction-badge svg { width: 17px; height: 17px; }
-.reconstruction-badge span { padding: 2px 5px; border-radius: 4px; color: #fff; background: var(--historia-evidence-inference); font-size: 9px; letter-spacing: .08em; }
+.reconstruction-badge span { padding: 3px 5px; border-radius: 4px; color: #fff; background: var(--historia-evidence-inference); font-size: 9px; font-weight: 700; letter-spacing: .03em; line-height: 1.2; }
+.research-status { margin: 8px 0 0; color: var(--historia-muted); font-size: 11px; font-weight: 650; }
 .research-prompt { margin: 25px 0 28px; font-family: var(--font-display); font-size: 19px; line-height: 1.38; }
 .info-actions { display: grid; grid-template-columns: 1fr 1.25fr auto; gap: 8px; }
 .button {
@@ -262,14 +263,18 @@
 .accuracy-summary p { margin: 14px 0 0; font-size: 14px; line-height: 1.45; }
 .evidence-section { margin-top: 24px; }
 .evidence-section h3, .source-list h3 { margin: 0 0 11px; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+.evidence-section h3 { display: flex; align-items: center; gap: 7px; }
+.evidence-symbol { display: inline-grid; place-items: center; width: 14px; height: 14px; color: var(--historia-evidence-reconstruction); font-size: 13px; line-height: 1; }
+.evidence-inferred .evidence-symbol, .evidence-uncertain .evidence-symbol { color: var(--historia-evidence-inference); }
+.evidence-unknown .evidence-symbol { color: var(--historia-evidence-unknown); }
 .evidence-section ul { margin: 0; padding: 0; list-style: none; }
 .evidence-section li { margin-bottom: 9px; padding: 12px; border-left: 3px solid var(--historia-evidence-reconstruction); background: rgba(255,255,255,.56); font-size: 13px; line-height: 1.45; }
-.evidence-section li span { display: block; margin-bottom: 4px; color: var(--historia-muted); font-size: 9px; font-weight: 800; letter-spacing: .1em; }
 .evidence-inferred li { border-color: var(--historia-evidence-inference); }
 .evidence-uncertain li, .evidence-unknown li { border-color: var(--historia-evidence-unknown); }
 .source-list { margin-top: 28px; }
-.source-list article { display: grid; gap: 4px; padding: 14px 0; border-top: 1px solid var(--historia-border); }
-.source-list span, .source-list em { color: var(--historia-muted); font-size: 12px; }
+.source-list article { display: grid; gap: 6px; padding: 16px 0; border-top: 1px solid var(--historia-border); }
+.source-list article p { margin: 0; color: var(--historia-text); font-family: var(--font-display); font-size: 15px; line-height: 1.4; }
+.source-list span, .source-list em { color: var(--historia-muted); font-size: 12px; font-style: normal; }
 .source-list a { width: max-content; margin-top: 5px; color: var(--historia-accent); font-size: 12px; font-weight: 700; }
 .accuracy-note { margin-top: 24px; padding: 14px; border: 1px dashed var(--historia-border); border-radius: 10px; color: var(--historia-muted); font-size: 12px; }
 .toast { position: absolute; z-index: 30; left: 50%; bottom: 150px; width: min(440px, calc(100% - 32px)); padding: 14px 18px; transform: translateX(-50%); border-radius: 12px; background: #143f34; color: white; box-shadow: var(--historia-shadow); font-size: 13px; text-align: center; }

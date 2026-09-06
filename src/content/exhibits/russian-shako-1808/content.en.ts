@@ -2,12 +2,12 @@ import type { ExhibitContent } from '../../types'
 export const shakoContentEn: ExhibitContent = {
   title: 'Infantry shako', shortTitle: '1808-pattern shako', collectionLabel: 'Russian Empire',
   categoryLabel: 'Uniform', periodLabel: 'Early 19th century', regionLabel: 'Russian Empire',
-  overview: 'An 1808-pattern shako configured for a private of the first battalion of army infantry, outside the grenadier platoon. This pattern remained in use in the 1812 campaign.',
-  researchPrompt: 'Which details held the shape, and which helped identify the soldier?',
+  overview: 'This is a reconstruction of a Russian infantry shako of the 1808 pattern. Such headgear remained in use during the 1812 campaign.',
+  researchPrompt: 'What could a shako tell us about its wearer?',
   observationSteps: [
-    'Turn the shako sideways. Compare the matte felt body with the V-shaped leather reinforcements.',
-    'Find the single flame above the round bomb. Then inspect the white oval repyok with its green centre.',
-    'Look around the rear for the adjustment buckle. Count the tassels on the wearer’s right and left.',
+    'Turn the shako sideways. Find the leather details that strengthen its tall felt body.',
+    'Study the front. Find the brass badge and the white and green repyok. Why might a military uniform need such distinguishing details?',
+    'Look at the back and sides. Find the buckle, white cord and tassels. Which details are practical, and which identify the wearer?',
   ],
-  explanation: 'The stiff felt body is reinforced with blackened leather; a separate visor projects forward. The brass single-flame grenade and white-and-green repyok represent the selected first-battalion private configuration. White cotton braids connect front and rear, with three tassels on the wearer’s right and one on the left. The construction follows the supplied specification; the badge contour and flame ribs follow the supplied photograph, while its exact size and stamping depth, leather thickness and repyok size remain reconstruction assumptions pending human review.',
+  explanation: 'The tall body was made from dense felt. Leather strips and bands helped it keep its shape, while the projecting visor shielded the face from sun and rain. A shako was more than a practical object: its details helped identify a soldier’s place in the army. This reconstruction shows a brass single-flame grenade badge, a white and green repyok, and a white etishket with tassels. The model is based on historical descriptions, images and measurements. Some details are a well-supported reconstruction where the evidence is incomplete.',
 }

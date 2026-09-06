@@ -20,8 +20,9 @@ export function ExhibitInfo({ content, isScan = false, isSourceBased = false, na
       <p className="eyebrow">{content.categoryLabel} <span>•</span> {content.periodLabel}</p>
       <h1 id="exhibit-title">{content.title}</h1>
       <div className="reconstruction-badge">
-        <Icon name="cube" />{isScan ? '3D-скан' : isSourceBased ? ui.historicalReconstruction : ui.reconstruction} <span>{isScan ? 'CC BY' : isSourceBased ? 'REVIEW' : 'DEV'}</span>
+        <Icon name="cube" />{isScan ? '3D-скан' : isSourceBased ? ui.historicalReconstruction : ui.reconstruction} {!isSourceBased && <span>{isScan ? 'CC BY' : 'DEV'}</span>}
       </div>
+      {isSourceBased && <p className="research-status">{ui.pendingHistoricalReview}</p>}
       <p className="research-prompt">{content.researchPrompt}</p>
       <div className="info-actions">
         <button className="button button-primary" type="button" onClick={onNarration} disabled={narrationState === 'unavailable'} aria-pressed={narrationState === 'playing'}>
