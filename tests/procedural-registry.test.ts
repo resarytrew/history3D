@@ -4,8 +4,8 @@ import { proceduralModelRegistry } from '../src/three/proceduralModelRegistry'
 import { russianShako1808 } from '../src/content/exhibits/russian-shako-1808/exhibit'
 
 describe('lazy procedural registry', () => {
-  it('keeps both procedural exhibits registered and loads the shako through runtime', async () => {
-    expect(Object.keys(proceduralModelRegistry)).toHaveLength(2)
+  it('keeps procedural exhibits registered and loads the shako through runtime', async () => {
+    expect(Object.keys(proceduralModelRegistry)).toHaveLength(3)
     const loaded = await loadExhibitModel(russianShako1808.model, new AbortController().signal)
     expect(loaded.root.name).toBe('RussianShako1808')
     loaded.dispose()

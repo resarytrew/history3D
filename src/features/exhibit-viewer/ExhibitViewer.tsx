@@ -30,6 +30,10 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
         const position = byId.get(button.dataset.hotspotId!)
         button.hidden = !position?.visible
         if (position) { button.style.left = `${position.x}%`; button.style.top = `${position.y}%` }
+        const dx = Number(button.dataset.offsetX ?? 0), dy = Number(button.dataset.offsetY ?? 0)
+        button.style.marginLeft = `${dx}px`; button.style.marginTop = `${dy}px`
+        button.style.setProperty('--leader-length', `${Math.hypot(dx, dy)}px`)
+        button.style.setProperty('--leader-angle', `${Math.atan2(dx, -dy)}rad`)
       })
     }
 
@@ -86,8 +90,10 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
               <button
                 key={hotspot.id}
                 type="button"
-                className={`hotspot-marker ${selectedHotspotId === hotspot.id ? 'is-active' : ''}`}
+                className={`hotspot-marker ${hotspot.labelOffset ? 'has-leader' : ''} ${selectedHotspotId === hotspot.id ? 'is-active' : ''}`}
                 data-hotspot-id={hotspot.id}
+                data-offset-x={hotspot.labelOffset?.[0]}
+                data-offset-y={hotspot.labelOffset?.[1]}
                 hidden
                 aria-label={`${hotspot.number}. ${hotspot.label}`}
                 onClick={() => onSelectHotspot(hotspot)}

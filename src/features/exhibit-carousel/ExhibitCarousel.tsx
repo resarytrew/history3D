@@ -12,7 +12,7 @@ interface ExhibitCarouselProps {
 export function ExhibitCarousel({ collection, activeId, thumbnails, onSelect }: ExhibitCarouselProps) {
   const ui = useUi()
   return (
-    <nav className={`exhibit-carousel ${collection.entries.length === 1 ? 'is-single' : ''}`} aria-label={ui.exhibits}>
+    <nav className={`exhibit-carousel ${collection.entries.length === 1 ? 'is-single' : collection.entries.length === 2 ? 'is-pair' : ''}`} aria-label={ui.exhibits}>
       <button className="carousel-arrow" type="button" aria-label={ui.previous}>‹</button>
       <div className="carousel-track">
         {collection.entries.map((entry) => {

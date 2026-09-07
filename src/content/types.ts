@@ -56,7 +56,7 @@ export interface EvidenceItem {
   readonly sourceIds: readonly string[]
   readonly confidence: 'high' | 'medium' | 'low' | 'unknown'
   readonly note?: string
-  readonly sourceRefs?: readonly { readonly sourceId: string; readonly locator: string; readonly basis: 'transcribed-document' | 'author-reconstruction' | 'archaeological-context' }[]
+  readonly sourceRefs?: readonly { readonly sourceId: string; readonly locator: string; readonly basis: 'transcribed-document' | 'author-reconstruction' | 'archaeological-context' | 'catalogue-record' }[]
 }
 
 export interface Hotspot {
@@ -65,6 +65,8 @@ export interface Hotspot {
   readonly label: string
   readonly category: 'form' | 'construction' | 'decoration' | 'context'
   readonly position: readonly [number, number, number]
+  /** Optional screen-space label displacement; the anchor still controls occlusion. */
+  readonly labelOffset?: readonly [number, number]
   readonly surface?: {
     readonly objectName: string
     readonly normal: readonly [number, number, number]
@@ -175,6 +177,8 @@ export interface Exhibit {
     readonly minDistance: number
     readonly maxDistance: number
     readonly safeAreaPadding: number
+    /** Aspect at which the initial composition was authored; narrower canvases widen the view. */
+    readonly referenceAspect?: number
     readonly hotspotOcclusionTolerance?: number
     readonly polarAngleRange?: readonly [number, number]
     readonly sceneScale?: number
@@ -205,7 +209,7 @@ export interface CollectionEntry {
   readonly category: ExhibitCategory
   readonly status: ReviewStatus
   readonly exhibitId?: string
-  readonly icon: 'axe' | 'boat' | 'church' | 'helmet' | 'cross'
+  readonly icon: 'axe' | 'boat' | 'church' | 'helmet' | 'cross' | 'musket'
 }
 
 export interface ExhibitCollection {

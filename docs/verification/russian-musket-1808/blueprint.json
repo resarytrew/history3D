@@ -1,0 +1,37 @@
+{
+  "framework": "M.C.M.T / img2threejs",
+  "version": "0.1.0",
+  "object": "Russian infantry musket, pattern 1808, Tula 1811 museum reference",
+  "purpose": "Nonfunctional exterior museum visualization",
+  "macro": {
+    "referenceImage": { "width": 1800, "height": 1200, "view": "right", "scaleBar": false },
+    "shape": "Long horizontal barrel and fore-end; dropped broad butt, narrow wrist; external flintlock on right",
+    "workingLengthMetres": 1.458,
+    "scaleConfidence": "low; not a measurement of the reference object",
+    "coordinateConvention": "+X toward muzzle; +Y upward; +Z right lock side; metres",
+    "hiddenSurfaces": "inferred, subject to revision"
+  },
+  "components": [
+    { "name": "stock", "primitive": "lofted elliptical/superelliptical sections", "material": "wood", "visibleFeatures": ["dropped butt", "wrist", "fore-end", "shallow seating relief"] },
+    { "name": "barrel", "primitive": "tapered cylinder and faceted breech", "material": "steel", "visibleFeatures": ["breech facets", "muzzle rim with shallow dark recess"] },
+    { "name": "bands", "primitive": "bevelled elliptical straps and outline extrusions", "material": "brass", "visibleFeatures": ["three fitting positions", "split front assembly", "springs", "front sight"] },
+    { "name": "external lock", "primitive": "bevelled photo-contour extrusions", "material": "steel", "visibleFeatures": ["lock plate", "cock opening", "jaws", "flint", "raised frizzen", "pan", "screw slots"] },
+    { "name": "butt plate and guard", "primitive": "bevelled curved silhouettes", "material": "brass", "visibleFeatures": ["thin butt edge", "guard bow", "external trigger silhouette"] },
+    { "name": "ramrod and swivels", "primitive": "cylinders and swept curves", "material": "steel" },
+    { "name": "reverse plate", "primitive": "inferred bevelled outline", "material": "brass", "confidence": "low" }
+  ],
+  "materials": {
+    "wood": { "baseColor": "#663a22", "metalness": 0, "roughness": 0.53, "clearcoat": 0.07, "microdetail": "seeded elongated grain and pores in color/bump maps; species unconfirmed" },
+    "steel": { "baseColor": "#92938d", "metalness": 0.94, "roughness": 0.41, "microdetail": "subtle surface and roughness modulation; no archaeological corrosion" },
+    "brass": { "baseColor": "#ae925a", "metalness": 0.86, "roughness": 0.43, "microdetail": "worked surface normal and roughness perturbation" },
+    "flint": { "baseColor": "#615c51", "metalness": 0, "roughness": 0.88 },
+    "wrapping": { "baseColor": "#423128", "metalness": 0, "roughness": 0.92, "confidence": "low" }
+  },
+  "topology": {
+    "method": "Procedural Three.js; smooth stock loft; bevelled outline extrusions; open bands; external-only hardware",
+    "cutouts": ["cock silhouette opening", "screw head slots", "band interiors", "shallow muzzle rim"],
+    "hardEdges": ["faceted breech", "flint", "frizzen face"],
+    "microdetailPolicy": "Grain, small scratches and surface irregularity belong to maps/shading; no fabricated inscriptions",
+    "lighting": "Shared artifact studio, ACES, soft reflected panels"
+  }
+}

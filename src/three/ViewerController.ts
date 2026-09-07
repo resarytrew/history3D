@@ -253,6 +253,7 @@ export class ViewerController {
     this.sun.shadow.camera.updateProjectionMatrix()
     this.scaleFigure.position.copy(vectorFromTuple(exhibit.presentation.scaleComparison?.figurePosition ?? [-2.15, 0.08, 0.72]))
     this.camera.near = Math.min(0.05, exhibit.presentation.minDistance / 20)
+    this.camera.zoom = exhibit.presentation.referenceAspect ? Math.min(1, this.camera.aspect / exhibit.presentation.referenceAspect) : 1
     this.camera.updateProjectionMatrix()
     this.camera.position.copy(vectorFromTuple(exhibit.presentation.cameraPosition))
     this.controls.target.copy(vectorFromTuple(exhibit.presentation.cameraTarget))
@@ -287,6 +288,8 @@ export class ViewerController {
     this.renderer.setSize(width, height, false)
     this.projectionDirty = true
     this.camera.aspect = width / height
+    const referenceAspect = this.exhibit?.presentation.referenceAspect
+    this.camera.zoom = referenceAspect ? Math.min(1, this.camera.aspect / referenceAspect) : 1
     this.camera.updateProjectionMatrix()
   }
 
