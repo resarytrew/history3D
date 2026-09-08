@@ -27,6 +27,8 @@ export const pistolControlViews = [
   { name: '24-pan', direction: [.15,1.6,1], parts: ['lock_pan'] },
   { name: '25-spring', direction: [.1,.3,1], parts: ['lock_frizzen_spring','spring_screw'] },
   { name: '26-lockplate', direction: [0,0,1], parts: ['lock_lockplate'] },
+  { name: '27-screw-head-top', direction: [.41,.91,.3], parts: ['lock_jaw_screw_head'] },
+  { name: '28-screw-head-oblique', direction: [-.6,.35,1], parts: ['lock_jaw_screw_head'] },
 ] as const
 
 /** Orthographic inspection exposes all surfaces without perspective-based proportion changes. */

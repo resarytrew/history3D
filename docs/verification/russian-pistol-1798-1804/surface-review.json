@@ -1,0 +1,25 @@
+{
+  "version": "0.9.0",
+  "date": "2026-09-08",
+  "sha256": "e103db771a2e5c83809f3c6b390391dc95cf3cbe5c9b0f71ab63a3023390b1f9",
+  "baseline": "surface-before",
+  "testsRun": false,
+  "mobileChanges": false,
+  "mechanicsModelled": false,
+  "artificialAgingAdded": false,
+  "viewed": [
+    "26-lockplate.png",
+    "22-jaws-flint.png"
+  ],
+  "changes": [
+    "Pan lower contour restored to photograph height",
+    "Finial foot revealed above faceted collar",
+    "Analytical normals retained for jaw taper and raised shoulders",
+    "Metal seating separated from carved wood relief"
+  ],
+  "limitations": [
+    "100 percent correspondence not established",
+    "Side wall faceting and some edge highlights remain visible in extreme closeups",
+    "Depth and hidden surfaces are inferred; no calibrated survey"
+  ]
+}

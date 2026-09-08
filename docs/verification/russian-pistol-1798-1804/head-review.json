@@ -1,0 +1,25 @@
+{
+  "version": "0.10.0",
+  "date": "2026-09-08",
+  "sha256": "62c604d67afe82189c2f6f43cc648f309f2dffb749d3a741b0bbd770b527bafe",
+  "baseline": "head-before",
+  "testsRun": false,
+  "artificialAgingAdded": false,
+  "mechanicsModelled": false,
+  "viewed": [
+    "22-jaws-flint.png",
+    "27-screw-head-top.png",
+    "28-screw-head-oblique.png"
+  ],
+  "changes": [
+    "Replaced shallow extruded silhouette with rounded cross-sections around inclined axis",
+    "Concave neck and expanded asymmetric crown",
+    "Geometrically clipped slot with separate walls and recessed floor",
+    "Two dedicated head views added"
+  ],
+  "limitations": [
+    "Unseen depth is inferred from the museum close-up",
+    "Uniform interior shading is an artistic display approximation",
+    "Other exterior lock parts unchanged in this pass"
+  ]
+}

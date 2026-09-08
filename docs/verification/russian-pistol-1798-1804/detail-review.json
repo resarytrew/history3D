@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-08",
+  "scope": "Static exterior sculpture; screw head, exposed stem relief, pan and front head",
+  "sha256": "5ac057b00c54e3e988af9743d6c233ca7044980f36e33a9a846f3e7095d06803",
+  "testsRun": false,
+  "mobileChanges": false,
+  "mechanicsModelled": false,
+  "artificialAgingAdded": false,
+  "viewed": [
+    "22-jaws-flint.png",
+    "24-pan.png",
+    "photo-lock.png"
+  ],
+  "limitations": [
+    "Unseen depths inferred from a single museum close-up; no claim of 100 percent likeness",
+    "Stem relief remains nonfunctional sculpture",
+    "Some existing jaw shoulder and edge shading still requires refinement"
+  ]
+}
