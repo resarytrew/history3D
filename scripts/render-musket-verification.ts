@@ -25,6 +25,8 @@ try {
     const T = await import(/* @vite-ignore */ threeUrl)
     const { createRussianMusket1808 } = await import(/* @vite-ignore */ modelUrl)
     const { createArtifactEnvironment, createArtifactLights, artifactStudioExposure } = await import(/* @vite-ignore */ envUrl)
+    const shadowUrl = '/src/three/contactShadow.ts'
+    const { createContactShadow } = await import(/* @vite-ignore */ shadowUrl)
     document.body.style.cssText = 'margin:0;background:#eeeae2'
     const renderer = new T.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
     renderer.setSize(1500, 750); renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = artifactStudioExposure
@@ -33,6 +35,7 @@ try {
     const environment = createArtifactEnvironment(renderer); scene.environment = environment.texture
     scene.add(createArtifactLights())
     const root = createRussianMusket1808(); scene.add(root); root.updateMatrixWorld(true)
+    const shadow = createContactShadow(renderer,root); scene.add(shadow.mesh)
     const camera = new T.PerspectiveCamera(28, 2, 0.001, 20)
     const render = (name: string) => {
       const views: Record<string, number[][]> = {
@@ -46,6 +49,7 @@ try {
         reverse: [[-0.36, 0.31, -0.36], [-0.358, 0.23, -0.022]],
       }
       const view = views[name]; camera.position.fromArray(view[0]); camera.up.set(0, 1, 0)
+      shadow.mesh.visible = name === 'hero'
       camera.lookAt(new T.Vector3().fromArray(view[1])); renderer.render(scene, camera)
       return { calls: renderer.info.render.calls, renderedTriangles: renderer.info.render.triangles }
     }

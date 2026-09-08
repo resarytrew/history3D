@@ -35,8 +35,8 @@ test('opens a hotspot, resets camera and opens sources', async ({ page }) => {
     await page.getByRole('button', { name: 'Сбросить ракурс' }).click()
     await expect(page.getByText('Какие детали усиливают вертикальное движение фасада?')).toBeHidden()
   } else {
-    await expect(hotspot).toHaveCount(0)
-    await expect(page.getByRole('alert')).toContainText('3D-viewer не запущен')
+    await expect(hotspot).toBeHidden()
+    await expect(page.getByRole('alert')).toContainText('Не удалось загрузить 3D-экспонат')
   }
   await page.getByRole('button', { name: 'Источники' }).click()
   await expect(page.getByRole('dialog', { name: 'Как восстановлена модель?' })).toBeVisible()
@@ -47,6 +47,7 @@ test('orbit changes the camera when WebGL is available', async ({ page }) => {
   const canvas = page.locator('canvas.viewer-canvas')
   await expect(canvas).toHaveAttribute('data-renderer', /webgl|unavailable/, { timeout: 15_000 })
   test.skip(await canvas.getAttribute('data-renderer') !== 'webgl', 'test browser did not provide WebGL2')
+  await expect(page.locator('.viewer-stage')).toHaveAttribute('data-state','ready',{timeout:30_000})
   const bounds = await canvas.boundingBox()
   expect(bounds).toBeTruthy()
   if (!bounds) return

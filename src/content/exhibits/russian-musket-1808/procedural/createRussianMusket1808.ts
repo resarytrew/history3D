@@ -1,16 +1,10 @@
-import { BufferGeometry, CatmullRomCurve3, CylinderGeometry, ExtrudeGeometry, Float32BufferAttribute, Group, Mesh, Path, Shape, SphereGeometry, TubeGeometry, Vector3, type Material } from 'three'
-import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { BufferGeometry, CatmullRomCurve3, CylinderGeometry, ExtrudeGeometry, Float32BufferAttribute, Group, LatheGeometry, Mesh, Path, Shape, TorusGeometry, TubeGeometry, Vector2, Vector3, type Material } from 'three'
+import { camberPlate, chippedFlint, fittedBand, smoothMetal } from './musketSurfaceGeometry'
 import { createMusketMaterials } from './musketMaterials'
 import { musket1808Dimensions as D, photoX as X, photoY as Y } from './musket1808Dimensions'
 
 type Point = readonly [number, number]
 type Section = readonly [number, number, number, number]
-
-function smoothBevels(geometry: BufferGeometry): BufferGeometry {
-  geometry.deleteAttribute('normal'); geometry.deleteAttribute('uv')
-  const result = mergeVertices(geometry, 0.0000001)
-  result.computeVertexNormals(); geometry.dispose(); return result
-}
 
 /** Rings follow a continuous stock silhouette; their depth is explicitly reconstructed. */
 function stockGeometry() {
@@ -25,18 +19,19 @@ function stockGeometry() {
   ]
   const curve = new CatmullRomCurve3(sections.map(([x, top, bottom]) => new Vector3(X(x), Y(top), Y(bottom))), false, 'centripetal')
   const positions: number[] = [], uv: number[] = [], indices: number[] = []
-  const longitudinal = 480, radial = 128
+  const longitudinal = 640, radial = 128
   for (let i = 0; i <= longitudinal; i++) {
     const p = curve.getPoint(i / longitudinal)
     let station = sections.findIndex((entry) => X(entry[0]) > p.x)
     if (station < 1) station = sections.length - 1
     const a = sections[station - 1], b = sections[station]
     const f = Math.max(0, Math.min(1, (p.x - X(a[0])) / (X(b[0]) - X(a[0]))))
-    const width = a[3] + (b[3] - a[3]) * f
+    const width = a[3] + (b[3] - a[3]) * f*f*(3-2*f)
+    const ease = (a: number, b: number) => { const t = Math.max(0,Math.min(1,(p.x-X(a))/(X(b)-X(a)))); return t*t*(3-2*t) }
+    const square = (1 - 0.56*ease(350,405))*(1-ease(540,610)) + 0.55*ease(540,610)
     for (let j = 0; j <= radial; j++) {
       const angle = j / radial * Math.PI * 2
       const sine = Math.sin(angle)
-      const square = p.x > X(385) && p.x < X(572) ? 0.44 : p.x >= X(572) ? 0.55 : 1
       const z = Math.sign(sine) * Math.pow(Math.abs(sine), square) * width
       const c = Math.cos(angle)
       let y = (p.y + p.z) / 2 + (p.y - p.z) / 2 * Math.sign(c) * Math.pow(Math.abs(c), 0.70)
@@ -62,6 +57,7 @@ function stockGeometry() {
   const geometry = new BufferGeometry()
   geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
   geometry.setAttribute('uv', new Float32BufferAttribute(uv, 2)); geometry.setIndex(indices); geometry.computeVertexNormals()
+  geometry.userData = { radial, longitudinal }
   return geometry
 }
 
@@ -88,7 +84,10 @@ export function createRussianMusket1808(): Group {
     const shape = outline(points, smooth)
     for (const points of holes) { const h = new Path(); h.setFromPoints(outline(points).getPoints()); shape.holes.push(h) }
     const g = new ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.00045, bevelThickness: 0.00035, curveSegments: 32 })
-    g.translate(0, 0, z); return add(name, smooth ? smoothBevels(g) : g, material)
+    g.translate(0, 0, z)
+    if (name === 'LockPlate' || name === 'Cock' || name === 'FrizzenFace') return add(name, camberPlate(g, name === 'Cock' ? 0.0011 : 0.0006), material)
+    // Wood needs its UVs; metal smoothing can merge across UV seams.
+    return add(name, smooth && material !== m.wood ? smoothMetal(g) : g, material)
   }
   const tube = (name: string, points: readonly (readonly [number, number, number])[], radius: number, material: Material, closed = false) =>
     add(name, new TubeGeometry(new CatmullRomCurve3(points.map((p) => new Vector3(...p)), closed, 'centripetal'), Math.max(40, points.length * 16), radius, 12, closed), material)
@@ -100,6 +99,10 @@ export function createRussianMusket1808(): Group {
     g.translate(X(px), Y(py), z); const mesh = add(name, g, material)
     const backing = add(name + 'SlotShadow', new CylinderGeometry(radius * 0.86, radius * 0.86, 0.0003, 32), m.darkSteel)
     backing.rotation.x = Math.PI / 2; backing.position.set(X(px), Y(py), z - 0.00015)
+    if (name === 'CockPivot' || name === 'CockTopPin' || name === 'FrizzenPivot') {
+      const rim = add(name + 'Bezel', new TorusGeometry(radius+0.00045,0.00045,12,80), material)
+      rim.position.set(X(px),Y(py),z+0.0001)
+    }
     return mesh
   }
   const axial = (name: string, start: number, end: number, y: number, r1: number, r2: number, material: Material, radial = 96, segments = 1) => {
@@ -107,7 +110,7 @@ export function createRussianMusket1808(): Group {
     g.rotateZ(-Math.PI / 2); g.translate((start + end) / 2, y, 0)
     return add(name, g, material)
   }
-  add('WoodStock', stockGeometry(), m.wood)
+  const stock = stockGeometry(); add('WoodStock', stock, m.wood)
   const muzzle = X(1760), breech = muzzle - D.documented.barrelLength, axis = D.reconstruction.barrelAxisHeight
   // Facets at the breech and a gently tapered exterior, with only a shallow dark muzzle recess.
   axial('FacetedBreech', breech, breech + 0.10, axis, 0.018, 0.0164, m.steel, 8, 8)
@@ -123,25 +126,27 @@ export function createRussianMusket1808(): Group {
   axial('MuzzleShadow', muzzle - 0.0085, muzzle - 0.008, axis, 0.0089, 0.0089, m.darkSteel, 64)
   plate('BreechTang', [[389, 586], [388, 579], [454, 574], [459, 581]], -0.006, 0.012, m.steel)
   // The stock fittings are formed straps, open around wood, with rolled edge highlights.
-  const band = (name: string, px: number, width: number, halfWidth: number) => {
-    const path: [number, number, number][] = []
-    for (let j = 0; j < 48; j++) {
-      const a = j / 48 * Math.PI * 2
-      path.push([X(px), axis - 0.006 + Math.cos(a) * 0.023, Math.sin(a) * halfWidth])
+  const band = (name: string, px: number, width: number) => {
+    const radius = (x: number) => 0.0164 + (0.0107-0.0164)*(x-barrelStart)/(muzzle-barrelStart)
+    const fitted = fittedBand(stock,X(px),width,axis,radius,Y(616))
+    add(name, fitted.geometry, m.brass)
+    // Resampled outline keeps the edging smooth without multiplying vertices at tiny hull edges.
+    const curve = new CatmullRomCurve3(fitted.edge, true, 'centripetal')
+    const path = curve.getSpacedPoints(48).slice(0,-1)
+    for (const side of [-1, 1]) tube(name + 'RolledEdge' + side, path.map((p) => [p.x + side*width/2,p.y,p.z]),0.00028,m.brass,true)
+    let rimWidth = 0
+    for (let i=0;i<fitted.edge.length;i++) {
+      const a=fitted.edge[i], b=fitted.edge[(i+1)%fitted.edge.length], y=Y(599)
+      if ((a.y-y)*(b.y-y)<=0 && Math.abs(b.y-a.y)>1e-8) rimWidth=Math.max(rimWidth,a.z+(b.z-a.z)*(y-a.y)/(b.y-a.y))
     }
-    const shape = new Shape(); shape.absellipse(0, 0, halfWidth, 0.023, 0, Math.PI * 2, false, 0)
-    const inner = new Path(); inner.absellipse(0, 0, halfWidth - 0.0015, 0.0215, 0, Math.PI * 2, true, 0); shape.holes.push(inner)
-    const g = new ExtrudeGeometry(shape, { depth: width, bevelEnabled: true, bevelThickness: 0.00025, bevelSize: 0.0002, bevelSegments: 3, curveSegments: 48 })
-    g.rotateY(Math.PI / 2); g.translate(X(px) - width / 2, axis - 0.006, 0)
-    add(name, smoothBevels(g), m.brass)
-    for (const side of [-1, 1]) tube(name + 'RolledEdge' + side, path.map(([x,y,z]) => [x + side * width / 2, y, z]), 0.00042, m.brass, true)
-    screw(name + 'Pin', px, 599, halfWidth + 0.0002, 0.0019, m.brass)
+    screw(name + 'Pin', px,599,rimWidth,0.0019,m.brass)
   }
-  band('RearBand', 793, 0.018, 0.0182)
-  band('MiddleBand', 1225, 0.016, 0.0166)
-  band('NoseBand', 1645, 0.022, 0.0158)
-  band('NoseBandFront', 1675, 0.009, 0.0143)
-  plate('NoseBandBridge', [[1597, 578], [1612, 577], [1622, 584], [1680, 585], [1680, 605], [1651, 610], [1623, 608], [1598, 604]], 0.009, 0.003, m.brass)
+  band('RearBand', 793, 0.018)
+  band('MiddleBand', 1225, 0.016)
+  band('NoseBand', 1610, 0.015)
+  band('NoseBandFront', 1675, 0.009)
+  const noseBridge = plate('NoseBandBridge', [[1605, 580], [1613, 580], [1622, 586], [1679, 586], [1679, 605], [1651, 610], [1623, 608], [1605, 604]], 0.0123, 0.0015, m.brass)
+  const reverseBridge = noseBridge.clone(); reverseBridge.name = 'NoseBandBridgeReverse'; reverseBridge.scale.z = -1; root.add(reverseBridge)
   plate('FrontSight', [[1602, 574], [1606, 569], [1613, 569], [1619, 574], [1618, 581], [1602, 581]], -0.0014, 0.0028, m.brass)
   for (const [name, a, b] of [['RearBandSpring', 724, 781], ['MiddleBandSpring', 1158, 1215], ['NoseBandSpring', 1546, 1600]] as const) {
     plate(name, [[a, 603], [b, 600], [b, 604], [a, 606]], 0.0132, 0.0009, m.steel)
@@ -159,14 +164,27 @@ export function createRussianMusket1808(): Group {
   screw('CockPivot', 438, 598, 0.033, 0.006)
   screw('CockTopPin', 457, 564, 0.034, 0.0055)
   plate('LowerJaw', [[447, 543], [457, 539], [488, 555], [490, 560], [479, 564]], 0.023, 0.018, m.steel, false)
-  plate('FlintLeather', [[461, 539], [493, 554], [486, 564], [460, 551]], 0.025, 0.017, m.leather, false)
-  plate('Flint', [[479, 548], [498, 558], [493, 567], [481, 562], [472, 553]], 0.027, 0.016, m.flint, false)
+  plate('FlintLeather', [[461, 539], [475, 546], [477, 551], [476, 554], [470, 554], [460, 551]], 0.025, 0.0185, m.leather, false)
+  add('Flint',chippedFlint([[479,548],[488,552],[497,558],[496,561],[493,567],[484,563],[481,561],[474,555],[472,553]].map(([x,y]) => new Vector3(X(x),Y(y),0.027)),0.016),m.flint)
   plate('UpperJaw', [[453, 538], [458, 534], [482, 546], [480, 550]], 0.022, 0.020, m.steel, false)
   tube('JawScrewStem', [[X(462), Y(542), 0.034], [X(473), Y(521), 0.034]], 0.0022, m.steel)
+  // Visible surface relief only; spacing is illustrative, not a measured screw specification.
+  const stemStart = new Vector3(X(462),Y(542),0.034), stemEnd = new Vector3(X(473),Y(521),0.034)
+  const stemDirection = stemEnd.clone().sub(stemStart).normalize()
+  for (let i=0;i<7;i++) {
+    const thread = add('JawScrewSurfaceRidge'+i,new TorusGeometry(0.0022,0.00018,8,48),m.steel)
+    thread.quaternion.setFromUnitVectors(new Vector3(0,0,1),stemDirection)
+    thread.position.copy(stemStart).lerp(stemEnd,0.18+i*0.07)
+  }
   tube('JawScrewLoop', [[X(471), Y(528), 0.034], [X(469), Y(520), 0.034], [X(476), Y(516), 0.034], [X(479), Y(521), 0.034], [X(475), Y(529), 0.034]], 0.0016, m.steel, true)
-  const pan = add('BrassPan', new SphereGeometry(1, 48, 24, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), m.brass)
-  pan.scale.set(0.016, 0.010, 0.010); pan.position.set(X(492), Y(576), 0.029)
-  tube('PanLip', [[X(476), Y(575), 0.026], [X(483), Y(577), 0.040], [X(500), Y(580), 0.039], [X(509), Y(577), 0.024]], 0.0012, m.brass)
+  const bowl: Vector2[] = []
+  for (let i=0;i<=48;i++) { const a=i/48*Math.PI/2; bowl.push(new Vector2(Math.sin(a)*0.010,-Math.cos(a)*0.007)) }
+  for (let i=48;i>=0;i--) { const a=i/48*Math.PI/2; bowl.push(new Vector2(Math.sin(a)*0.0088,-Math.cos(a)*0.0056)) }
+  const pan = add('BrassPan',new LatheGeometry(bowl,96),m.brass)
+  pan.scale.set(1.15,1,0.72); pan.position.set(X(492),Y(577),0.028)
+  plate('PanBolster', [[478,579],[488,578],[501,583],[510,588],[505,597],[492,592],[485,587]],0.019,0.006,m.brass)
+  const lipPoints: [number,number,number][] = Array.from({length:48},(_,i) => { const a=i/48*Math.PI*2; return [X(492)+Math.cos(a)*0.011,Y(577),0.028+Math.sin(a)*0.0068] })
+  tube('PanLip',lipPoints,0.00055,m.brass,true)
   plate('Frizzen', [[506, 555], [513, 551], [525, 570], [526, 585], [519, 590], [514, 583], [516, 571]], 0.025, 0.008, m.steel)
   plate('FrizzenFace', [[508, 551], [530, 527], [542, 513], [545, 513], [542, 524], [521, 553], [516, 558]], 0.025, 0.012, m.steel, false)
   tube('FrizzenSpring', [[X(554), Y(603), 0.028], [X(538), Y(601), 0.029], [X(516), Y(600), 0.029], [X(509), Y(594), 0.029]], 0.0023, m.steel)
@@ -187,6 +205,6 @@ export function createRussianMusket1808(): Group {
   const slingLoop = (name: string, px: number, py: number) => tube(name, [[X(px-7),Y(py),-0.007], [X(px-6),Y(py+8),-0.012], [X(px+4),Y(py+10),0], [X(px+6),Y(py+8),0.012], [X(px+7),Y(py),0.007]], 0.0015, m.steel, true)
   slingLoop('MiddleSlingSwivel', 1222, 622)
   slingLoop('RearSlingSwivel', 462, 639)
-  root.userData = { units: 'metres', reference: 'Padikovo, Tula 1811', evidenceLevel: 'source-based-reconstruction', functional: false, unverified: ['overall length', 'hidden side', 'wood species', 'markings', 'fitting depths'], version: '0.1.0' }
+  root.userData = { units: 'metres', reference: 'Padikovo, Tula 1811', evidenceLevel: 'source-based-reconstruction', functional: false, unverified: ['overall length', 'hidden side', 'wood species', 'markings', 'fitting depths'], version: '0.2.0' }
   return root
 }

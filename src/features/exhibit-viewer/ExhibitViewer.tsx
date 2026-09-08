@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import type { Exhibit, Hotspot } from '../../content/types'
 import { ViewerController, type ProjectedHotspot } from '../../three/ViewerController'
 import { useUi } from '../../i18n/ui'
+import { ViewerLoading } from './ViewerLoading'
 
 export interface ExhibitViewerHandle {
   readonly reset: () => void
@@ -20,7 +21,9 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const ui = useUi()
     const controllerRef = useRef<ViewerController | null>(null)
-    const [ready, setReady] = useState(false)
+    const [readyExhibitId, setReadyExhibitId] = useState<string | null>(null)
+    const loadingExhibitId = useRef(exhibit.id)
+    const ready = readyExhibitId === exhibit.id
     const [error, setError] = useState<string | null>(null)
     const hotspotLayerRef = useRef<HTMLDivElement>(null)
     // Write projection in the renderer's frame; React state would introduce a frame of lag.
@@ -49,7 +52,7 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
       let controller: ViewerController
       try {
         controller = new ViewerController(canvas, {
-          onReady: () => setReady(true),
+          onReady: () => setReadyExhibitId(loadingExhibitId.current),
           onError: (message) => {
             publishProjection([])
             setError(message)
@@ -60,7 +63,7 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
         const detail = cause instanceof Error ? cause.message : 'Неизвестная ошибка инициализации viewer.'
         canvas.dataset.renderer = 'unavailable'
         canvas.dataset.rendererError = detail
-        setError(`3D-viewer не запущен — показан poster экспоната. ${detail}`)
+        setError(detail)
         publishProjection([])
         return
       }
@@ -73,18 +76,16 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
 
     useEffect(() => {
       if (!controllerRef.current) return
-      setReady(false)
+      loadingExhibitId.current = exhibit.id
+      setReadyExhibitId(null)
       setError(null)
       publishProjection([])
       controllerRef.current.load(exhibit)
     }, [exhibit])
 
     return (
-      <div className="viewer-stage" aria-label={`Интерактивная 3D-модель: ${exhibit.content.ru?.title ?? exhibit.id}`}>
-        <picture className={`viewer-poster ${ready ? 'is-hidden' : ''}`} aria-hidden="true">
-          <img src={exhibit.assets.poster} alt="" />
-        </picture>
-        <canvas ref={canvasRef} className={`viewer-canvas ${error ? 'is-unavailable' : ''}`} tabIndex={0} aria-label={ui.viewerLabel} />
+      <div className="viewer-stage" data-state={error ? 'error' : ready ? 'ready' : 'loading'} aria-busy={!ready && !error} aria-label={`Интерактивная 3D-модель: ${exhibit.content.ru?.title ?? exhibit.id}`}>
+        <canvas ref={canvasRef} className="viewer-canvas" tabIndex={ready && !error ? 0 : -1} aria-label={ui.viewerLabel} />
         <div ref={hotspotLayerRef} className="hotspot-layer" aria-label="Точки исследования">
           {exhibit.hotspots.map((hotspot) => (
               <button
@@ -102,8 +103,8 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
               </button>
           ))}
         </div>
-        {!ready && !error && <div className="viewer-loading" role="status">{ui.preparing}</div>}
-        {error && <div className="viewer-error" role="alert">{error}</div>}
+        {!ready && !error && <ViewerLoading />}
+        {error && <div className="viewer-error" role="alert">{ui.viewerUnavailable}</div>}
       </div>
     )
   },

@@ -7,6 +7,7 @@ import { ExhibitCarousel } from '../features/exhibit-carousel/ExhibitCarousel'
 import { ExhibitInfo } from '../features/exhibit-info/ExhibitInfo'
 import { ResearchFlow } from '../features/exhibit-info/ResearchFlow'
 import type { ExhibitViewerHandle } from '../features/exhibit-viewer/ExhibitViewer'
+import { ViewerLoading } from '../features/exhibit-viewer/ViewerLoading'
 import { HotspotCard } from '../features/hotspots/HotspotCard'
 import { useNarration } from '../features/narration/useNarration'
 import { ProvenanceDrawer } from '../features/provenance/ProvenanceDrawer'
@@ -129,8 +130,8 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
       </header>
 
       <Suspense fallback={(
-        <div className="viewer-stage viewer-suspense" aria-label={ui.preparing}>
-          <picture className="viewer-poster"><img src={exhibit.assets.poster} alt="" /></picture>
+        <div className="viewer-stage viewer-suspense" data-state="loading" aria-busy="true" aria-label={ui.preparing}>
+          <ViewerLoading />
         </div>
       )}>
         <ExhibitViewer ref={viewerRef} exhibit={exhibit} selectedHotspotId={selectedHotspot?.id ?? null} onSelectHotspot={selectHotspot} />

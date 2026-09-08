@@ -27,6 +27,7 @@ import { LatestRequestCoordinator } from '../state/latest-request'
 import { disposeObject3D } from './dispose'
 import { loadExhibitModel, type LoadedExhibitModel } from './model-runtime'
 import { artifactStudioExposure, createArtifactEnvironment, createArtifactLights } from './artifactStudio'
+import { createContactShadow } from './contactShadow'
 import { bindSurfaceAnchor, projectSurfaceHotspots, type SurfaceAnchor, type ProjectedHotspot } from './hotspotProjection'
 export type { ProjectedHotspot } from './hotspotProjection'
 
@@ -99,6 +100,7 @@ export class ViewerController {
   private readonly sun: DirectionalLight
   private readonly reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
   private activeModel: LoadedExhibitModel | null = null
+  private contactShadow: ReturnType<typeof createContactShadow> | null = null
   private exhibit: Exhibit | null = null
   private transition: CameraTransition | null = null
   private projectionDirty = true
@@ -174,6 +176,9 @@ export class ViewerController {
     this.exhibit = exhibit
     this.projectionDirty = true
     this.transition = null
+    this.contactShadow?.dispose()
+    this.contactShadow = null
+    delete this.canvas.dataset.contactShadow
     this.activeModel?.dispose()
     this.activeModel = null
     this.scaleFigure.visible = false
@@ -189,6 +194,10 @@ export class ViewerController {
           this.activeModel = loaded
           loaded.root.rotation.y = exhibit.presentation.initialYaw
           this.scene.add(loaded.root)
+          if (exhibit.presentation.contactShadow) {
+            this.contactShadow = createContactShadow(this.renderer,loaded.root)
+            this.scene.add(this.contactShadow.mesh)
+          }
           for (const hotspot of exhibit.hotspots) this.surfaceAnchors.set(hotspot.id, bindSurfaceAnchor(loaded.root, hotspot))
           this.projectionDirty = true
           this.configureCamera(exhibit)
@@ -307,7 +316,11 @@ export class ViewerController {
     // Preserve full geometry and shading; redraw only when the view actually changes.
     if (!this.projectionDirty && !transitioning && !(this.firstFramePending && this.activeModel)) return
     // The display's shadow catcher is not part of the artifact or its underside.
-    this.groundShadow.visible = this.exhibit?.presentation.lighting !== 'artifact-studio' || this.camera.position.y > this.groundShadow.position.y
+    this.groundShadow.visible = !this.contactShadow && (this.exhibit?.presentation.lighting !== 'artifact-studio' || this.camera.position.y > this.groundShadow.position.y)
+    if (this.contactShadow) {
+      this.contactShadow.mesh.visible = !this.scaleFigure.visible && this.camera.position.y > this.contactShadow.mesh.position.y
+      this.canvas.dataset.contactShadow = this.contactShadow.mesh.visible ? 'visible' : 'hidden'
+    }
     this.renderer.render(this.scene, this.camera)
     if (this.firstFramePending && this.activeModel) {
       this.firstFramePending = false
@@ -350,6 +363,8 @@ export class ViewerController {
     this.controls.removeEventListener('start', this.handleControlsStart)
     this.controls.removeEventListener('change', this.handleControlsChange)
     this.controls.dispose()
+    this.contactShadow?.dispose()
+    this.contactShadow = null
     this.activeModel?.dispose()
     this.activeModel = null
     disposeObject3D(this.scene, this.renderer)

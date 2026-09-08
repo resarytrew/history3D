@@ -4,7 +4,7 @@ test('allows an underside inspection and returns to the initial view', async ({ 
   test.setTimeout(120_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/?exhibit=russian-shako-1808')
-  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0', { timeout: 30_000 })
+  await expect(page.locator('.viewer-stage')).toHaveAttribute('data-state', 'ready', { timeout: 30_000 })
   const canvas = page.locator('canvas.viewer-canvas')
   const box = (await canvas.boundingBox())!
   const x = box.x + box.width * 0.85, y = box.y + box.height * 0.47
@@ -24,7 +24,7 @@ test('detail markers follow the orbit and disappear on the back of the shako', a
   test.setTimeout(120_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/?exhibit=russian-shako-1808')
-  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0', { timeout: 30_000 })
+  await expect(page.locator('.viewer-stage')).toHaveAttribute('data-state', 'ready', { timeout: 30_000 })
   const canvas = page.locator('canvas.viewer-canvas'), bounds = (await canvas.boundingBox())!
   const badge = page.locator('[data-hotspot-id="shako-grenade"]')
   const repyok = page.locator('[data-hotspot-id="shako-repyok"]')
@@ -61,8 +61,7 @@ test('shako loads in WebGL, exposes all six details and survives collection swit
   const originalCanvas = await canvas.elementHandle()
   await expect(canvas).toHaveAttribute('data-renderer', 'webgl', { timeout: 30_000 })
   await expect(canvas).toHaveAttribute('data-lighting', 'artifact-studio')
-  await expect(page.locator('.viewer-poster')).toHaveClass(/is-hidden/, { timeout: 30_000 })
-  await expect(page.locator('.viewer-poster')).toHaveCSS('opacity', '0', { timeout: 30_000 })
+  await expect(page.locator('.viewer-stage')).toHaveAttribute('data-state', 'ready', { timeout: 30_000 })
   await page.screenshot({ path: `docs/verification/russian-shako-1808/1810/integration-${testInfo.project.name}.png` })
   const labels = ['Форма тульи', 'V-образное усиление', 'Гренада об одном огне', 'Репеёк', 'Этишкет', 'Козырёк']
   for (const [i, label] of labels.entries()) {
@@ -101,7 +100,7 @@ test('shako loads in WebGL, exposes all six details and survives collection swit
   await expect(canvas).toHaveAttribute('data-lighting', 'default', { timeout: 30_000 })
   await page.getByRole('combobox', { name: 'Коллекция' }).selectOption('russian-empire')
   await expect(page.getByRole('heading', { name: 'Пехотный кивер' })).toBeVisible()
-  await expect(page.locator('.viewer-poster')).toHaveClass(/is-hidden/, { timeout: 30_000 })
+  await expect(page.locator('.viewer-stage')).toHaveAttribute('data-state', 'ready', { timeout: 30_000 })
   expect(await originalCanvas!.evaluate((element) => element.isConnected)).toBe(true)
   await expect(canvas).toHaveAttribute('data-lighting', 'artifact-studio')
   await page.getByRole('button', { name: 'Переключить язык' }).click()

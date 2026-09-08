@@ -55,7 +55,23 @@ describe('1808 musket exterior reconstruction', () => {
       for (const m of Array.isArray(o.material) ? o.material : [o.material]) materials.add(m.name)
     })
     expect(triangles).toBe(russianMusket1808.model.kind === 'procedural' ? russianMusket1808.model.approximateTriangles : 0)
+    expect(triangles).toBeGreaterThanOrEqual(395_168)
     expect(materials).toEqual(new Set(['OiledBrownWood', 'MaintainedSteel', 'WorkedBrass', 'RecessedSteel', 'GreyFlint', 'FlintWrapping']))
+  })
+  it('keeps formed bands outside the stock and exposes the flint face', () => {
+    for (const [name,px] of [['RearBand',793],['MiddleBand',1225]] as const) {
+      const center = new Vector3(X(px),0.23,0)
+      for (let i=0;i<12;i++) {
+        const direction = new Vector3(0,Math.cos(i*Math.PI/6),Math.sin(i*Math.PI/6))
+        const ray = new Raycaster(center.clone().addScaledVector(direction,0.2),direction.negate())
+        const band = ray.intersectObject(root.getObjectByName(name)!)[0]
+        const stock = ray.intersectObject(root.getObjectByName('WoodStock')!)[0]
+        expect(band,`${name} exterior ${i}`).toBeDefined()
+        if (stock) expect(stock.distance-band.distance).toBeGreaterThan(0.0001)
+      }
+    }
+    const flintRay = new Raycaster(new Vector3(X(491),Y(560),0.15),new Vector3(0,0,-1))
+    expect(flintRay.intersectObject(root.getObjectByName('Flint')!).length).toBeGreaterThan(0)
   })
   it('binds markers to surfaces and hides the right-side labels on the reverse', () => {
     const hotspots = russianMusket1808.hotspots

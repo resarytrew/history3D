@@ -179,6 +179,8 @@ export interface Exhibit {
     readonly safeAreaPadding: number
     /** Aspect at which the initial composition was authored; narrower canvases widen the view. */
     readonly referenceAspect?: number
+    /** Soft display shadow baked from the model, separate from artifact geometry. */
+    readonly contactShadow?: boolean
     readonly hotspotOcclusionTolerance?: number
     readonly polarAngleRange?: readonly [number, number]
     readonly sceneScale?: number

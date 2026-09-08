@@ -1,0 +1,70 @@
+{
+  "triangles": 395168,
+  "meshes": 70,
+  "bounds": {
+    "min": [
+      -0.7318767309188843,
+      0.10478370636701584,
+      -0.026900000870227814
+    ],
+    "max": [
+      0.7290000319480896,
+      0.2957209348678589,
+      0.04334999993443489
+    ],
+    "size": [
+      1.4608767628669739,
+      0.19093722850084305,
+      0.0702500008046627
+    ]
+  },
+  "calls": 70,
+  "renderedTriangles": 395168,
+  "renders": {
+    "right": {
+      "calls": 70,
+      "renderedTriangles": 395168
+    },
+    "left": {
+      "calls": 70,
+      "renderedTriangles": 395168
+    },
+    "hero": {
+      "calls": 70,
+      "renderedTriangles": 395168
+    },
+    "top": {
+      "calls": 70,
+      "renderedTriangles": 395168
+    },
+    "bottom": {
+      "calls": 70,
+      "renderedTriangles": 395168
+    },
+    "muzzle": {
+      "calls": 70,
+      "renderedTriangles": 395168
+    },
+    "butt": {
+      "calls": 70,
+      "renderedTriangles": 395168
+    },
+    "lock": {
+      "calls": 38,
+      "renderedTriangles": 222096
+    },
+    "furniture": {
+      "calls": 20,
+      "renderedTriangles": 279104
+    },
+    "wood": {
+      "calls": 38,
+      "renderedTriangles": 223096
+    },
+    "reverse": {
+      "calls": 38,
+      "renderedTriangles": 222096
+    }
+  },
+  "errors": []
+}

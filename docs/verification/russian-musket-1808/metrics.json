@@ -1,6 +1,6 @@
 {
-  "triangles": 395168,
-  "meshes": 70,
+  "triangles": 506692,
+  "meshes": 82,
   "bounds": {
     "min": [
       -0.7318767309188843,
@@ -10,60 +10,60 @@
     "max": [
       0.7290000319480896,
       0.2957209348678589,
-      0.04334999993443489
+      0.04385000094771385
     ],
     "size": [
       1.4608767628669739,
       0.19093722850084305,
-      0.0702500008046627
+      0.07075000181794167
     ]
   },
-  "calls": 70,
-  "renderedTriangles": 395168,
+  "calls": 83,
+  "renderedTriangles": 506694,
   "renders": {
     "right": {
-      "calls": 70,
-      "renderedTriangles": 395168
+      "calls": 82,
+      "renderedTriangles": 506692
     },
     "left": {
-      "calls": 70,
-      "renderedTriangles": 395168
+      "calls": 82,
+      "renderedTriangles": 506692
     },
     "hero": {
-      "calls": 70,
-      "renderedTriangles": 395168
+      "calls": 83,
+      "renderedTriangles": 506694
     },
     "top": {
-      "calls": 70,
-      "renderedTriangles": 395168
+      "calls": 82,
+      "renderedTriangles": 506692
     },
     "bottom": {
-      "calls": 70,
-      "renderedTriangles": 395168
+      "calls": 82,
+      "renderedTriangles": 506692
     },
     "muzzle": {
-      "calls": 70,
-      "renderedTriangles": 395168
+      "calls": 82,
+      "renderedTriangles": 506692
     },
     "butt": {
-      "calls": 70,
-      "renderedTriangles": 395168
+      "calls": 82,
+      "renderedTriangles": 506692
     },
     "lock": {
-      "calls": 38,
-      "renderedTriangles": 222096
+      "calls": 49,
+      "renderedTriangles": 318008
     },
     "furniture": {
-      "calls": 20,
-      "renderedTriangles": 279104
+      "calls": 21,
+      "renderedTriangles": 328716
     },
     "wood": {
-      "calls": 38,
-      "renderedTriangles": 223096
+      "calls": 49,
+      "renderedTriangles": 319008
     },
     "reverse": {
-      "calls": 38,
-      "renderedTriangles": 222096
+      "calls": 49,
+      "renderedTriangles": 318008
     }
   },
   "errors": []

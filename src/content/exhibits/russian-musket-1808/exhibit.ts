@@ -12,10 +12,10 @@ export const russianMusket1808: Exhibit = {
   chronology: { label: 'Образец 1808 года · прототип 1811 года', from: 1811, to: 1811 },
   geography: { place: 'Тула', region: 'Российская империя' },
   reconstruction: musketReconstruction,
-  model: { kind: 'procedural', factoryId: 'russian-musket-1808-v1', developmentOnly: true, approximateTriangles: 395_168 },
+  model: { kind: 'procedural', factoryId: 'russian-musket-1808-v1', developmentOnly: true, approximateTriangles: 506_692 },
   presentation: {
     initialYaw: 0, cameraPosition: [0.03, 0.54, 2.10], cameraTarget: [-0.09, 0.22, 0],
-    minDistance: 0.13, maxDistance: 6, safeAreaPadding: 0.12, referenceAspect: 1.5,
+    minDistance: 0.13, maxDistance: 6, safeAreaPadding: 0.12, referenceAspect: 1.5, contactShadow: true,
     hotspotOcclusionTolerance: 0.00045, polarAngleRange: [0.08, 3.06], sceneScale: 0.3, lighting: 'artifact-studio',
     scaleComparison: { figurePosition: [-1.02, 0, 0], cameraPosition: [0.15, 1.05, 4.4], cameraTarget: [-0.15, 0.85, 0] },
   },
