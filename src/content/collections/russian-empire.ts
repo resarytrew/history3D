@@ -1,6 +1,6 @@
 import type { ExhibitCollection } from '../types'
 export const russianEmpireCollection: ExhibitCollection = {
-  id: 'russian-empire', title: 'Российская империя', period: 'Начало XIX века',
+  id: 'russian-empire', title: 'Отечественная война 1812 года', period: '1812 год',
   defaultExhibitId: 'russian-shako-1808',
   entries: [
     { id: 'russian-shako-1808', title: 'Кивер 1808 года', category: 'uniform', status: 'historical-review', exhibitId: 'russian-shako-1808', icon: 'helmet' },

@@ -1,4 +1,4 @@
-export function Brand({ subtitle = 'Древняя Русь' }: { readonly subtitle?: string }) {
+export function Brand({ subtitle = 'Отечественная война 1812 года' }: { readonly subtitle?: string }) {
   return (
     <div className="brand" aria-label={`HISTORIA 3D, ${subtitle}`}>
       <svg className="brand-mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">

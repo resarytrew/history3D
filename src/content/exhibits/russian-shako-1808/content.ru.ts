@@ -1,6 +1,6 @@
 import type { ExhibitContent } from '../../types'
 export const shakoContentRu: ExhibitContent = {
-  title: 'Пехотный кивер', shortTitle: 'Кивер 1808 года', collectionLabel: 'Российская империя',
+  title: 'Пехотный кивер', shortTitle: 'Кивер 1808 года', collectionLabel: 'Отечественная война 1812 года',
   categoryLabel: 'Обмундирование', periodLabel: '1810 год · 1-й батальон', regionLabel: 'Российская империя',
   overview: 'Перед вами кивер образца 1808 года, восстановленный для рядового мушкетера 1-го батальона на 1810 год. Конкретный полк не установлен.',
   researchPrompt: 'Что кивер мог рассказать о своём владельце?',

@@ -1,6 +1,6 @@
 import type { ExhibitContent } from '../../types'
 export const shakoContentEn: ExhibitContent = {
-  title: 'Infantry shako', shortTitle: '1808-pattern shako', collectionLabel: 'Russian Empire',
+  title: 'Infantry shako', shortTitle: '1808-pattern shako', collectionLabel: 'Patriotic War of 1812',
   categoryLabel: 'Uniform', periodLabel: '1810 · 1st battalion', regionLabel: 'Russian Empire',
   overview: 'An 1808-pattern shako reconstructed for a private musketeer of the 1st battalion in 1810. No specific regiment is attributed.',
   researchPrompt: 'What could a shako tell us about its wearer?',

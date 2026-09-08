@@ -1,6 +1,6 @@
 import type { ExhibitContent } from '../../types'
 export const musketContentEn: ExhibitContent = {
-  title: 'Infantry musket', shortTitle: '1808 pattern musket', collectionLabel: 'Russian Empire',
+  title: 'Infantry musket', shortTitle: '1808 pattern musket', collectionLabel: 'Patriotic War of 1812',
   categoryLabel: 'Arms', periodLabel: '1808 pattern · reference made in 1811', regionLabel: 'Tula · Russian Empire',
   overview: 'A reconstruction of the 1808 pattern infantry musket, based on a museum example made at Tula in 1811. It introduces Russian infantry equipment on the eve of the 1812 campaign.',
   researchPrompt: 'What can one object reveal about soldiers and the craftspeople who equipped them?',

@@ -1,6 +1,6 @@
 import type { ExhibitContent } from '../../types'
 export const pistolContentEn: ExhibitContent = {
-  title: 'Cavalry pistol', shortTitle: '1798/1804 pattern pistol', collectionLabel: 'Russian Empire',
+  title: 'Cavalry pistol', shortTitle: '1798/1804 pattern pistol', collectionLabel: 'Patriotic War of 1812',
   categoryLabel: 'Arms', periodLabel: '1798/1804 pattern · reference made in 1803', regionLabel: 'Tula · Russian Empire',
   overview: 'A shortened cuirassier and dragoon flintlock pistol, reconstructed from an example made at Tula in 1803 and held by the museum at Padikovo. This type remained in Russian cavalry service during the era of the 1812 campaign.',
   researchPrompt: 'How could an existing weapon be adapted to changing requirements?',
