@@ -1,6 +1,6 @@
 {
-  "triangles": 182330,
-  "meshes": 71,
+  "triangles": 145482,
+  "meshes": 65,
   "names": [
     "pistol_stock",
     "pistol_barrel",
@@ -13,34 +13,28 @@
     "pistol_lock_lower_jaw",
     "pistol_lock_upper_jaw",
     "pistol_lock_jaw_screw",
-    "pistol_jaw_screw_visible_ridges",
-    "pistol_upper_jaw_shoulder",
     "pistol_lock_jaw_screw_head",
     "pistol_jaw_finial_collar",
     "pistol_cock_pivot_seat",
     "pistol_cock_pivot_surround",
     "pistol_cock_pivot_head",
     "pistol_cock_pivot_rim",
-    "pistol_cock_pivot_slot_floor",
+    "pistol_cock_pivot_slot",
     "pistol_lock_frizzen",
     "pistol_lock_frizzen_foot",
-    "pistol_frizzen_shoe",
     "pistol_frizzen_pivot_lobe",
     "pistol_lock_pan",
-    "pistol_pan_lip",
     "pistol_lock_pan_connection",
     "pistol_frizzen_pivot_seat",
     "pistol_frizzen_pivot_head",
     "pistol_frizzen_pivot_rim",
-    "pistol_frizzen_pivot_slot_floor",
+    "pistol_frizzen_pivot_slot",
     "pistol_lock_frizzen_spring",
     "pistol_spring_tail",
     "pistol_spring_screw_head",
-    "pistol_spring_screw_shoulder",
     "pistol_lock_plate_rib0",
     "pistol_lock_plate_rib1",
     "pistol_lock_plate_rear_moulding",
-    "pistol_cock_raised_margin",
     "pistol_lock_plate_inscription",
     "pistol_sideplate",
     "pistol_counter_screw472head",
@@ -85,79 +79,79 @@
     ],
     "max": [
       0.23000000417232513,
-      0.15749907493591309,
-      0.028931081295013428
+      0.15759825706481934,
+      0.028484242036938667
     ],
     "size": [
       0.4601300358772278,
-      0.15749907493591309,
-      0.049715593457221985
+      0.15759825706481934,
+      0.049268754199147224
     ]
   },
-  "calls": 72,
-  "renderedTriangles": 182332,
-  "bytes": 8938712,
-  "sha256": "ebf702a55dfacdbb5cde9808f3ce8cfdb939fb6673f9b37beac73dc00f1c67df",
+  "calls": 66,
+  "renderedTriangles": 145484,
+  "bytes": 8971380,
+  "sha256": "5f899dfb42ec491d221fff3bb7a9f60d9e70bb838ad1b6de503b2c49b66d7acb",
   "renders": {
     "01-right": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "02-left": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "03-top": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "04-bottom": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "05-front": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "06-rear": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "07-front-3-quarter": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "08-rear-3-quarter": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "09-lock": {
-      "calls": 50,
-      "renderedTriangles": 141674
+      "calls": 44,
+      "renderedTriangles": 104826
     },
     "10-cock": {
-      "calls": 50,
-      "renderedTriangles": 143870
+      "calls": 44,
+      "renderedTriangles": 107022
     },
     "11-frizzen-pan": {
-      "calls": 53,
-      "renderedTriangles": 141506
+      "calls": 47,
+      "renderedTriangles": 104658
     },
     "12-breech": {
-      "calls": 33,
-      "renderedTriangles": 124260
+      "calls": 31,
+      "renderedTriangles": 99474
     },
     "13-muzzle": {
       "calls": 21,
       "renderedTriangles": 70836
     },
     "14-sideplate": {
-      "calls": 48,
-      "renderedTriangles": 136910
+      "calls": 42,
+      "renderedTriangles": 103626
     },
     "15-trigger": {
-      "calls": 35,
-      "renderedTriangles": 108786
+      "calls": 32,
+      "renderedTriangles": 93860
     },
     "16-ramrod": {
       "calls": 16,
@@ -173,75 +167,75 @@
     },
     "19-buttcap": {
       "calls": 14,
-      "renderedTriangles": 107552
+      "renderedTriangles": 107062
     },
     "20-stock-cross-section-area": {
-      "calls": 58,
-      "renderedTriangles": 145438
+      "calls": 52,
+      "renderedTriangles": 108590
     },
     "21-left-3-quarter": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "22-jaws-flint": {
-      "calls": 27,
-      "renderedTriangles": 123256
+      "calls": 22,
+      "renderedTriangles": 91226
     },
     "23-frizzen": {
-      "calls": 54,
-      "renderedTriangles": 141890
+      "calls": 49,
+      "renderedTriangles": 106002
     },
     "24-pan": {
-      "calls": 34,
-      "renderedTriangles": 132428
+      "calls": 28,
+      "renderedTriangles": 98080
     },
     "25-spring": {
-      "calls": 21,
-      "renderedTriangles": 85134
+      "calls": 18,
+      "renderedTriangles": 78066
     },
     "26-lockplate": {
-      "calls": 50,
-      "renderedTriangles": 141674
+      "calls": 44,
+      "renderedTriangles": 104826
     },
     "right": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "left": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "hero": {
-      "calls": 72,
-      "renderedTriangles": 182332
+      "calls": 66,
+      "renderedTriangles": 145484
     },
     "top": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "bottom": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "muzzle": {
-      "calls": 71,
-      "renderedTriangles": 182330
+      "calls": 65,
+      "renderedTriangles": 145482
     },
     "butt": {
-      "calls": 64,
-      "renderedTriangles": 167928
+      "calls": 60,
+      "renderedTriangles": 141248
     },
     "lock": {
-      "calls": 52,
-      "renderedTriangles": 160010
+      "calls": 46,
+      "renderedTriangles": 123162
     },
     "reverse": {
-      "calls": 55,
-      "renderedTriangles": 176534
+      "calls": 49,
+      "renderedTriangles": 139686
     },
     "grip": {
-      "calls": 20,
-      "renderedTriangles": 123420
+      "calls": 19,
+      "renderedTriangles": 114350
     },
     "ramrod": {
       "calls": 16,

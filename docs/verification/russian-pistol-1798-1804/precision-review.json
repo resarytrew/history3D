@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-08T16:31:39.752207+00:00",
+  "scope": "Static exterior proportions from supplied lock close-up; no artificial ageing",
+  "baseline": "precision-before/before.glb",
+  "modelSha256": "22a3d2f32acd627667eb02b9679334324127f74214a863a821d6c9d9af97d11d",
+  "visualViews": [
+    "photo-lock.png",
+    "09-lock.png",
+    "11-frizzen-pan.png"
+  ],
+  "changes": [
+    "asymmetric photo-sliced upper head and visible collar",
+    "shorter exposed smooth stem",
+    "thinner jaw and frizzen exterior forms",
+    "pan shifted right and deeper lower profile",
+    "larger, flatter main head and steeper visible stripe",
+    "narrower exterior strip and polygonal small head",
+    "shorter thinner trigger silhouette with visible loop",
+    "neutral iron without oxidation or painted edge wear"
+  ],
+  "tests": {
+    "run": false,
+    "reason": "Explicit user instruction"
+  },
+  "mobileAdaptation": {
+    "performed": false
+  },
+  "mechanicalValidation": {
+    "performed": false
+  },
+  "qualification": "Visual reconstruction from uncalibrated photographs; hidden depth inferred; exact likeness not claimed",
+  "previousChecks": "static-validation.json, refinement-audit.json and acceptance-audit.json refer to version 0.5.0 and their recorded hash, not this model"
+}

@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-08T16:50:19.118972+00:00",
+  "scope": "Static exterior layered-metal detail pass",
+  "baseline": "relief-before/before.glb",
+  "modelSha256": "ebf702a55dfacdbb5cde9808f3ce8cfdb939fb6673f9b37beac73dc00f1c67df",
+  "visualViews": [
+    "photo-lock.png",
+    "22-jaws-flint.png",
+    "11-frizzen-pan.png"
+  ],
+  "changes": [
+    "geometric recessed head slots with bevels and recessed floors",
+    "stepped main head surround",
+    "closed visible stem relief rings",
+    "faceted neck collar",
+    "raised upper jaw shoulder seated on leaf",
+    "jaw thickness tapers toward tips",
+    "frizzen shoe seated on curved parent face",
+    "separate pan rim and polygonal head shoulder",
+    "low sculpted cock margin following the photographed S curve"
+  ],
+  "tests": {
+    "run": false,
+    "reason": "Explicit user instruction"
+  },
+  "mobileAdaptation": {
+    "performed": false
+  },
+  "mechanicalValidation": {
+    "performed": false
+  },
+  "qualification": "Image-based exterior artwork. Hidden depths and cross sections inferred; closed stem rings are a visual simplification, not a reconstructed helical fastener. Exact likeness not claimed.",
+  "previousChecks": "Earlier automated reports apply only to their recorded historical model hashes."
+}

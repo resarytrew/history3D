@@ -34,8 +34,8 @@
     {
       "name": "lock",
       "metalness": 0.92,
-      "roughness": "mapped mottled iron",
-      "texture": "original oxidation and fine pits; no photographic pixels",
+      "roughness": "uniform neutral surface",
+      "texture": "uniform neutral iron; no artificial ageing",
       "certainty": "visual approximation"
     }
   ],
@@ -65,7 +65,7 @@
     },
     {
       "name": "Cock and Frizzen",
-      "geometry": "image-traced crowned exterior contours, empty jaws, sculpted slotted head, tall upright frizzen",
+      "geometry": "photo-contour exterior sculpture with layered shoulders, recessed visible head slots, closed stem relief rings, faceted neck, tapered leaves and raised pan lip",
       "visible": "empty jaws and raised frizzen",
       "inferred": "depths and cross-sections; no internal or moving mechanism"
     },
@@ -136,7 +136,7 @@
       512,
       512
     ],
-    "wear": "subdued original mottled iron artwork on lock; other maps retained"
+    "wear": "lock: uniform neutral iron, no artificial oxidation or pits; wood unchanged"
   },
   "uncertainty": [
     "overall length about 460 mm is assumed",
