@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { readFile, writeFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
+import { writeArtifact as writeFile } from './write-artifact'
 import { resolve } from 'node:path'
 
 const out=resolve('docs/verification/russian-pistol-1798-1804')
@@ -55,39 +56,47 @@ async function load(path:string){
   return {geometry,wood:{albedo:textureHash(wood.pbrMetallicRoughness!.baseColorTexture!.index),
     roughness:textureHash(wood.pbrMetallicRoughness!.metallicRoughnessTexture!.index),normal:textureHash(wood.normalTexture!.index)}}
 }
-const before=await load(resolve(out,'refinement-before/before.glb'))
-const after=await load(resolve('src/content/exhibits/russian-pistol-1798-1804/models/pistol_1798_1804.glb'))
-const frozen=['barrel','breech','breech_tang','ramrod','ramrod_head','ramrod_pipe_front','ramrod_pipe_rear',
-  'ramrod_pipe_mount_front','ramrod_pipe_mount_rear','grip_escutcheon','front_sight','buttcap_heel','buttcap_fastener']
-const freeze=frozen.map(name=>{const a=before.geometry(`pistol_${name}`),b=after.geometry(`pistol_${name}`)
-  assert.equal(b.hash,a.hash,`Frozen geometry changed: ${name}`);return {name,unchanged:true,sha256:b.hash}})
-assert.deepEqual(after.wood,before.wood,'Wood maps changed')
-const oldStock=before.geometry('pistol_stock'),newStock=after.geometry('pistol_stock')
-assert.equal(newStock.positions.length,oldStock.positions.length)
-assert.deepEqual(newStock.indices,oldStock.indices,'Stock topology changed')
-assert.deepEqual(newStock.uv,oldStock.uv,'Stock UVs changed')
-let changedLeftVertices=0
-for(let i=0;i<oldStock.positions.length;i+=3){
-  assert.equal(newStock.positions[i],oldStock.positions[i],'Stock longitudinal silhouette')
-  assert.equal(newStock.positions[i+1],oldStock.positions[i+1],'Stock vertical silhouette')
-  if(oldStock.positions[i+2]!==newStock.positions[i+2]){
-    assert(oldStock.positions[i+2]<0,'Right stock changed')
-    const x=(oldStock.positions[i]/(.460/1415))+747.5
-    assert(x>395&&x<885,'Stock outside the documented inlet changed');changedLeftVertices++
-  }
-}
-const parts=['lock_cock','lock_upper_jaw','lock_lower_jaw','lock_jaw_screw_head','lock_frizzen',
-  'lock_pan','lock_lockplate','sideplate','buttcap_right','buttcap_left']
+const before=await load(resolve(out,'lock-before/before.glb'))
+const modelPath='src/content/exhibits/russian-pistol-1798-1804/models/pistol_1798_1804.glb'
+const after=await load(resolve(modelPath))
+assert.deepEqual(after.wood,before.wood,'Wood maps changed outside the geometry task')
+const parts=['lock_cock','lock_cock_spur','lock_lower_jaw','lock_upper_jaw','lock_jaw_screw_head',
+  'lock_frizzen','lock_frizzen_foot','lock_pan_connection','lock_frizzen_spring']
 const appearance=parts.map(name=>{const a=before.geometry(`pistol_${name}`),b=after.geometry(`pistol_${name}`)
-  return {name,surfaceAreaChangePercent:100*(b.area/a.area-1),beforeTriangles:a.indices.length/3,afterTriangles:b.indices.length/3}})
-const barrel=after.geometry('pistol_barrel'),axisY=(barrel.min[1]+barrel.max[1])/2
-const radii=barrel.positions.flatMap((_,i)=>i%3===0&&Math.abs(barrel.positions[i]-barrel.max[0])<1e-7
-  ? [Math.hypot(barrel.positions[i+1]-axisY,barrel.positions[i+2])]:[])
-const bore=Math.min(...radii)*2000,outer=Math.max(...radii)*2000
-const measurements={scope:'Rendered exterior and blind visual recess only; not manufacturing specifications',
-  barrelLengthMm:(barrel.max[0]-barrel.min[0])*1000,boreMm:bore,muzzleLipOutsideMm:outer,visibleLipWallMm:(outer-bore)/2}
-const report={freeze,worldTransformsUnchanged:true,wood:{unchanged:true,sha256:after.wood},stock:{silhouetteUnchanged:true,topologyUnchanged:true,uvUnchanged:true,changedLeftVertices,
-  exception:'Removed only the unreferenced rectangular left-side flattening; right inlet, fore-end, UVs and wood maps preserved'},
-  appearance,measurements,mechanicalValidation:{performed:false,status:'Static exterior artwork; no operating kinetics, ignition path or functional mechanism has been designed or validated'}}
+  return {name,changed:b.hash!==a.hash,beforeTriangles:a.indices.length/3,afterTriangles:b.indices.length/3}})
+assert(appearance.every(p=>p.changed),'Requested exterior parts must be regenerated')
+// Grounding may shift all Y coordinates after changing the apple. Compare shapes
+// relative to their own minima, rather than accidentally freezing the old ground plane.
+const retained=['stock','barrel','breech','breech_tang','sideplate','buttcap_right','buttcap_left','foreend_plate','front_sight','trigger','trigger_guard','ramrod'].map(name=>{
+  const a=before.geometry(`pistol_${name}`),b=after.geometry(`pistol_${name}`)
+  assert.deepEqual(a.indices,b.indices)
+  assert.equal(a.positions.length,b.positions.length)
+  const maxError=Math.max(...a.positions.map((v,i)=>Math.abs((v-a.min[i%3])-(b.positions[i]-b.min[i%3]))))
+  assert(maxError<1e-7,`${name}: exterior shape changed`)
+  return {name,maxShapeError:maxError}
+})
+const metrics=JSON.parse(await readFile(resolve(out,'metrics.json'),'utf8'))
+assert(metrics.triangles<150000)
+assert.equal(metrics.invalidValues,0);assert.equal(metrics.missingUv,0)
+assert(metrics.roundtripBoundsError<1e-6);assert.equal(metrics.errors.length,0)
+assert(!metrics.names.includes('pistol_lock_flint'),'Photographed jaws must remain empty')
+const modelHash=hash(await readFile(resolve(modelPath)))
+assert.equal(modelHash,metrics.sha256,'Renders and exported GLB differ')
+const report={scope:'Static museum lock close-up: sculpted exterior relief, heads and local iron artwork',
+  baseline:'lock-before/before.glb (saved before the focused lock relief pass)',appearance,retained,
+  wood:{mapsUnchanged:true,sha256:after.wood},modelHash,
+  qualification:'Photo contours are artwork references. Unseen depths and cross-sections are inferred; no 100% likeness claim.',
+  mechanicalValidation:{performed:false,status:'Outside the user-defined scope'}}
 await writeFile(resolve(out,'refinement-audit.json'),JSON.stringify(report,null,2)+'\n')
+const renders=await Promise.all(Object.keys(metrics.renders).concat(['photo-right','photo-left','photo-lock']).map(async name=>{
+  const data=await readFile(resolve(out,`${name}.png`))
+  assert.equal(data.toString('ascii',1,4),'PNG')
+  return {file:`${name}.png`,width:data.readUInt32BE(16),height:data.readUInt32BE(20),sha256:hash(data)}
+}))
+await writeFile(resolve(out,'acceptance-audit.json'),JSON.stringify({
+  scope:report.scope,model:{path:modelPath,sha256:modelHash,matchesRenderMetrics:true},renders,
+  softwareChecks:'finite geometry, self-contained GLB roundtrip, named meshes and render artifacts',
+  visualReview:'See PISTOL_REFINEMENT_REPORT.md for inspected views and limitations',
+  mechanicalValidation:report.mechanicalValidation,
+},null,2)+'\n')
 console.log(JSON.stringify(report,null,2))

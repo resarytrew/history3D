@@ -12,6 +12,16 @@ describe('1798/1804 cavalry pistol',()=>{
   let root:Group
   beforeAll(()=>{root=createPistol();root.updateMatrixWorld(true)})
   afterAll(()=>disposeObject3D(root))
+  it('keeps the museum jaws empty and the grip symmetric across its middle plane',()=>{
+    expect(root.getObjectByName('pistol_lock_flint')).toBeUndefined()
+    const stock=root.getObjectByName('pistol_stock')!
+    for(const [x,y] of [[80,680],[145,665],[215,580],[270,540]]) {
+      const hits=[-1,1].map(sign=>new Raycaster(new Vector3(X(x),Y(y)+root.userData.groundOffset,sign*.15),
+        new Vector3(0,0,-sign)).intersectObject(stock)[0])
+      expect(hits.every(Boolean)).toBe(true)
+      expect(hits[0].point.z).toBeCloseTo(-hits[1].point.z,6)
+    }
+  })
   it('uses metric geometry, correct barrel length and outward stock faces',()=>{
     expect(new Box3().setFromObject(root).getSize(new Vector3()).x).toBeCloseTo(.46,2)
     const barrel=new Box3().setFromObject(root.getObjectByName('pistol_barrel')!)
@@ -43,9 +53,9 @@ describe('1798/1804 cavalry pistol',()=>{
     for(let i=0;i<positions.count;i++)if(Math.abs(positions.getX(i)-barrelBox.max.x)<1e-6)radii.push(Math.hypot(positions.getY(i)-axisY,positions.getZ(i)))
     expect(Math.min(...radii)*2).toBeCloseTo(.017,6)
     const stock=root.getObjectByName('pistol_stock')!, box=new Box3().setFromObject(stock)
-    const frontHits=new Raycaster(new Vector3(box.max.x+.001,Y(482),0),new Vector3(-1,0,0)).intersectObject(stock)
+    const frontHits=new Raycaster(new Vector3(box.max.x+.001,Y(479)+root.userData.groundOffset,0),new Vector3(-1,0,0)).intersectObject(stock)
     expect(frontHits[0].point.x).toBeCloseTo(box.max.x,5)
-    const rearHits=new Raycaster(new Vector3(box.min.x-.001,Y(675),0),new Vector3(1,0,0)).intersectObject(stock)
+    const rearHits=new Raycaster(new Vector3(box.min.x-.001,Y(670)+root.userData.groundOffset,0),new Vector3(1,0,0)).intersectObject(stock)
     expect(rearHits[0].point.x).toBeCloseTo(box.min.x,5)
   })
   it('keeps two hollow pipes connected to stock and the rod separate',()=>{
@@ -75,8 +85,8 @@ describe('1798/1804 cavalry pistol',()=>{
     expect(json.asset.version).toBe('2.0')
     for(const buffer of json.buffers)expect(buffer.uri).toBeUndefined()
     for(const image of json.images){expect(image.uri).toBeUndefined();expect(image.bufferView).toBeTypeOf('number')}
-    expect(json.images).toHaveLength(9)
-    expect(json.materials.filter((m:{normalTexture?:unknown})=>m.normalTexture)).toHaveLength(3)
+    expect(json.images).toHaveLength(12)
+    expect(json.materials.filter((m:{normalTexture?:unknown})=>m.normalTexture)).toHaveLength(4)
     expect(json.animations).toBeUndefined()
     expect(json.nodes.some((n:{name:string})=>n.name==='pistol_sideplate')).toBe(true)
   })
@@ -88,6 +98,21 @@ describe('1798/1804 cavalry pistol',()=>{
     expect(triangles).toBeLessThan(150_000)
     const metrics=JSON.parse(readFileSync('docs/verification/russian-pistol-1798-1804/metrics.json','utf8'))
     expect(metrics.triangles).toBe(triangles);expect(metrics.roundtripBoundsError).toBeLessThan(1e-6)
+  })
+  it('keeps sculpted exterior surfaces closed after displacement, including UV seams',()=>{
+    for(const name of ['lock_cock','lock_upper_jaw','lock_lower_jaw','lock_frizzen','lock_frizzen_foot']){
+      const g=(root.getObjectByName(`pistol_${name}`) as Mesh).geometry
+      const p=g.getAttribute('position'),index=g.getIndex(),edges=new Map<string,number>()
+      const vertex=(i:number)=>[p.getX(i),p.getY(i),p.getZ(i)].map(v=>Math.round(v*1e7)).join(',')
+      for(let i=0;i<(index?.count??p.count);i+=3){
+        const ids=[0,1,2].map(k=>vertex(index?index.getX(i+k):i+k))
+        if(new Set(ids).size<3)continue
+        for(let k=0;k<3;k++){
+          const key=[ids[k],ids[(k+1)%3]].sort().join('|');edges.set(key,(edges.get(key)??0)+1)
+        }
+      }
+      expect([...edges.values()].every(count=>count===2),`${name}: open or nonmanifold edge`).toBe(true)
+    }
   })
   it('resolves all source claims and preserves uncertainty',()=>{
     const r=exhibit.reconstruction,items=[...r.known,...r.inferred,...r.uncertain,...r.unknown]

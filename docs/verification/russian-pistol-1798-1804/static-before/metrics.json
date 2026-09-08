@@ -1,0 +1,245 @@
+{
+  "triangles": 127022,
+  "meshes": 64,
+  "names": [
+    "pistol_stock",
+    "pistol_barrel",
+    "pistol_breech_tang",
+    "pistol_breech",
+    "pistol_breech_tang_screw",
+    "pistol_lock_lockplate",
+    "pistol_lock_cock",
+    "pistol_lock_cock_spur",
+    "pistol_lock_lower_jaw",
+    "pistol_lock_upper_jaw",
+    "pistol_lock_jaw_screw",
+    "pistol_lock_jaw_screw_head",
+    "pistol_lock_flint",
+    "pistol_cock_pivot_seat",
+    "pistol_cock_pivot_head",
+    "pistol_cock_pivot_slot",
+    "pistol_lock_frizzen",
+    "pistol_lock_frizzen_foot",
+    "pistol_lock_pan",
+    "pistol_lock_pan_connection",
+    "pistol_frizzen_pivot_seat",
+    "pistol_frizzen_pivot_head",
+    "pistol_frizzen_pivot_slot",
+    "pistol_lock_frizzen_spring",
+    "pistol_spring_screw_head",
+    "pistol_spring_screw_slot",
+    "pistol_sideplate",
+    "pistol_counter_screw472head",
+    "pistol_counter_screw472slot",
+    "pistol_lock_screw472head",
+    "pistol_lock_screw472slot",
+    "pistol_counter_screw597head",
+    "pistol_counter_screw597slot",
+    "pistol_lock_screw597head",
+    "pistol_lock_screw597slot",
+    "pistol_counter_screw831head",
+    "pistol_counter_screw831slot",
+    "pistol_lock_screw831head",
+    "pistol_lock_screw831slot",
+    "pistol_trigger_guard",
+    "pistol_trigger_plate",
+    "pistol_trigger",
+    "pistol_foreend_plate",
+    "pistol_front_sight",
+    "pistol_ramrod",
+    "pistol_ramrod_head",
+    "pistol_ramrod_pipe_rear",
+    "pistol_ramrod_pipe_mount_rear",
+    "pistol_ramrod_pipe_front",
+    "pistol_ramrod_pipe_mount_front",
+    "pistol_barrel_pin_945_-1head",
+    "pistol_barrel_pin_945_-1slot",
+    "pistol_barrel_pin_945_1head",
+    "pistol_barrel_pin_945_1slot",
+    "pistol_barrel_pin_1275_-1head",
+    "pistol_barrel_pin_1275_-1slot",
+    "pistol_barrel_pin_1275_1head",
+    "pistol_barrel_pin_1275_1slot",
+    "pistol_buttcap_right",
+    "pistol_buttcap_left",
+    "pistol_buttcap_heel",
+    "pistol_buttcap_fastener",
+    "pistol_butt_cap_rear",
+    "pistol_grip_escutcheon"
+  ],
+  "invalidValues": 0,
+  "missingUv": 0,
+  "roundtripBoundsError": 0,
+  "bounds": {
+    "min": [
+      -0.23013003170490265,
+      0,
+      -0.020844541490077972
+    ],
+    "max": [
+      0.23000000417232513,
+      0.1403087079524994,
+      0.028165653347969055
+    ],
+    "size": [
+      0.4601300358772278,
+      0.1403087079524994,
+      0.04901019483804703
+    ]
+  },
+  "calls": 65,
+  "renderedTriangles": 127024,
+  "bytes": 6503372,
+  "sha256": "bc440afa9146c5121b210d1393426a5bb863543031eda0977c8e71b93addf527",
+  "renders": {
+    "01-right": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "02-left": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "03-top": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "04-bottom": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "05-front": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "06-rear": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "07-front-3-quarter": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "08-rear-3-quarter": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "09-lock": {
+      "calls": 42,
+      "renderedTriangles": 99646
+    },
+    "10-cock": {
+      "calls": 38,
+      "renderedTriangles": 98854
+    },
+    "11-frizzen-pan": {
+      "calls": 42,
+      "renderedTriangles": 99646
+    },
+    "12-breech": {
+      "calls": 26,
+      "renderedTriangles": 93752
+    },
+    "13-muzzle": {
+      "calls": 21,
+      "renderedTriangles": 80402
+    },
+    "14-sideplate": {
+      "calls": 42,
+      "renderedTriangles": 99646
+    },
+    "15-trigger": {
+      "calls": 28,
+      "renderedTriangles": 93424
+    },
+    "16-ramrod": {
+      "calls": 16,
+      "renderedTriangles": 63944
+    },
+    "17-ramrod-pipes": {
+      "calls": 14,
+      "renderedTriangles": 63548
+    },
+    "18-foreend": {
+      "calls": 14,
+      "renderedTriangles": 63548
+    },
+    "19-buttcap": {
+      "calls": 14,
+      "renderedTriangles": 102388
+    },
+    "20-stock-cross-section-area": {
+      "calls": 50,
+      "renderedTriangles": 103410
+    },
+    "21-left-3-quarter": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "22-jaws-flint": {
+      "calls": 19,
+      "renderedTriangles": 88168
+    },
+    "23-frizzen": {
+      "calls": 42,
+      "renderedTriangles": 99646
+    },
+    "24-pan": {
+      "calls": 23,
+      "renderedTriangles": 90644
+    },
+    "25-spring": {
+      "calls": 18,
+      "renderedTriangles": 82218
+    },
+    "26-lockplate": {
+      "calls": 42,
+      "renderedTriangles": 99646
+    },
+    "right": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "left": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "hero": {
+      "calls": 65,
+      "renderedTriangles": 127024
+    },
+    "top": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "bottom": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "muzzle": {
+      "calls": 64,
+      "renderedTriangles": 127022
+    },
+    "butt": {
+      "calls": 59,
+      "renderedTriangles": 123972
+    },
+    "lock": {
+      "calls": 43,
+      "renderedTriangles": 101854
+    },
+    "reverse": {
+      "calls": 45,
+      "renderedTriangles": 102250
+    },
+    "grip": {
+      "calls": 19,
+      "renderedTriangles": 107224
+    },
+    "ramrod": {
+      "calls": 16,
+      "renderedTriangles": 63944
+    }
+  },
+  "errors": []
+}

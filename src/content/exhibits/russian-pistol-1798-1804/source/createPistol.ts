@@ -3,6 +3,7 @@ import { TessellateModifier } from 'three/examples/jsm/modifiers/TessellateModif
 import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { barrelStart, photoScale, pistolDimensions, X, Y } from './dimensions'
 import { pistolMaterials } from './materials'
+import { fromLeftPhoto } from './photoRegistration'
 
 type Point = readonly [number, number]
 /** Editable exterior reconstruction. Coordinates trace museum l_1.jpg; depths are inferred. */
@@ -10,6 +11,7 @@ export function createPistol() {
   const root = new T.Group(); root.name = 'RussianPistol1798_1804'
   root.userData = { units: 'metres', prototype: 'Tula 1803, Padikovo museum', status: 'reconstruction', internalMechanism: false }
   const m = pistolMaterials()
+  const contours = new WeakMap<T.Mesh,T.Vector2[]>()
   function add(name: string, geometry: T.BufferGeometry, material: T.Material | T.Material[]) {
     const mesh = new T.Mesh(geometry, material); mesh.name = name; mesh.castShadow = mesh.receiveShadow = true
     root.add(mesh); return mesh
@@ -18,14 +20,27 @@ export function createPistol() {
   function outline(name: string, points: readonly Point[], z: number, depth: number, material = m.steel, bevel = 1.5) {
     const shape = new T.Shape()
     const last = points[points.length - 1], first = points[0]
-    shape.moveTo((last[0]+first[0])/2,-(last[1]+first[1])/2)
-    points.forEach(([x,y],i)=>{const next=points[(i+1)%points.length];shape.quadraticCurveTo(x,-y,(x+next[0])/2,-(y+next[1])/2)})
+    if(['LockPlate','Cock','LowerJaw','Frizzen','PanConnection'].includes(name)){
+      // Interpolating contours retain the photographed local inflections; midpoint
+      // rounding used to erase the rear tip, jaw taper and narrow neck transitions.
+      const curve=new T.CatmullRomCurve3(points.map(([x,y])=>point(x,y)),true,'centripetal')
+      curve.getPoints(points.length*4).forEach((p,i)=>{if(i===0)shape.moveTo(p.x,p.y);else shape.lineTo(p.x,p.y)})
+    }else{
+      shape.moveTo((last[0]+first[0])/2,-(last[1]+first[1])/2)
+      points.forEach(([x,y],i)=>{const next=points[(i+1)%points.length];shape.quadraticCurveTo(x,-y,(x+next[0])/2,-(y+next[1])/2)})
+    }
     shape.closePath()
     const geometry = new T.ExtrudeGeometry(shape, { depth, steps: 1, bevelEnabled: bevel > 0, bevelSize: bevel, bevelThickness: bevel, bevelSegments: 3, curveSegments: 5 })
     // Physical, planar UVs prevent the default exporter from repeating a map per photo pixel.
     const uv = geometry.getAttribute('uv'), pos = geometry.getAttribute('position')
-    for (let i = 0; i < uv.count; i++) uv.setXY(i, pos.getX(i) / 240, pos.getY(i) / 240)
-    geometry.translate(0, 0, z); return add(name, geometry, material)
+    const normals=geometry.getAttribute('normal')
+    const lockOutline=['LockPlate','Cock','CockSpur','LowerJaw','UpperJaw','Frizzen','FrizzenFoot','FrizzenPivotLobe','PanConnection','FrizzenSpring','SpringTail'].includes(name)
+    for (let i = 0; i < uv.count; i++) {
+      if(lockOutline&&Math.abs(normals.getZ(i))<.4)uv.setXY(i,(pos.getX(i)+pos.getY(i))/240,pos.getZ(i)/240)
+      else uv.setXY(i, pos.getX(i) / 240, pos.getY(i) / 240)
+    }
+    geometry.translate(0, 0, z)
+    const mesh=add(name, geometry, material);contours.set(mesh,shape.getPoints(5));return mesh
   }
   function cylinder(name: string, a: number[], b: number[], radius: number, material = m.steel, endRadius = radius, radial = 48) {
     const av = point(a[0], a[1], a[2]), bv = point(b[0], b[1], b[2]), direction = bv.clone().sub(av)
@@ -35,6 +50,34 @@ export function createPistol() {
   }
   function screw(name: string, x: number, y: number, z: number, radius: number, material = m.steel, reverse = false) {
     const sign = reverse ? -1 : 1
+    if(name==='CockPivot'||name==='FrizzenPivot'){
+      // Sculpt only the visible, worn head and its shallow recessed stripe.
+      const p:number[]=[],uv:number[]=[],colors:number[]=[],indices:number[]=[]
+      const segments=48,rings=6
+      for(let j=0;j<=rings;j++)for(let k=0;k<=segments;k++){
+        const r=radius*j/rings,a=k/segments*Math.PI*2,dx=r*Math.cos(a),dy=r*Math.sin(a)
+        p.push(x+dx,-y+dy,z+1.5+2.6*Math.sqrt(Math.max(0,1-(r/radius)**2)))
+        uv.push((x+dx)/240,(-y+dy)/240)
+        colors.push(1,1,1)
+        if(j<rings&&k<segments){const q=j*(segments+1)+k,b=q+segments+1;indices.push(q,b,q+1,b,b+1,q+1)}
+      }
+      const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3))
+      g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setAttribute('color',new T.Float32BufferAttribute(colors,3))
+      g.setIndex(indices);g.computeVertexNormals();add(`${name}Head`,g,m.lock)
+      cylinder(`${name}Rim`,[x,y,z-.5],[x,y,z+1.5],radius,material,radius)
+      const sp:number[]=[],si:number[]=[],su:number[]=[]
+      for(let j=0;j<=32;j++)for(const side of [-1,1]){
+        const along=(j/32*2-1)*radius*.9,across=side*.85
+        const dx=along*Math.cos(.9)-across*Math.sin(.9),dy=along*Math.sin(.9)+across*Math.cos(.9)
+        sp.push(x+dx,-y+dy,z+1.57+2.6*Math.sqrt(Math.max(0,1-(dx*dx+dy*dy)/(radius*radius))))
+        su.push(j/32,(side+1)/2)
+        if(j<32&&side===-1){const a=j*2;si.push(a,a+2,a+1,a+1,a+2,a+3)}
+      }
+      const stripe=new T.BufferGeometry();stripe.setAttribute('position',new T.Float32BufferAttribute(sp,3))
+      stripe.setAttribute('uv',new T.Float32BufferAttribute(su,2));stripe.setIndex(si);stripe.computeVertexNormals()
+      add(`${name}Slot`,stripe,m.dark)
+      return
+    }
     cylinder(`${name}Head`, [x, y, z], [x, y, z + 3 * sign], radius, material, radius * .93)
     // A shallow dark slot indication; no internal fastener thread is modelled.
     const g = new T.BoxGeometry(radius * 1.5, 1.8, .6)
@@ -42,28 +85,90 @@ export function createPistol() {
   }
 
   // A crowned exterior cross-section gives forged parts volume without invented engraving.
+  function subdivideSurface(source:T.BufferGeometry,edge:number){
+    const g=source.index?source.toNonIndexed():source.clone()
+    const attributes=['position','normal','uv'] as const
+    let faces:number[][]=[]
+    for(let i=0;i<g.attributes.position.count;i++)faces.push(attributes.flatMap(name=>{
+      const a=g.getAttribute(name);return Array.from({length:a.itemSize},(_,k)=>a.array[i*a.itemSize+k])
+    }))
+    g.dispose()
+    const midpoint=(a:number[],b:number[])=>a.map((v,i)=>(v+b[i])/2)
+    const long=(a:number[],b:number[])=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2])>edge
+    // Both triangles incident on a long edge receive the same midpoint. Independent
+    // longest-edge subdivision left T-junctions that opened into cracks after relief.
+    for(let pass=0;pass<6;pass++){
+      const next:number[][]=[];let split=false
+      for(let i=0;i<faces.length;i+=3){
+        const [a,b,c]=faces.slice(i,i+3),mask=Number(long(a,b))+2*Number(long(b,c))+4*Number(long(c,a))
+        const ab=midpoint(a,b),bc=midpoint(b,c),ca=midpoint(c,a)
+        const variants=[[[a,b,c]],[[a,ab,c],[ab,b,c]],[[b,bc,a],[bc,c,a]],
+          [[ab,b,bc],[a,ab,c],[ab,bc,c]],[[c,ca,b],[ca,a,b]],
+          [[a,ab,ca],[ab,b,c],[ab,c,ca]],[[ca,bc,c],[a,b,ca],[b,bc,ca]],
+          [[a,ab,ca],[ab,b,bc],[ca,bc,c],[ab,bc,ca]]]
+        next.push(...variants[mask].flat());split ||= mask!==0
+      }
+      faces=next;if(!split)break
+    }
+    const result=new T.BufferGeometry();let offset=0
+    for(const name of attributes){const size=source.getAttribute(name).itemSize
+      result.setAttribute(name,new T.Float32BufferAttribute(faces.flatMap(v=>v.slice(offset,offset+size)),size));offset+=size}
+    return result
+  }
   function crown(mesh: T.Mesh, amount: number) {
     const old = mesh.geometry
-    mesh.geometry = new TessellateModifier(12, 4).modify(old); old.dispose()
+    const sculpt=['Cock','CockSpur','LowerJaw','UpperJaw','JawScrewFinial','Frizzen','FrizzenFoot','FrizzenPivotLobe'].includes(mesh.name)
+    mesh.geometry = sculpt?subdivideSurface(old,12):new TessellateModifier(12,4).modify(old); old.dispose()
     mesh.geometry.computeBoundingBox()
     const box = mesh.geometry.boundingBox!, size = box.getSize(new T.Vector3()), pos = mesh.geometry.getAttribute('position')
+    const normals=mesh.geometry.getAttribute('normal')
+    const sculptHeight=(x:number,y:number)=>{
+      let distance=Infinity
+      const contour=contours.get(mesh)!
+      for(let j=1;j<contour.length;j++){
+        const a=contour[j-1],b=contour[j],dx=b.x-a.x,dy=b.y-a.y
+        const t=T.MathUtils.clamp(((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1),0,1)
+        distance=Math.min(distance,Math.hypot(x-a.x-dx*t,y-a.y-dy*t))
+      }
+      return amount*(1-Math.exp(-distance/2.8))
+    }
     for (let i = 0; i < pos.count; i++) {
       const nx = (pos.getX(i) - box.min.x) / size.x, ny = (pos.getY(i) - box.min.y) / size.y
       const side = (pos.getZ(i) - (box.min.z + box.max.z) / 2) / (size.z / 2)
-      pos.setZ(i, pos.getZ(i) + amount * Math.sin(Math.PI * nx) * Math.sin(Math.PI * ny) * side)
+      let lift=amount * Math.sin(Math.PI * nx) * Math.sin(Math.PI * ny)
+      if(sculpt){
+        // Round the cross-section relative to the actual silhouette. A bounding-box
+        // sine made narrow S-shaped areas flat and left the finial heart-shaped.
+        const x=pos.getX(i),y=pos.getY(i),step=.25
+        lift=sculptHeight(x,y)
+        const dx=(sculptHeight(x+step,y)-sculptHeight(x-step,y))/(2*step)*side
+        const dy=(sculptHeight(x,y+step)-sculptHeight(x,y-step))/(2*step)*side
+        const nz=normals.getZ(i)/(1+lift*2/size.z)
+        const normal=new T.Vector3(normals.getX(i)-dx*nz,normals.getY(i)-dy*nz,nz).normalize()
+        normals.setXYZ(i,normal.x,normal.y,normal.z)
+      }
+      pos.setZ(i, pos.getZ(i) + lift * side)
     }
-    mesh.geometry.deleteAttribute('normal')
-    const smooth = mergeVertices(mesh.geometry); mesh.geometry.dispose(); mesh.geometry = smooth; smooth.computeVertexNormals()
+    if(!sculpt)mesh.geometry.deleteAttribute('normal')
+    const smooth = mergeVertices(mesh.geometry); mesh.geometry.dispose(); mesh.geometry = smooth
+    if(!sculpt)smooth.computeVertexNormals()
     return mesh
   }
 
   // Longitudinal stock sections, full elliptical volume with a softly flattened lock inlet.
   const sections = [
-    [42, 643, 710, 2], [49, 635, 728, 28], [72, 627, 741, 47], [105, 613, 747, 57],
-    [146, 584, 733, 61], [180, 555, 674, 59], [215, 529, 624, 53], [270, 495, 588, 48],
-    [330, 465, 565, 48], [420, 436, 548, 55], [500, 420, 540, 61], [590, 411, 539, 61],
-    [700, 423, 540, 59], [850, 430, 538, 53], [1020, 436, 550, 46], [1170, 440, 514, 40],
-    [1300, 442, 501, 36], [1360, 443, 490, 33], [1406, 444, 488, 32],
+    [42, 657, 684, 3], [49, 629, 705, 24], [60, 621, 730, 39], [72, 616, 740, 47],
+    [85, 614, 746, 52], [105, 602, 750, 57], [125, 583, 751, 60], [146, 562, 751, 61],
+    [160, 550, 748, 60], [170, 542, 743, 59], [180, 534, 731, 58], [190, 526, 701, 56],
+    [200, 519, 672, 53], [215, 509, 649, 50], [240, 494, 625, 47], [270, 480, 604, 45],
+    [300, 468, 588, 45], [330, 455, 578, 46], [360, 449, 568, 49], [390, 437, 557, 52],
+    [420, 429, 546, 55], [450, 421, 541, 57], [500, 410, 539, 59], [550, 402, 538, 59],
+    [590, 398, 536, 59], [620, 398, 536, 58], [650, 405, 537, 58],
+    [700, 431, 540, 57], [760, 438, 537, 55], [820, 439, 535, 53], [875, 448, 536, 51],
+    [920, 446, 535, 49], [975, 442, 533, 46], [1020, 441, 532, 44], [1090, 444, 529, 42],
+    [1130, 443, 526, 40], [1150, 442, 510, 40], [1170, 441, 505, 40],
+    [1240, 441, 501, 38], [1300, 442, 498, 36], [1340, 443, 491, 34],
+    [1360, 443, 486, 33], [1406, 444, 483, 32],
   ]
   function sectionAt(x: number) {
     let j = 0; while (j < sections.length - 2 && x > sections[j + 1][0]) j++
@@ -80,20 +185,36 @@ export function createPistol() {
   const muzzleRadius = pistolDimensions.muzzleOuterDiameterMm / 2000 / photoScale
   const recessRadius = pistolDimensions.calibreMm / 2000 / photoScale
   const barrelRadiusAt = (x: number) => {
-    const samples = [[barrelStart,43],[barrelStart+15,43],[barrelStart+115,40],[barrelStart+300,39],[1453,muzzleRadius]]
+    const samples = [[barrelStart,33],[barrelStart+15,33],[barrelStart+115,32],[barrelStart+300,32],[1453,muzzleRadius]]
     let i = 0; while (i < samples.length-2 && x > samples[i+1][0]) i++
     const a=samples[i],b=samples[i+1]
     return T.MathUtils.lerp(a[1],b[1],T.MathUtils.clamp((x-a[0])/(b[0]-a[0]),0,1))
   }
   const inletBlend = (x: number) => T.MathUtils.smoothstep(x,395,455) * (1-T.MathUtils.smoothstep(x,825,885))
+  // Shallow carved borders visible around the lock and along the fore-end.
+  // Relief is part of the wood surface, so there is no detached decorative strip.
+  const lockBorder=new T.CatmullRomCurve3([[399,511],[421,489],[437,466],[486,443],
+    [548,431],[598,434],[660,432],[724,453],[791,466],[848,491],[871,512],
+    [858,529],[789,535],[701,536],[591,540],[495,544],[436,544],[410,534]].map(([x,y])=>new T.Vector3(x,y,0)),true,'centripetal').getPoints(170)
+  const foreBorder=new T.CatmullRomCurve3([[790,464],[849,483],[893,500],[932,505],
+    [965,495],[1012,488],[1054,488],[1096,479],[1125,480],[1152,491],[1194,491],
+    [1255,485],[1317,482],[1355,477]].map(([x,y])=>new T.Vector3(x,y,0)),false,'centripetal').getPoints(100)
+  const reliefAt=(x:number,y:number,sign:number)=>{
+    if(x<390||x>1360)return 0
+    const curve=x<878&&sign>0?lockBorder:x>790?foreBorder:[]
+    let d2=Infinity
+    for(const p of curve)d2=Math.min(d2,(x-p.x)**2+(y-p.y)**2)
+    return 1.7*Math.exp(-d2/30)-.55*Math.exp(-d2/120)
+  }
   const stockSide = (x: number, y: number, sign = 1) => {
     const [top,bottom,width] = sectionAt(x), vertical=(y-(top+bottom)/2)/((bottom-top)/2)
     const side=width * Math.pow(Math.max(0,1-vertical*vertical),.35)
-    return sign < 0 ? side : T.MathUtils.lerp(side,Math.min(width*.92,side),inletBlend(x))
+    const base=sign < 0 ? side : T.MathUtils.lerp(side,Math.min(width*.92,side),inletBlend(x))
+    return Math.max(0,base+reliefAt(x,y,sign)*Math.min(1,base/12))
   }
-  const n = 360, sides = 80, positions: number[] = [], uvs: number[] = [], indices: number[] = []
+  const n = 320, sides = 72, positions: number[] = [], uvs: number[] = [], indices: number[] = []
   for (let i = 0; i <= n; i++) {
-    const x = 42 + (1406 - 42) * i / n, [top, bottom, width] = sectionAt(x)
+    const t=i/n, x=t<=.5?42+318*t*2:360+1046*(t-.5)*2, [top, bottom, width] = sectionAt(x)
     for (let k = 0; k <= sides; k++) {
       const theta = k / sides * Math.PI * 2
       let y = -(top + bottom) / 2 + (bottom - top) / 2 * Math.cos(theta)
@@ -101,6 +222,7 @@ export function createPistol() {
       let z = width * Math.sign(Math.sin(theta)) * Math.pow(Math.abs(Math.sin(theta)), .7)
       // Retain the accepted right inlet; the counterplate follows the curved left wood.
       if (z > 0) z = T.MathUtils.lerp(z,Math.min(z,width*.92),inletBlend(x))
+      z+=Math.sign(z)*reliefAt(x,-y,Math.sign(z))*Math.min(1,Math.abs(z)/12)
       // Carve the upper stock surface to the lower barrel arc. This is an actual channel,
       // not a floating cylinder or a depth/texture illusion; the lower stock stays solid.
       const radius = barrelRadiusAt(x) + .6
@@ -125,8 +247,8 @@ export function createPistol() {
   add('WoodStock', stock, m.wood)
 
   // Exterior barrel and a blind visual recess; hidden operating components are not reconstructed.
-  const barrelProfile = [new T.Vector2(0, barrelStart), new T.Vector2(43, barrelStart), new T.Vector2(43, barrelStart + 15),
-    new T.Vector2(40, barrelStart + 115), new T.Vector2(39, barrelStart + 300), new T.Vector2(muzzleRadius, 1453),
+  const barrelProfile = [new T.Vector2(0, barrelStart), new T.Vector2(33, barrelStart), new T.Vector2(33, barrelStart + 15),
+    new T.Vector2(32, barrelStart + 115), new T.Vector2(32, barrelStart + 300), new T.Vector2(muzzleRadius, 1453),
     new T.Vector2(muzzleRadius - .5, 1455), new T.Vector2(recessRadius, 1455), new T.Vector2(recessRadius, 1305), new T.Vector2(0, 1305)]
   // Split normals at profile corners: averaging rim, inner wall and end face made a false bowl.
   const barrelRings=barrelProfile.slice(1).map((p,i)=>{
@@ -157,80 +279,190 @@ export function createPistol() {
   for(let i=0;i<tangIndex.length;i+=3)[tangIndex[i+1],tangIndex[i+2]]=[tangIndex[i+2],tangIndex[i+1]]
   tang.geometry.setIndex(tangIndex); tang.geometry.computeVertexNormals()
   // Exterior transition shoulder only; no chamber or internal firing components.
-  const shoulder = outline('BreechShoulder', [[barrelStart-17,410],[barrelStart-9,398],[barrelStart+2,393],
-    [barrelStart+4,470],[barrelStart-12,466]], -20, 40, m.steel, 2)
+  const shoulder = outline('BreechShoulder', [[barrelStart-17,407],[barrelStart-9,400],[barrelStart+2,400],
+    [barrelStart+4,461],[barrelStart-12,456]], -20, 40, m.steel, 1)
   crown(shoulder,1)
   const tangScrew=new T.SphereGeometry(1,24,12); tangScrew.scale(6,2,6); tangScrew.translate(519,-sectionAt(519)[0]+4,0); add('TangScrew',tangScrew,m.steel)
 
-  const plate=outline('LockPlate', [[433,497],[443,477],[469,464],[508,455],[548,453],[612,455],
-    [682,451],[730,452],[777,466],[816,477],[843,487],[849,503],[838,513],[801,516],
-    [505,522],[462,519],[440,511]],48,4,m.steel,.8)
-  function seat(mesh:T.Mesh, base:number, sign:number){const old=mesh.geometry;mesh.geometry=new TessellateModifier(12,9).modify(old);old.dispose();const pos=mesh.geometry.getAttribute('position')
+  // Registration of the supplied close-up against the right-hand whole-object photo.
+  // These are image-space artwork contours, not fabrication dimensions.
+  const detail = (points: readonly Point[]): Point[] => points.map(([x,y])=>[555+(x-550)*.385,474+(y-570)*.385])
+  const plate=outline('LockPlate', detail([[187,634],[217,619],[242,568],[283,537],[357,509],
+    [456,478],[511,465],[590,461],[705,442],[780,441],[806,475],[924,497],[986,520],
+    [1101,535],[1230,558],[1312,586],[1339,620],[1335,649],[1304,661],[1138,660],
+    [720,664],[415,677],[294,679],[233,667],[209,652]]),48,4,m.steel,.8)
+  function seat(mesh:T.Mesh, base:number, sign:number, edge=12, clearance=-1.8){const old=mesh.geometry;mesh.geometry=new TessellateModifier(edge,9).modify(old);old.dispose();const pos=mesh.geometry.getAttribute('position')
     for(let i=0;i<pos.count;i++){
       const z=stockSide(pos.getX(i),-pos.getY(i),sign)
-      pos.setZ(i,sign*(z-1.8)+pos.getZ(i)-base)}
+      pos.setZ(i,sign*(z+clearance)+pos.getZ(i)-base)}
     mesh.geometry.deleteAttribute('normal');const smooth=mergeVertices(mesh.geometry);mesh.geometry.dispose();mesh.geometry=smooth;mesh.geometry.computeVertexNormals()}
   seat(plate,48,1)
   // Static museum silhouette study only. No moving joints or firing simulation.
-  crown(outline('Cock', [[539,474],[542,489],[555,496],[574,492],[590,480],[601,459],[603,442],[596,427],
-    [580,409],[573,396],[574,382],[583,374],[595,373],[605,377],[604,369],[592,365],
-    [580,370],[567,382],[565,397],[573,414],[586,433],[590,447],[585,462],[572,470],[551,464]],59,12,m.steel,2),1.1)
-  crown(outline('CockSpur', [[580,375],[588,353],[596,340],[601,324],[606,320],[609,325],[604,343],[600,358],[591,374]],59,11,m.steel,1.2),.7)
-  crown(outline('LowerJaw', [[588,375],[603,374],[621,382],[638,389],[641,393],[625,390],[601,381],[589,381]],58,23,m.steel,1),.6)
-  crown(outline('UpperJaw', [[599,356],[611,358],[629,369],[642,381],[636,382],[618,370],[598,361]],60,21,m.steel,1),.5)
-  cylinder('JawScrew', [606,377,72], [617,350,72],3.7,m.steel,3.5)
-  const finial = new T.LatheGeometry([[0,0],[5,0],[6,2],[6,7],[5,8],[0,8]].map(([r,y])=>new T.Vector2(r,y)),24)
-  finial.rotateZ(-.39); finial.translate(617,-350,72); add('JawScrewFinial',finial,m.steel)
-  // A clearly identified interpretive flint, absent from the photographed museum jaws.
-  const flint=outline('Flint',[[615,370],[625,369],[638,375],[657,382],[662,386],[659,389],
-    [654,388],[651,392],[645,389],[640,390],[625,383],[614,378]],59,22,m.flint,0)
-  // Uneven facets are visual stone texture, unrelated to an operating contact edge.
-  const fp=flint.geometry.getAttribute('position')
-  for(let i=0;i<fp.count;i++){
-    const x=fp.getX(i),y=fp.getY(i),z=fp.getZ(i)
-    fp.setZ(i,z+(z>70?1:-1)*(.8*Math.sin(x*1.3+y*.7)+.5*Math.cos(y*2.1)))
+  crown(outline('Cock',detail([[453,548],[466,510],[491,485],[523,474],[550,478],[582,500],
+    [614,507],[645,486],[651,457],[636,427],[603,404],[579,381],[571,350],[579,319],
+    [596,291],[620,276],[648,276],[674,286],[680,310],[662,317],[643,310],[625,320],
+    [617,342],[622,364],[647,382],[689,406],[716,434],[733,469],[732,510],[716,549],
+    [685,589],[651,621],[608,646],[564,657],[517,652],[480,631],[458,597]]),59,12,m.steel,1.3),4.2)
+  crown(outline('CockSpur',detail([[579,319],[600,248],[628,193],[652,145],[663,118],[659,99],
+    [668,81],[680,74],[691,79],[695,91],[688,92],[681,85],[674,94],[676,110],
+    [687,142],[678,171],[657,211],[628,253],[614,292]]),59,11,m.steel,.65),2.4)
+  crown(outline('LowerJaw',detail([[637,282],[660,285],[694,299],[734,315],[777,337],[809,352],
+    [827,360],[826,366],[806,366],[771,354],[728,338],[690,326],[667,323],[654,332],
+    [643,329],[646,315],[631,310]]),58,23,m.steel,.7),2.2)
+  crown(outline('UpperJaw',detail([[662,198],[699,212],[741,232],[777,266],[810,301],[841,335],
+    [844,342],[834,340],[794,315],[755,289],[718,265],[684,248],[654,233]]),60,21,m.steel,.8),3)
+  cylinder('JawScrew',[607,363,72],[627,314,72],5,m.steel,5)
+  // Bulbous exterior finial, with a narrow neck and the photographed broken top
+  // contour. These rings describe only the visible artwork, with no thread.
+  const finialProfile=[[0,0],[7.7,0],[9,4],[8.5,8],[7.4,12],[8.2,17],
+    [12.6,23],[16.5,29],[17,34],[15.5,39],[11.8,43],[8,45],[0,45]]
+  const finial=new T.LatheGeometry(finialProfile.map(([r,h])=>new T.Vector2(r,h)),48)
+  const finialPos=finial.getAttribute('position')
+  for(let i=0;i<finialPos.count;i++){
+    const x=finialPos.getX(i),h=finialPos.getY(i)
+    const notch=(1-T.MathUtils.smoothstep(Math.abs(x),1.5,4))*T.MathUtils.smoothstep(h,38,43)
+    finialPos.setXYZ(i,x,h-notch*4.5,finialPos.getZ(i)*.86)
   }
-  flint.geometry.computeVertexNormals()
+  finial.rotateZ(-.287);finial.translate(627,-339,73);finial.computeVertexNormals()
+  add('JawScrewFinial',finial,m.steel)
+  cylinder('JawFinialCollar',[624,344,73],[627,336,73],8,m.steel,7.6,6)
   cylinder('CockPivotSeat',[555,474,stockSide(555,474)],[555,474,64],12)
-  screw('CockPivot',555,474,74,12)
-  // Raised striking face is curved in section, and its lid remains visibly separate from the pan.
-  crown(outline('Frizzen',[[730,330],[734,328],[729,343],[714,359],[695,373],[687,378],
-    [683,373],[697,362],[714,348],[725,337]],42,23,m.steel,1.2),.7)
-  crown(outline('FrizzenFoot',[[684,373],[691,379],[696,399],[712,418],[737,432],[756,438],
-    [763,445],[752,449],[732,441],[704,425],[691,409],[686,389]],43,22,m.steel,1.2),.5)
-  // A shallow asymmetric exterior hollow; no touch-hole or ignition passage.
-  const pan=new T.LatheGeometry([[0,-452],[13,-451],[23,-447],[26,-442],[25,-439],
-    [22,-439],[21,-443],[12,-446],[0,-446]].map(([r,y])=>new T.Vector2(r,y)),48)
-  const pp=pan.getAttribute('position')
-  for(let i=0;i<pp.count;i++){
-    const x=pp.getX(i),z=pp.getZ(i)
-    pp.setXYZ(i,699+x*(.93+.07*z/26),pp.getY(i),70+z*.64)
-    pan.getAttribute('uv').setXY(i,pp.getX(i)/240,pp.getZ(i)/240)
+  const cockRim=new T.TorusGeometry(22.7,1.3,6,48)
+  cockRim.translate(555,-474,77);add('CockPivotSurround',cockRim,m.steel)
+  screw('CockPivot',555,474,78,19)
+  // Fixed upright exhibition pose traced from this specimen, without articulation.
+  crown(outline('Frizzen',detail([[807,47],[820,42],[833,79],[850,139],[868,216],[881,298],
+    [899,391],[889,400],[862,395],[857,319],[846,239],[833,160],[818,93]]),44,20,m.steel,.8),3)
+  crown(outline('FrizzenFoot',detail([[863,390],[889,382],[928,388],[962,392],[996,389],[1034,398],
+    [1079,420],[1112,443],[1143,448],[1155,440],[1150,426],[1159,420],[1179,424],
+    [1187,449],[1174,468],[1156,474],[1130,469],[1093,459],[1068,449],[1047,455],
+    [1029,469],[1007,462],[1008,454],[980,446],[933,440],[891,430],[862,414]]),44,20,m.steel,.8),4)
+  crown(outline('FrizzenPivotLobe',detail([[1051,445],[1045,470],[1022,478],[1020,509],
+    [1035,540],[1055,553],[1065,545],[1072,527],[1084,516],[1085,476]]),48,16,m.steel,.6),2)
+  // D-shaped shallow exterior relief. Its straight back blends into the visible
+  // side backing, unlike the old isolated circular bowl and oval pedestal.
+  const rim=new T.Shape()
+  rim.moveTo(649,54);rim.lineTo(721,54);rim.quadraticCurveTo(729,61,723,70)
+  rim.bezierCurveTo(711,83,667,84,653,73);rim.quadraticCurveTo(645,63,649,54)
+  const contour=rim.getPoints(12),panP:number[]=[],panUv:number[]=[],panI:number[]=[]
+  contour.pop()
+  const ringCount=contour.length
+  const rings=[{scale:1,y:432},{scale:.92,y:443},{scale:.62,y:451},{scale:.20,y:454},
+    {scale:.66,y:440},{scale:.86,y:432}]
+  for(const {scale,y} of rings)for(const p of contour){
+    const x=686+(p.x-686)*scale,z=64+(p.y-64)*scale
+    panP.push(x,-y,z);panUv.push(x/240,z/240)
   }
-  pan.deleteAttribute('normal')
-  const smoothPan=mergeVertices(pan);pan.dispose();smoothPan.computeVertexNormals();add('Pan',smoothPan,m.steel)
-  outline('PanConnection',[[678,451],[694,448],[716,451],[722,458],[701,464],[679,459]],40,29,m.steel,.7)
+  // Outside, rim, inside, and a closed shallow floor use independent surface strips.
+  const join=(a:number,b:number)=>{for(let i=0;i<ringCount;i++){
+    const j=(i+1)%ringCount;panI.push(a*ringCount+i,a*ringCount+j,b*ringCount+i,
+      b*ringCount+i,a*ringCount+j,b*ringCount+j)
+  }}
+  join(0,1);join(1,2);join(2,3);join(5,0);join(4,5)
+  for(const ring of [3,4]){
+    const center=panP.length/3;panP.push(686,-rings[ring].y,64);panUv.push(686/240,64/240)
+    for(let i=0;i<ringCount;i++){
+      const a=ring*ringCount+i,b=ring*ringCount+(i+1)%ringCount
+      if(ring===3)panI.push(center,b,a);else panI.push(center,a,b)
+    }
+  }
+  const pan=new T.BufferGeometry();pan.setAttribute('position',new T.Float32BufferAttribute(panP,3))
+  pan.setAttribute('uv',new T.Float32BufferAttribute(panUv,2));pan.setIndex(panI);pan.computeVertexNormals();add('Pan',pan,m.steel)
+  outline('PanConnection',[[645,437],[648,425],[654,424],[655,413],[659,412],[661,430],
+    [668,434],[716,434],[725,440],[720,448],[698,454],[675,453],[649,448]],38,19,m.steel,.65)
   cylinder('FrizzenPivotSeat',[754,445,stockSide(754,445)],[754,445,65],10)
   screw('FrizzenPivot',754,445,66,12)
   // Separate static exterior strip, not engraved ornament or a designed elastic mechanism.
-  const spring=outline('FrizzenSpring',[[746,480],[777,479],[812,486],[825,493],[822,500],[807,502],
-    [761,498],[753,496],[753,493],[799,496],[813,496],[816,493],[809,490],[778,484],[747,485]],0,6,m.steel,.6)
-  seat(spring,0,1)
-  screw('SpringScrew',755,495,stockSide(755,495)+5,6)
+  const spring=outline('FrizzenSpring',detail([[991,541],[1040,550],[1111,560],[1195,578],
+    [1278,589],[1317,611],[1330,634],[1327,651],[1310,660],[1275,660],[1174,645],
+    [1081,642],[1052,633],[1042,624],[1098,627],[1201,641],[1289,648],[1315,640],
+    [1312,625],[1277,617],[1195,611],[1100,592],[1031,571]]),0,5,m.steel,1.3)
+  seat(spring,-4,1)
+  const springTail=outline('SpringTail',detail([[875,603],[949,600],[992,607],[1032,619],
+    [1045,637],[1005,627],[948,617]]),0,4,m.steel,.45);seat(springTail,-3,1)
+  const headX=755,headY=495,headZ=stockSide(headX,headY)+6
+  const headContour=Array.from({length:6},(_,i)=>[headX+7*Math.cos(i*Math.PI/3+.2),headY+7*Math.sin(i*Math.PI/3+.2)] as Point)
+  outline('SpringScrewHead',headContour,headZ,4,m.steel,.9)
+  const rearRibs=[[[347,527],[356,522],[379,665],[371,676]],[[369,521],[379,516],[400,662],[392,672]]] as const
+  rearRibs.forEach((points,i)=>{const rib=outline(`LockPlateRib${i}`,detail(points),0,2.7,m.steel,.7);seat(rib,-3.5,1)})
+
+  // Low edge moulding is seated directly on the plate's curved face.
+  const borderPath=detail([[202,636],[225,634],[250,579],[289,553],[341,530],
+    [337,552],[357,656],[306,665],[253,654],[228,639]])
+  const borderCurve=new T.CatmullRomCurve3(borderPath.map(([x,y])=>point(x,y,stockSide(x,y)+2.8)),false,'centripetal')
+  const borderGeometry=new T.TubeGeometry(borderCurve,80,.65,6,false)
+  add('LockPlateRearMoulding',borderGeometry,m.steel)
+
+  // Surface artwork for the legible ТУЛА / 1803 on the supplied close-up.
+  // The worn small rear stamp and the unseen marks are deliberately not invented.
+  const lettering:Point[][][]=[
+    [[[0,0],[22,0]],[[11,0],[11,25]],[[6,25],[16,25]],[[0,0],[0,5]],[[22,0],[22,5]]],
+    [[[0,0],[10,14],[20,0]],[[10,14],[5,24],[0,25]],[[0,0],[5,0]],[[16,0],[23,0]]],
+    [[[0,25],[9,0],[14,0],[22,25]],[[0,25],[5,25]],[[18,25],[25,25]]],
+    [[[0,25],[10,0],[12,0],[23,25]],[[5,16],[18,16]],[[0,25],[6,25]],[[18,25],[25,25]]],
+    [[[4,5],[11,0],[11,24]],[[5,24],[17,24]]],
+    [[[10,0],[3,2],[2,8],[10,13],[18,18],[16,24],[7,26],[1,21],[3,16],[16,8],[17,3],[10,0]]],
+    [[[10,0],[3,3],[1,12],[4,23],[11,25],[18,22],[20,12],[17,3],[10,0]]],
+    [[[1,3],[9,0],[17,3],[17,9],[10,12],[17,15],[19,21],[13,25],[4,25],[0,21]]],
+  ]
+  const stampP:number[]=[],stampUv:number[]=[],stampI:number[]=[]
+  lettering.forEach((glyph,index)=>glyph.forEach(stroke=>{
+    const [ox,oy]=index<4?[772+index*32,552]:[777+(index-4)*29,594]
+    const curve=new T.CatmullRomCurve3(stroke.map(([x,y])=>point(ox+x,oy+y)),false,'centripetal')
+    const steps=Math.max(3,(stroke.length-1)*3),base=stampP.length/3
+    for(let i=0;i<=steps;i++){
+      const p=curve.getPoint(i/steps),t=curve.getTangent(i/steps)
+      for(const side of [-1,1]){
+        const [x,y]=detail([[p.x-t.y*.62*side,-p.y-t.x*.62*side]])[0]
+        const hit=new T.Raycaster(point(x,y,200),new T.Vector3(0,0,-1)).intersectObject(plate)[0]
+        if(!hit)throw new Error('Lettering must lie on the visible lock plate')
+        stampP.push(x,-y,hit.point.z+.035);stampUv.push(x/240,-y/240)
+      }
+      if(i<steps){const a=base+i*2;stampI.push(a,a+2,a+1,a+1,a+2,a+3)}
+    }
+  }))
+  const stamp=new T.BufferGeometry();stamp.setAttribute('position',new T.Float32BufferAttribute(stampP,3))
+  stamp.setAttribute('uv',new T.Float32BufferAttribute(stampUv,2));stamp.setIndex(stampI);stamp.computeVertexNormals()
+  add('LockPlateInscription',stamp,new T.MeshStandardMaterial({name:'Worn inscription',color:'#464037',roughness:.9,metalness:.5,side:T.DoubleSide}))
+
+  // Apply local iron artwork only to the lock assembly. Unrelated materials stay stable.
+  for(const child of root.children.slice(root.children.indexOf(plate)))if(child instanceof T.Mesh){
+    if(child.material===m.steel)child.material=m.lock
+    if(child.material!==m.lock)continue
+    const geometry=child.geometry,pos=geometry.getAttribute('position'),normal=geometry.getAttribute('normal')
+    const color=geometry.getAttribute('color'),values:number[]=[]
+    for(let i=0;i<pos.count;i++){
+      // Worn bevels catch more light, while broad faces retain darker oxidation.
+      const wear=.88+.30*Math.pow(1-Math.abs(normal.getZ(i)),.5)
+      const c=(color?color.getX(i):1)*wear;values.push(c,c,c)
+    }
+    geometry.setAttribute('color',new T.Float32BufferAttribute(values,3))
+  }
 
   // Serpentine left counterplate follows l_2.jpg; three visible heads, not a musket's two rosettes.
-  const reverse: Point[] = [[460,484],[467,467],[488,461],[512,471],[544,470],[570,457],[576,439],[589,428],[601,429],[612,441],[615,461],[643,467],[675,454],[700,451],[726,465],[758,479],[808,478],[831,476],[844,486],[844,502],[830,512],[808,506],[766,503],[730,494],[699,475],[678,475],[649,489],[620,495],[596,485],[570,480],[542,484],[513,494],[480,499]]
-  const lighterReverse=reverse.map(([x,y]):Point=>[x,480+(y-480)*.82])
-  const counter=outline('Counterplate',lighterReverse,-61,2.4,m.brass,.5);seat(counter,-58.6,-1)
-  // Shared axes bind the two exterior ends to the same stock/lock location.
-  for (const [x,y] of [[472,482],[597,454],[831,490]]) {
-    const side=stockSide(x,y)
-    screw(`CounterScrew${x}`,x,y,-stockSide(x,y,-1)-1.2,7,m.steel,true)
-    screw(`LockScrew${x}`,x,y,side+2,4.2)
+  const reverse: Point[] = ([[644,494],[646,481],[658,466],[679,470],[696,481],[724,484],
+    [751,475],[782,456],[805,449],[826,453],[855,465],[877,468],[884,453],[884,435],
+    [894,420],[907,421],[919,434],[920,451],[939,450],[957,455],[976,468],[992,471],
+    [1011,470],[1025,459],[1039,470],[1044,484],[1036,497],[1022,498],[1005,490],
+    [986,491],[967,486],[947,475],[925,473],[906,482],[887,490],[864,491],[839,483],
+    [818,474],[801,473],[784,480],[759,497],[736,507],[710,506],[685,508],[665,513],
+    [650,507]] as Point[]).map(([x,y])=>fromLeftPhoto(x,y))
+  const counter=outline('Counterplate',reverse,-61,2.4,m.brass,.5);seat(counter,-58.6,-1)
+  // Only the visible heads are placed; no through-axes or internal fasteners are inferred.
+  for (const [u,v,r] of [[1028,482,9],[903,441,15],[669,490,15]]) {
+    const [x,y]=fromLeftPhoto(u,v)
+    const start=root.children.length,z=-stockSide(x,y,-1)-1.2
+    screw(`CounterScrew${1500-u}`,x,y,z,r,m.steel,true)
+    // Tilt the visible heads to the curved exterior seat, avoiding a buried lower edge.
+    const dx=stockSide(x+.5,y,-1)-stockSide(x-.5,y,-1)
+    const dy=stockSide(x,y+.5,-1)-stockSide(x,y-.5,-1)
+    const q=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,-1),new T.Vector3(-dx,dy,-1).normalize())
+    for(const child of root.children.slice(start))if(child instanceof T.Mesh)
+      child.geometry.translate(-x,y,-z).applyQuaternion(q).translate(x,-y,z)
   }
 
   // Guard is a flattened forged strip, rather than a circular wire tube.
-  const guardCurve = new T.CatmullRomCurve3([[427,545],[439,579],[464,605],[499,619],[536,617],[570,596],[585,566],[590,544]].map(([x,y])=>point(x,y,0)))
+  const guardCurve = new T.CatmullRomCurve3([[427,sectionAt(427)[1]+1],[439,579],[464,605],[499,619],[536,617],[570,596],[585,566],[590,sectionAt(590)[1]+1]].map(([x,y])=>point(x,y,0)))
   const gp: number[]=[], guv: number[]=[], gi: number[]=[]
   for(let i=0;i<=160;i++){const t=i/160,p=guardCurve.getPoint(t), tangent=guardCurve.getTangent(t), side=new T.Vector3(-tangent.y,tangent.x,0)
     for(let j=0;j<=12;j++){const a=j/12*Math.PI*2; const v=p.clone().addScaledVector(side,(3.5+.55*Math.sin(t*Math.PI)+.2*Math.sin(t*3*Math.PI))*Math.cos(a)); v.z=(14+3*Math.cos(t*Math.PI*2))*Math.sin(a);gp.push(...v.toArray());guv.push(t*2,j/12)
@@ -249,12 +481,12 @@ export function createPistol() {
   crown(outline('Trigger', [[511,536],[522,540],[518,550],[508,562],[501,581],[500,597],[505,602],
     [504,609],[497,612],[491,606],[491,589],[494,570],[502,550]],-5,10,m.steel,1.8),1)
 
-  // Open-topped exterior end reinforcement; the barrel remains visually separate.
+  // The supplied specimen has a complete oval exterior band around the fore-end.
   const bandP:number[]=[], bandUv:number[]=[], bandI:number[]=[], bandSides=96
   for(const [ring,x,offset] of [[0,1364,1.6],[1,1408,1.6],[2,1408,.1],[3,1364,.1]] as const) {
     const [top,bottom,width]=sectionAt(Math.min(x,1406)), middle=-(top+bottom)/2, half=(bottom-top)/2
     for(let k=0;k<=bandSides;k++) {
-      const a=1.73+k/bandSides*(Math.PI*2-3.46), dy=Math.cos(a), dz=Math.sin(a), center=-445
+      const a=k/bandSides*Math.PI*2, dy=Math.cos(a), dz=Math.sin(a), center=-445
       const inside=(r:number)=> {
         const y=center+r*dy,z=r*dz
         return (y+axisY)**2+z*z<=barrelRadiusAt(x)**2 || ((y-middle)/half)**2+Math.pow(Math.abs(z)/width,2/.7)<=1
@@ -275,7 +507,7 @@ export function createPistol() {
   }
   const band=new T.BufferGeometry();band.setAttribute('position',new T.Float32BufferAttribute(bandP,3));band.setAttribute('uv',new T.Float32BufferAttribute(bandUv,2));band.setIndex(bandI);band.computeVertexNormals();add('MuzzleBand',band,m.brass)
   outline('FrontSight',[[1274,400],[1283,393],[1299,389],[1315,390],[1329,400]],-6,12,m.brass,.8)
-  const ramrodY = (x: number) => 534 - (x-1080)*.085
+  const ramrodY = (x: number) => 519 - (x-1080)*.03
   // The rear end enters the solid fore-end volume instead of ending as an exposed cut stub.
   cylinder('WoodRamrod',[1000,ramrodY(1000),0],[1395,ramrodY(1395),0],7.5,m.wood,7)
   cylinder('RamrodTip',[1362,ramrodY(1362),0],[1419,ramrodY(1419),0],7.5,m.brass,10)
@@ -295,23 +527,44 @@ export function createPistol() {
     screw(`BarrelPin_${x}_${sign}`,x,y,sign*stockSide(x,y),2.5,m.steel,sign<0)
   }
 
-  // Butt cap shell and two long ears trace the prototype, with a rounded lower return.
-  for(const sign of [1,-1]){
-    const cp:number[]=[], cu:number[]=[], ci:number[]=[], longitudinal=100,angular=48
-    for(let i=0;i<=longitudinal;i++){const x=42+140*i/longitudinal,[top,bottom,width]=sectionAt(x),t=i/longitudinal
-      const start=.68+.90*t, end=Math.PI-(Math.PI-1.60)*Math.pow(t,.7)
-      for(let k=0;k<=angular;k++){const angle=start+(end-start)*k/angular
-        cp.push(x,-(top+bottom)/2+((bottom-top)/2+1.4)*Math.cos(angle),sign*(width+1.4)*Math.pow(Math.sin(angle),.7));cu.push(t,k/angular)
-        if(i<longitudinal&&k<angular){const a=i*(angular+1)+k,b=a+angular+1;if(sign===1)ci.push(a,a+1,b,b,a+1,b+1);else ci.push(a,b,a+1,b,b+1,a+1)}}}
-    const cap=new T.BufferGeometry();cap.setAttribute('position',new T.Float32BufferAttribute(cp,3));cap.setAttribute('uv',new T.Float32BufferAttribute(cu,2));cap.setIndex(ci);cap.computeVertexNormals()
-    add(sign===1?'ButtCapRight':'ButtCapLeft',cap,m.brass)
+  // Continuous surface bands wrap the apple and taper into long side ears.
+  // The shared loft avoids the rear seam and silhouette clipping of projected plates.
+  const capUpper=[[42,658],[49,637],[72,646],[105,640],[131,626],[146,617],
+    [170,601],[215,573],[250,551],[276,536],[278,539]]
+  const earLower=[[131,690],[140,657],[150,638],[170,616],[215,584],[250,560],[276,543],[278,539]]
+  const lipUpper=[[131,690],[140,717],[150,729],[164,736],[173,sectionAt(173)[1]]]
+  function capLine(points:number[][],x:number){
+    let i=0;while(i<points.length-2&&x>points[i+1][0])i++
+    const a=points[i],b=points[i+1],t=T.MathUtils.clamp((x-a[0])/(b[0]-a[0]),0,1)
+    const previous=points[Math.max(0,i-1)],next=points[Math.min(points.length-1,i+2)]
+    const m0=(b[1]-previous[1])/(b[0]-previous[0])*(b[0]-a[0])
+    const m1=(next[1]-a[1])/(next[0]-a[0])*(b[0]-a[0])
+    return (2*t*t*t-3*t*t+1)*a[1]+(t*t*t-2*t*t+t)*m0+(-2*t*t*t+3*t*t)*b[1]+(t*t*t-t*t)*m1
   }
-  // Complete the cap's lower return, with restrained facets and a domed attachment.
-  const heel=new T.SphereGeometry(1,24,12); heel.scale(46,17,48); heel.rotateZ(-.22); heel.translate(95,-731,0)
-  add('ButtCapHeel',heel,m.brass)
-  const heelNail=new T.SphereGeometry(1,20,12); heelNail.scale(7,3.5,7); heelNail.translate(95,-748,0)
+  for(const sign of [1,-1]){
+    const cp:number[]=[],cu:number[]=[],ci:number[]=[]
+    for(const [start,end,steps,angular,kind] of [[42,131,96,48,0],[131,278,96,24,1],[131,173,48,24,2]]){
+      const base=cp.length/3
+      for(let i=0;i<=steps;i++){
+        const x=start+(end-start)*i/steps,[top,bottom,width]=sectionAt(x)
+        const angle=(y:number)=>Math.acos(T.MathUtils.clamp(((top+bottom)/2-y)/((bottom-top)/2),-1,1))
+        const first=angle(capLine(kind===2?lipUpper:capUpper,x)),last=kind===1?angle(capLine(earLower,x)):Math.PI
+        for(let k=0;k<=angular;k++){
+          const theta=first+(last-first)*k/angular
+          cp.push(x,-(top+bottom)/2+((bottom-top)/2+1.6)*Math.cos(theta),
+            sign*(width+2)*Math.pow(Math.max(0,Math.sin(theta)),.7));cu.push(x/240,k/angular)
+          if(i<steps&&k<angular){const a=base+i*(angular+1)+k,b=a+angular+1
+            if(sign===1)ci.push(a,a+1,b,b,a+1,b+1);else ci.push(a,b,a+1,b,b+1,a+1)}
+        }
+      }
+    }
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(cp,3))
+    g.setAttribute('uv',new T.Float32BufferAttribute(cu,2));g.setIndex(ci);g.computeVertexNormals()
+    add(sign===1?'ButtCapRight':'ButtCapLeft',g,m.brass)
+  }
+  const heelNail=new T.SphereGeometry(1,20,12);heelNail.scale(7,3.5,7);heelNail.translate(105,-751,0)
   add('ButtCapNail',heelNail,m.brass)
-  const capRear=new T.SphereGeometry(1,24,16); capRear.scale(2.4,34,3.5); capRear.translate(42,-676.5,0)
+  const capRear=new T.SphereGeometry(1,32,24);capRear.scale(2.4,15.1,5);capRear.translate(42,-670.5,0)
   add('ButtCapRear',capRear,m.brass)
   // Small plain escutcheon: the photograph's worn crowned cipher is not speculatively transcribed.
   const esc=new T.SphereGeometry(1,48,24);esc.scale(40,2.1,23);esc.translate(290,0,0)

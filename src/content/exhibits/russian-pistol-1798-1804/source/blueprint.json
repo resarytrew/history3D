@@ -30,18 +30,25 @@
       "roughness": "0.48–0.68, mapped",
       "texture": "muted warmth, fine surface variation",
       "certainty": "alloy untested"
+    },
+    {
+      "name": "lock",
+      "metalness": 0.92,
+      "roughness": "mapped mottled iron",
+      "texture": "original oxidation and fine pits; no photographic pixels",
+      "certainty": "visual approximation"
     }
   ],
   "components": [
     {
       "name": "WoodStock",
-      "geometry": "closed longitudinal elliptical loft with swept cavalry grip",
+      "geometry": "photo-profile loft with densely sampled grip curves, fore-end undercut and integral shallow carved border relief",
       "visible": "side contour",
       "inferred": "depth and cross sections"
     },
     {
       "name": "Barrel",
-      "geometry": "complete tapered lathe exterior, annular muzzle and blind visual recess",
+      "geometry": "revised rear exterior taper seated in photo-profile stock; closed display-only recess retained",
       "documentedMm": {
         "calibre": 17,
         "shortenedLengthApprox": 269
@@ -52,19 +59,19 @@
     },
     {
       "name": "LockPlate",
-      "geometry": "rounded outline, tessellated and seated on stock",
+      "geometry": "interpolating photo contour with defined rear tip and lower edge, seated on wood",
       "visible": "right photo and macro",
       "inferred": "plate camber and depth"
     },
     {
       "name": "Cock and Frizzen",
-      "geometry": "crowned curved exterior volumes, separate jaws and shortened screw; interpretive flint",
+      "geometry": "image-traced crowned exterior contours, empty jaws, sculpted slotted head, tall upright frizzen",
       "visible": "empty jaws and raised frizzen",
-      "inferred": "depths, revised proportions and added flint; museum jaws are empty"
+      "inferred": "depths and cross-sections; no internal or moving mechanism"
     },
     {
       "name": "Pan",
-      "geometry": "shallow asymmetric static exterior recess; no ignition passage",
+      "geometry": "rounded tapering shallow exterior bowl with raised back; no internal passage",
       "visible": "exterior macro",
       "inferred": "interior depth"
     },
@@ -88,7 +95,7 @@
     },
     {
       "name": "ButtCap",
-      "geometry": "compact conforming end shells with short side returns; accepted heel and fastener preserved",
+      "geometry": "conforming photo-traced side plates with long ears and rounded lower return",
       "visible": "both sides",
       "inferred": "underside and thickness"
     }
@@ -98,7 +105,7 @@
     "connections": [
       "stock/barrel bedding",
       "lock plate seat",
-      "open-topped fore-end reinforcement",
+      "complete oval exterior fore-end band",
       "ramrod guide",
       "trigger guard and stock",
       "butt cap around wood"
@@ -117,7 +124,8 @@
     "sets": [
       "wood",
       "steel",
-      "brass"
+      "brass",
+      "lock"
     ],
     "channels": [
       "sRGB base color",
@@ -128,7 +136,7 @@
       512,
       512
     ],
-    "wear": "moderate maintained museum appearance, not archaeological corrosion"
+    "wear": "subdued original mottled iron artwork on lock; other maps retained"
   },
   "uncertainty": [
     "overall length about 460 mm is assumed",
@@ -136,5 +144,11 @@
     "no top or bottom survey",
     "regiment and battle provenance unknown",
     "independent review pending"
-  ]
+  ],
+  "photoRegistration": {
+    "right": "fixed orthographic photo coordinates",
+    "left": "rigid camera roll 0.015 radians; centerY 507.5 photo pixels; inverse mapping shared by counterplate",
+    "closeUp": "fixed affine registration of the museum detail to right photo",
+    "qualification": "manual image registration, not a calibrated measurement"
+  }
 }

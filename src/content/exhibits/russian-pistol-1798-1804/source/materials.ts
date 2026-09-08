@@ -2,10 +2,18 @@ import { DataTexture, MeshStandardMaterial, RepeatWrapping, RGBAFormat, SRGBColo
 
 /** Deterministic, original PBR maps; no museum pixels or runtime shader patches. */
 export function pistolMaterials() {
-  function surface(kind: 'wood' | 'steel' | 'brass', seed: number) {
+  function surface(kind: 'wood' | 'steel' | 'brass' | 'lock', seed: number) {
     const size = 512, color = new Uint8Array(size * size * 4), rough = new Uint8Array(color.length)
     const heights = new Float32Array(size * size), normal = new Uint8Array(color.length)
     const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
+    // Periodic value noise gives the visible iron irregular oxidation at several
+    // scales. It is original artwork, not a projection of the museum photograph.
+    const field = (x:number,y:number,n:number) => {
+      const a=x/size*n,b=y/size*n,ix=Math.floor(a),iy=Math.floor(b)
+      const h=(i:number,j:number)=>{let v=Math.imul((i+n)%n+((j+n)%n)*157+1803,374761393);v=Math.imul(v^(v>>>13),1274126177);return ((v^(v>>>16))>>>0)/4294967295}
+      const u=(a-ix)**2*(3-2*(a-ix)),v=(b-iy)**2*(3-2*(b-iy))
+      return (h(ix,iy)*(1-u)+h(ix+1,iy)*u)*(1-v)+(h(ix,iy+1)*(1-u)+h(ix+1,iy+1)*u)*v
+    }
     for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
       const u = x / size * Math.PI * 2, v = y / size * Math.PI * 2
       const noise = random(), cloud = Math.sin(u * 3 + Math.sin(v * 2)) * Math.cos(v * 3 - Math.sin(u))
@@ -21,6 +29,15 @@ export function pistolMaterials() {
       const r = (kind === 'wood' ? 204 : kind === 'steel' ? 173 : 166) + cloud * 9 + (noise - .5) * 10
       rough.set([r, r, r, 255], i)
       heights[y * size + x] = kind === 'wood' ? -grain * .035 - pore * .02 + noise * .01 : noise * .016 + mark * .003
+      if(kind==='lock'){
+        const broad=field(x,y,7),medium=field(x,y,23),fine=field(x,y,83)
+        const oxide=Math.max(0,(broad*.5+medium*.35+fine*.15)-.47)
+        const light=94+(medium-.5)*19+(fine-.5)*14+(noise-.5)*8-oxide*45
+        color.set([light+8+oxide*25,light+4,light-2-oxide*18,255],i)
+        const r=151+oxide*100+(fine-.5)*18
+        rough.set([r,r,r,255],i)
+        heights[y*size+x]=(fine-.5)*.035+(noise-.5)*.018
+      }
     }
     for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
       const h = (dx: number, dy: number) => heights[((y + dy + size) % size) * size + (x + dx + size) % size]
@@ -38,8 +55,8 @@ export function pistolMaterials() {
       roughnessMap: map(rough, 'roughness'), normalMap: map(normal, 'normal'), roughness: 1,
       metalness: kind === 'wood' ? 0 : .92 })
   }
-  const wood = surface('wood', 1798), steel = surface('steel', 1803), brass = surface('brass', 1804)
+  const wood = surface('wood', 1798), steel = surface('steel', 1803), brass = surface('brass', 1804), lock = surface('lock',1803)
+  lock.vertexColors=true
   const dark = new MeshStandardMaterial({ name: 'Recessed steel', color: '#242728', metalness: .7, roughness: .8 })
-  const flint = new MeshStandardMaterial({ name: 'Reconstruction flint', color: '#343a3b', roughness: .74, flatShading: true })
-  return { wood, steel, brass, dark, flint }
+  return { wood, steel, brass, dark, lock }
 }

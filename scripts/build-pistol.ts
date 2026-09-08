@@ -1,5 +1,6 @@
 /// <reference lib="dom" />
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile } from 'node:fs/promises'
+import { writeArtifact } from './write-artifact'
 import { createHash } from 'node:crypto'
 import { resolve } from 'node:path'
 import { chromium } from '@playwright/test'
@@ -8,8 +9,9 @@ import { pistolControlViews } from './pistol-control-views'
 
 const out = resolve('docs/verification/russian-pistol-1798-1804')
 const assets = resolve('src/content/exhibits/russian-pistol-1798-1804')
-const baseline = process.argv.includes('--baseline')
-const renderOut = baseline ? resolve(out,'refinement-before') : out
+const baseline = process.argv.includes('--baseline')||process.argv.includes('--static-baseline')||process.argv.includes('--profile-baseline')||process.argv.includes('--lock-baseline')
+const baselineFolder=process.argv.includes('--baseline')?'refinement-before':process.argv.includes('--static-baseline')?'static-before':process.argv.includes('--profile-baseline')?'profile-before':'lock-before'
+const renderOut = baseline ? resolve(out,baselineFolder) : out
 for (const p of [out, ...['models','images','backgrounds'].map(p=>resolve(assets,p))]) await mkdir(p,{recursive:true})
 const server=await createServer({cacheDir:resolve('node_modules/.vite-pistol-build'),server:{host:'127.0.0.1',port:4190,strictPort:true,hmr:false,watch:null},logLevel:'error'})
 await server.listen()
@@ -21,7 +23,7 @@ try {
   await page.addInitScript({content:'window.__name = (fn) => fn'})
   await page.route('**/__pistol-build',r=>r.fulfill({contentType:'text/html',body:'<html><body></body></html>'}))
   await page.goto(server.resolvedUrls!.local[0]+'__pistol-build')
-  const baselineData = (await readFile(resolve(out,'refinement-before/before.glb'))).toString('base64')
+  const baselineData = (await readFile(resolve(out,baselineFolder,'before.glb'))).toString('base64')
   const result=await page.evaluate(async({baselineData,baseline})=>{
     const imp=(url:string)=>import(/* @vite-ignore */ url)
     const T=await imp('/node_modules/three/build/three.module.js')
@@ -46,6 +48,7 @@ try {
     const {createArtifactEnvironment,createArtifactLights,artifactStudioExposure}=await imp('/src/three/artifactStudio.ts')
     const {createContactShadow}=await imp('/src/three/contactShadow.ts')
     const {controlCamera}=await imp('/scripts/pistol-control-views.ts')
+    const {leftPhotoRegistration}=await imp('/src/content/exhibits/russian-pistol-1798-1804/source/photoRegistration.ts')
     document.body.style.cssText='margin:0;background:#eeeae2'
     const renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true})
     renderer.setSize(1500,900);renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=artifactStudioExposure
@@ -60,7 +63,7 @@ try {
       if (/^\d\d-/.test(name)) {
         inspectionLight.visible=true
         shadow.mesh.visible=false
-        renderer.render(scene,controlCamera(framing,name,1500/900))
+        renderer.render(scene,controlCamera(root,name,1500/900))
         return {calls:renderer.info.render.calls,renderedTriangles:renderer.info.render.triangles}
       }
       inspectionLight.visible=false
@@ -84,25 +87,40 @@ try {
     const box=new T.Box3().setFromObject(root),sourceBox=new T.Box3().setFromObject(original)
     const mismatch=box.min.distanceTo(sourceBox.min)+box.max.distanceTo(sourceBox.max)
     Object.assign(window,{pistolRender:render,pistolThumbnail:()=>{renderer.setSize(640,384);render('hero')}})
+    Object.assign(window,{pistolPhoto:(name:string)=>{
+      const scale=.460/1415, close=name==='photo-lock', span=(close?577.5:1500)*scale
+      const offset=original.userData.groundOffset??original.getObjectByName('pistol')?.userData.groundOffset??0
+      const left=name==='photo-left'
+      const target=new T.Vector3(((close?632:750)-747.5)*scale,(750-(close?447.05:left?leftPhotoRegistration.centerY:500))*scale+offset,0)
+      const c=new T.OrthographicCamera(-span/2,span/2,span/3,-span/3,.001,10)
+      if(left)c.up.set(-Math.sin(leftPhotoRegistration.roll),Math.cos(leftPhotoRegistration.roll),0)
+      c.position.copy(target).add(new T.Vector3(0,0,name==='photo-left'?-2:2));c.lookAt(target)
+      renderer.setSize(1500,1000);inspectionLight.visible=true;shadow.mesh.visible=false;renderer.render(scene,c)
+    }})
     return {base64:btoa(binary),metrics:{triangles,meshes,names,invalidValues,missingUv,roundtripBoundsError:mismatch,
       bounds:{min:box.min.toArray(),max:box.max.toArray(),size:box.getSize(new T.Vector3()).toArray()},...render('hero')}}
   },{baselineData,baseline})
   const binary=Buffer.from(result.base64,'base64')
-  if (!baseline) await writeFile(resolve(assets,'models/pistol_1798_1804.glb'),binary)
+  if (!baseline) await writeArtifact(resolve(assets,'models/pistol_1798_1804.glb'),binary)
   const renders:Record<string,unknown>={}
   for(const name of [...pistolControlViews.map(v=>v.name),'right','left','hero','top','bottom','muzzle','butt','lock','reverse','grip','ramrod']){
     renders[name]=await page.evaluate(name=>(window as unknown as {pistolRender:(name:string)=>unknown}).pistolRender(name),name)
-    await page.screenshot({path:resolve(renderOut,`${name}.png`)})
+    await writeArtifact(resolve(renderOut,`${name}.png`),await page.screenshot())
+  }
+  await page.setViewportSize({width:1500,height:1000})
+  for(const name of ['photo-right','photo-left','photo-lock']){
+    await page.evaluate(name=>(window as unknown as {pistolPhoto:(name:string)=>void}).pistolPhoto(name),name)
+    await writeArtifact(resolve(renderOut,`${name}.png`),await page.screenshot())
   }
   if (!baseline) {
-  await copyFile(resolve(out,'hero.png'),resolve(assets,'images/poster.png'))
+  await writeArtifact(resolve(assets,'images/poster.png'),await readFile(resolve(out,'hero.png')))
   await page.setViewportSize({width:640,height:384})
   await page.evaluate(()=>(window as unknown as {pistolThumbnail:()=>void}).pistolThumbnail())
-  await page.screenshot({path:resolve(assets,'images/thumbnail.png')})
-  await copyFile(resolve('src/content/exhibits/russian-musket-1808/backgrounds/studio.png'),resolve(assets,'backgrounds/studio.png'))
+  await writeArtifact(resolve(assets,'images/thumbnail.png'),await page.screenshot())
+  await writeArtifact(resolve(assets,'backgrounds/studio.png'),await readFile(resolve('src/content/exhibits/russian-musket-1808/backgrounds/studio.png')))
   }
   const metrics={...result.metrics,bytes:binary.length,sha256:createHash('sha256').update(binary).digest('hex'),renders,errors}
-  await writeFile(resolve(renderOut,baseline?'rerender-metrics.json':'metrics.json'),JSON.stringify(metrics,null,2)+'\n')
+  await writeArtifact(resolve(renderOut,baseline?'rerender-metrics.json':'metrics.json'),JSON.stringify(metrics,null,2)+'\n')
   if(errors.length||metrics.invalidValues||metrics.missingUv||metrics.roundtripBoundsError>1e-6)throw new Error(JSON.stringify(metrics))
   console.log(JSON.stringify({...metrics,names:undefined,renders:undefined},null,2))
 }finally{await browser.close();await server.close()}

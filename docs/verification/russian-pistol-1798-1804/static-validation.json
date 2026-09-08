@@ -1,0 +1,45 @@
+{
+  "checkedAt": "2026-09-08T16:10:53.394622+00:00",
+  "scope": "Static museum lock relief and software integration",
+  "modelSha256": "5f899dfb42ec491d221fff3bb7a9f60d9e70bb838ad1b6de503b2c49b66d7acb",
+  "checks": {
+    "geometryAudit": "passed",
+    "unit": {
+      "passed": 70,
+      "files": 16,
+      "command": "npm test -- --maxWorkers=2",
+      "note": "Initial high-concurrency run timed out; bounded rerun passed."
+    },
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed; three existing developmentOnly warnings for other exhibits",
+    "e2e": {
+      "passed": 2,
+      "projects": [
+        "chromium",
+        "mobile"
+      ]
+    },
+    "comparisonGallery": "agent-browser: three overlay sections; lock opacity control set to 0.35 and image loaded",
+    "gitDiffCheck": "passed"
+  },
+  "metrics": {
+    "triangles": 145482,
+    "meshes": 65,
+    "bytes": 8971380,
+    "roundtripBoundsError": 0
+  },
+  "mechanicalValidation": {
+    "performed": false,
+    "reason": "Outside user-defined scope"
+  },
+  "likeness": {
+    "exactMatchClaimed": false,
+    "selectedProfileCheck": "profile-comparison.json",
+    "limitations": [
+      "uncalibrated photographs and inferred depths",
+      "unseen surfaces",
+      "iron patina and inscription approximated; wood maps retained"
+    ]
+  }
+}

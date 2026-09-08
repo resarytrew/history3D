@@ -1,0 +1,312 @@
+{
+  "scope": "Selected upper grip/stock silhouette in the right photo only; not a whole-model likeness score",
+  "method": "1500x1000 fixed orthographic render. Nineteen x samples outside lock/barrel; first pixel with max RGB below 220 after a 3-column median, in y=401..779. Includes real photograph lighting uncertainty.",
+  "cameraChangedForRightView": false,
+  "meanAbsolutePixelDeviationBefore": 14.105263157894736,
+  "meanAbsolutePixelDeviationAfter": 0.2631578947368421,
+  "samples": [
+    {
+      "x": 49,
+      "sourceTopY": 628,
+      "beforeTopY": 635,
+      "afterTopY": 627,
+      "beforeError": 7,
+      "afterError": 1
+    },
+    {
+      "x": 60,
+      "sourceTopY": 620,
+      "beforeTopY": 632,
+      "afterTopY": 620,
+      "beforeError": 12,
+      "afterError": 0
+    },
+    {
+      "x": 72,
+      "sourceTopY": 615,
+      "beforeTopY": 629,
+      "afterTopY": 616,
+      "beforeError": 14,
+      "afterError": 1
+    },
+    {
+      "x": 85,
+      "sourceTopY": 613,
+      "beforeTopY": 623,
+      "afterTopY": 613,
+      "beforeError": 10,
+      "afterError": 0
+    },
+    {
+      "x": 105,
+      "sourceTopY": 601,
+      "beforeTopY": 611,
+      "afterTopY": 601,
+      "beforeError": 10,
+      "afterError": 0
+    },
+    {
+      "x": 125,
+      "sourceTopY": 582,
+      "beforeTopY": 596,
+      "afterTopY": 582,
+      "beforeError": 14,
+      "afterError": 0
+    },
+    {
+      "x": 146,
+      "sourceTopY": 561,
+      "beforeTopY": 578,
+      "afterTopY": 561,
+      "beforeError": 17,
+      "afterError": 0
+    },
+    {
+      "x": 160,
+      "sourceTopY": 549,
+      "beforeTopY": 566,
+      "afterTopY": 549,
+      "beforeError": 17,
+      "afterError": 0
+    },
+    {
+      "x": 170,
+      "sourceTopY": 541,
+      "beforeTopY": 557,
+      "afterTopY": 541,
+      "beforeError": 16,
+      "afterError": 0
+    },
+    {
+      "x": 180,
+      "sourceTopY": 533,
+      "beforeTopY": 550,
+      "afterTopY": 533,
+      "beforeError": 17,
+      "afterError": 0
+    },
+    {
+      "x": 190,
+      "sourceTopY": 525,
+      "beforeTopY": 544,
+      "afterTopY": 525,
+      "beforeError": 19,
+      "afterError": 0
+    },
+    {
+      "x": 200,
+      "sourceTopY": 518,
+      "beforeTopY": 538,
+      "afterTopY": 518,
+      "beforeError": 20,
+      "afterError": 0
+    },
+    {
+      "x": 215,
+      "sourceTopY": 508,
+      "beforeTopY": 529,
+      "afterTopY": 508,
+      "beforeError": 21,
+      "afterError": 0
+    },
+    {
+      "x": 240,
+      "sourceTopY": 493,
+      "beforeTopY": 513,
+      "afterTopY": 493,
+      "beforeError": 20,
+      "afterError": 0
+    },
+    {
+      "x": 270,
+      "sourceTopY": 476,
+      "beforeTopY": 492,
+      "afterTopY": 477,
+      "beforeError": 16,
+      "afterError": 1
+    },
+    {
+      "x": 300,
+      "sourceTopY": 465,
+      "beforeTopY": 476,
+      "afterTopY": 465,
+      "beforeError": 11,
+      "afterError": 0
+    },
+    {
+      "x": 330,
+      "sourceTopY": 454,
+      "beforeTopY": 465,
+      "afterTopY": 455,
+      "beforeError": 11,
+      "afterError": 1
+    },
+    {
+      "x": 360,
+      "sourceTopY": 448,
+      "beforeTopY": 455,
+      "afterTopY": 448,
+      "beforeError": 7,
+      "afterError": 0
+    },
+    {
+      "x": 390,
+      "sourceTopY": 436,
+      "beforeTopY": 445,
+      "afterTopY": 437,
+      "beforeError": 9,
+      "afterError": 1
+    }
+  ],
+  "qualification": "The first sample set overlaps the profile fitting points. Intermediate samples below lie between fitted sections; neither is an independent historical measurement or whole-model accuracy score.",
+  "intermediateCheck": {
+    "meanAbsolutePixelDeviationBefore": 14.666666666666666,
+    "meanAbsolutePixelDeviationAfter": 0.5,
+    "samples": [
+      {
+        "x": 55,
+        "sourceTopY": 623,
+        "beforeTopY": 633,
+        "afterTopY": 622,
+        "beforeError": 10,
+        "afterError": 1
+      },
+      {
+        "x": 67,
+        "sourceTopY": 617,
+        "beforeTopY": 631,
+        "afterTopY": 617,
+        "beforeError": 14,
+        "afterError": 0
+      },
+      {
+        "x": 78,
+        "sourceTopY": 614,
+        "beforeTopY": 627,
+        "afterTopY": 615,
+        "beforeError": 13,
+        "afterError": 1
+      },
+      {
+        "x": 95,
+        "sourceTopY": 609,
+        "beforeTopY": 618,
+        "afterTopY": 608,
+        "beforeError": 9,
+        "afterError": 1
+      },
+      {
+        "x": 115,
+        "sourceTopY": 592,
+        "beforeTopY": 604,
+        "afterTopY": 592,
+        "beforeError": 12,
+        "afterError": 0
+      },
+      {
+        "x": 135,
+        "sourceTopY": 572,
+        "beforeTopY": 587,
+        "afterTopY": 572,
+        "beforeError": 15,
+        "afterError": 0
+      },
+      {
+        "x": 153,
+        "sourceTopY": 555,
+        "beforeTopY": 572,
+        "afterTopY": 555,
+        "beforeError": 17,
+        "afterError": 0
+      },
+      {
+        "x": 165,
+        "sourceTopY": 545,
+        "beforeTopY": 561,
+        "afterTopY": 545,
+        "beforeError": 16,
+        "afterError": 0
+      },
+      {
+        "x": 175,
+        "sourceTopY": 537,
+        "beforeTopY": 554,
+        "afterTopY": 537,
+        "beforeError": 17,
+        "afterError": 0
+      },
+      {
+        "x": 185,
+        "sourceTopY": 529,
+        "beforeTopY": 547,
+        "afterTopY": 529,
+        "beforeError": 18,
+        "afterError": 0
+      },
+      {
+        "x": 195,
+        "sourceTopY": 521,
+        "beforeTopY": 541,
+        "afterTopY": 522,
+        "beforeError": 20,
+        "afterError": 1
+      },
+      {
+        "x": 207,
+        "sourceTopY": 513,
+        "beforeTopY": 534,
+        "afterTopY": 514,
+        "beforeError": 21,
+        "afterError": 1
+      },
+      {
+        "x": 227,
+        "sourceTopY": 501,
+        "beforeTopY": 522,
+        "afterTopY": 501,
+        "beforeError": 21,
+        "afterError": 0
+      },
+      {
+        "x": 255,
+        "sourceTopY": 485,
+        "beforeTopY": 502,
+        "afterTopY": 485,
+        "beforeError": 17,
+        "afterError": 0
+      },
+      {
+        "x": 285,
+        "sourceTopY": 470,
+        "beforeTopY": 484,
+        "afterTopY": 471,
+        "beforeError": 14,
+        "afterError": 1
+      },
+      {
+        "x": 315,
+        "sourceTopY": 459,
+        "beforeTopY": 470,
+        "afterTopY": 459,
+        "beforeError": 11,
+        "afterError": 0
+      },
+      {
+        "x": 345,
+        "sourceTopY": 450,
+        "beforeTopY": 460,
+        "afterTopY": 451,
+        "beforeError": 10,
+        "afterError": 1
+      },
+      {
+        "x": 375,
+        "sourceTopY": 441,
+        "beforeTopY": 450,
+        "afterTopY": 443,
+        "beforeError": 9,
+        "afterError": 2
+      }
+    ]
+  }
+}

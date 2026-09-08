@@ -1,172 +1,256 @@
 {
-  "checkedAt": "2026-09-08T10:55:30.138Z",
+  "scope": "Static museum lock close-up: sculpted exterior relief, heads and local iron artwork",
   "model": {
     "path": "src/content/exhibits/russian-pistol-1798-1804/models/pistol_1798_1804.glb",
-    "sha256": "bc440afa9146c5121b210d1393426a5bb863543031eda0977c8e71b93addf527",
+    "sha256": "5f899dfb42ec491d221fff3bb7a9f60d9e70bb838ad1b6de503b2c49b66d7acb",
     "matchesRenderMetrics": true
   },
-  "requestedRenders": [
+  "renders": [
     {
-      "requirementNumber": 1,
-      "requirement": "right side",
       "file": "01-right.png",
       "width": 1500,
       "height": 900,
-      "sha256": "82e4b14ceba8d6b2fb7793afcb38eff3b5e2dd0ee19ea006fc8b6694ba7d04d2",
-      "artifactPresent": true
+      "sha256": "04cf6d0ee408f1876f9e218542d7c855f070b2ad6830eadeaff47958bd0467da"
     },
     {
-      "requirementNumber": 2,
-      "requirement": "left side",
       "file": "02-left.png",
       "width": 1500,
       "height": 900,
-      "sha256": "bc545ce757d7c4f7b7dfb14d3d115465d9d0cd92d4380ef5dcdfbb88bd12fdd9",
-      "artifactPresent": true
+      "sha256": "6784c80ceb8d434a9b7659a53674089e5206fb4249f2674df4b49a686e3af2eb"
     },
     {
-      "requirementNumber": 3,
-      "requirement": "right 3/4",
-      "file": "07-front-3-quarter.png",
-      "width": 1500,
-      "height": 900,
-      "sha256": "a1001f7ae82abe02e7b6d650f21a8c3cb541375f79f75143a9f131a8b5039daf",
-      "artifactPresent": true
-    },
-    {
-      "requirementNumber": 4,
-      "requirement": "left 3/4",
-      "file": "21-left-3-quarter.png",
-      "width": 1500,
-      "height": 900,
-      "sha256": "4da4dcea002b31cb6a0946566b983f15e7f2034ea1b4b311df864ec2e6f36cb3",
-      "artifactPresent": true
-    },
-    {
-      "requirementNumber": 5,
-      "requirement": "top",
       "file": "03-top.png",
       "width": 1500,
       "height": 900,
-      "sha256": "5ad73a5100564f9b0c9be076f856ff21125570a3d3c8818c42e1dee6e7bb69e0",
-      "artifactPresent": true
+      "sha256": "1dbdabc89178a3f8169c9be8dfb61fc9c5263e989d3e104e934d3edfe4e53b88"
     },
     {
-      "requirementNumber": 6,
-      "requirement": "bottom",
       "file": "04-bottom.png",
       "width": 1500,
       "height": 900,
-      "sha256": "1e59b40c41229cad0bbaddbdfeb0bd4df9381e0ada4fec6acb9cd02aaee0ab64",
-      "artifactPresent": true
+      "sha256": "9dc004edf6253ee9ba29934149dd83d04cc14fc4d0b49d8d0ff8b0cfc37f6bfa"
     },
     {
-      "requirementNumber": 7,
-      "requirement": "front",
       "file": "05-front.png",
       "width": 1500,
       "height": 900,
-      "sha256": "1f08983a94b0badb413045d1d08be9ff20dc9c1a3b67528a580932e95b3870dc",
-      "artifactPresent": true
+      "sha256": "ecc928443a72ce3c4bd555b68b8989b220c3059a6b0b96beff1139ec5a29cd89"
     },
     {
-      "requirementNumber": 8,
-      "requirement": "rear",
       "file": "06-rear.png",
       "width": 1500,
       "height": 900,
-      "sha256": "23fb6d14ccbf9369049e789224df5fadfe8a6fa4fbb8df3ffacb8d554e567615",
-      "artifactPresent": true
+      "sha256": "7e8a0a569c1c137126ed8484f87d5dc13cc48c70923cc9a761ade60d2dcfaa05"
     },
     {
-      "requirementNumber": 9,
-      "requirement": "lock complete",
+      "file": "07-front-3-quarter.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "67cc5674739939ed08e435ecea5bc5b2ff845d0fd1ef4e32b81166aceda3256e"
+    },
+    {
+      "file": "08-rear-3-quarter.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "33d0486e2e997df1b7a6de921474c2aadaed63e8b1964e3ac4a9799d162e7633"
+    },
+    {
       "file": "09-lock.png",
       "width": 1500,
       "height": 900,
-      "sha256": "33c778660b85edcdbe21bf074e22104bd488e0b6d89d186ba88100bae0b8adf0",
-      "artifactPresent": true
+      "sha256": "cccbbb0e62153d15ae8eaea7c4b2ea7515fe4b256d658e80ed86d1183dd80b16"
     },
     {
-      "requirementNumber": 10,
-      "requirement": "cock",
       "file": "10-cock.png",
       "width": 1500,
       "height": 900,
-      "sha256": "6669e2460ca5505f66a6a32345abe7ff7209163d460d5b72585308fd82cef248",
-      "artifactPresent": true
+      "sha256": "acb5fdc6080560b2f28f05508c690aec9ad18e01a1289752ccbbefc6cf940ca7"
     },
     {
-      "requirementNumber": 11,
-      "requirement": "jaws and flint",
-      "file": "22-jaws-flint.png",
+      "file": "11-frizzen-pan.png",
       "width": 1500,
       "height": 900,
-      "sha256": "4e778285849af427d7d83c2a47964eac91bd043592630e6ab48240188169fa9a",
-      "artifactPresent": true
+      "sha256": "a1a49348ad0b4bac474b3a0fcdea50188ebcfbe19f0bab426e33941092762171"
     },
     {
-      "requirementNumber": 12,
-      "requirement": "frizzen",
-      "file": "23-frizzen.png",
+      "file": "12-breech.png",
       "width": 1500,
       "height": 900,
-      "sha256": "76da18ea67322f9096d381dd94508259d8c6af698485282b913b8d9c00690446",
-      "artifactPresent": true
+      "sha256": "3223ea7b5923283120147aebcac3c80a5e94f6e6fb3672824818d5c4a200aeb4"
     },
     {
-      "requirementNumber": 13,
-      "requirement": "pan",
-      "file": "24-pan.png",
-      "width": 1500,
-      "height": 900,
-      "sha256": "a7ed662591ca579094664b9e6c5875be3ee37c3eb277b19a0a745d019f45d5f9",
-      "artifactPresent": true
-    },
-    {
-      "requirementNumber": 14,
-      "requirement": "frizzen spring",
-      "file": "25-spring.png",
-      "width": 1500,
-      "height": 900,
-      "sha256": "23d21eba73347fcc3c49e4bc3e59823d1dd40fd24dc7b5939ccf92200b624ce9",
-      "artifactPresent": true
-    },
-    {
-      "requirementNumber": 15,
-      "requirement": "sideplate",
-      "file": "14-sideplate.png",
-      "width": 1500,
-      "height": 900,
-      "sha256": "1b4fd28cef2785fe121dbbd1d16589370bd2cb2e6272a0a78d8ff29436cfa8b2",
-      "artifactPresent": true
-    },
-    {
-      "requirementNumber": 16,
-      "requirement": "butt cap",
-      "file": "19-buttcap.png",
-      "width": 1500,
-      "height": 900,
-      "sha256": "18547ceca49e23e4d89f8f1c3af63f8a9fd79ca4d55273126bf584a1a086c7df",
-      "artifactPresent": true
-    },
-    {
-      "requirementNumber": 17,
-      "requirement": "muzzle",
       "file": "13-muzzle.png",
       "width": 1500,
       "height": 900,
-      "sha256": "4e5306a83342c06ebf5c644b20ddf32955f2e96ee7c2fc5cb7dbe09b20160a40",
-      "artifactPresent": true
+      "sha256": "0842498288190a82135d219fca8e9fde7bad19a257b56f2fa5401679beebd10f"
+    },
+    {
+      "file": "14-sideplate.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "90fa988c0a8d145279eb8bfe97fa1b599598d839c892abc14da29d1471035c59"
+    },
+    {
+      "file": "15-trigger.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "e3bc5dc25d979e55fc1b4a5be05165b836ee15e29d4c44ab492f0ed0282f9c16"
+    },
+    {
+      "file": "16-ramrod.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "0eacae83621230bd2e480ec5f77a1fcd738ad96d48f12092062aaeea6cd8e70e"
+    },
+    {
+      "file": "17-ramrod-pipes.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "6ff63c9da766820c98ecf19b4c3e68228711348291e695c7073eca0d5435c5c9"
+    },
+    {
+      "file": "18-foreend.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "0a91deac33907a6b4680c40c1c4d288838a780fe4ecd16fa2681f0ee13ff74b1"
+    },
+    {
+      "file": "19-buttcap.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "2f271c2ad20172a28216ea8ac9c36159e3dfd3ce53c4989f1cfd43279ab1224a"
+    },
+    {
+      "file": "20-stock-cross-section-area.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "67319fe77d35296adf5f352319f744d9d34b58d6706faf65fa2b169c0487439c"
+    },
+    {
+      "file": "21-left-3-quarter.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "cee00a9fd74d26a7413b31c12c5000ba271ff5f8e9b6f477fd3ca6074cdeef6b"
+    },
+    {
+      "file": "22-jaws-flint.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "188245d2de80449c4554fe0255f210abbd6afdf811b99c20eda11b9c6f5a3876"
+    },
+    {
+      "file": "23-frizzen.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "8bd2cfd9fd252fcd584b192f1cb8e5e49b80b3d25b6a928c0f1d2ba1bc20992f"
+    },
+    {
+      "file": "24-pan.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "454e31fbe4a538ecc2c0788c71c74c6eb451a3b7070b8defd7f98092462018c1"
+    },
+    {
+      "file": "25-spring.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "1a5bc2d3f05b487567ef3481acb18212a2b3780ada851360f452090570cf42fa"
+    },
+    {
+      "file": "26-lockplate.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "ecb219edfa2e55c30ca4e992fc7e6be3c2ab1c40f79ca1663e5a59425dace305"
+    },
+    {
+      "file": "right.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "8e740c182b2da7ff60c3423b71e16873f9b9e174de8bc15c47202fb3580f8530"
+    },
+    {
+      "file": "left.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "57cd53bfb9bdce004c26945d2526e2c1aa4f75847e88b7735ffa9ebc2042010f"
+    },
+    {
+      "file": "hero.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "b4c2fe35eeed5cbcf816de6c18d5dcad065cb61e548b235473bfd35735e0c998"
+    },
+    {
+      "file": "top.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "148c8fd8055074d6b3d20bd4308205cbc04e490a18ea28ab696df488193184a8"
+    },
+    {
+      "file": "bottom.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "3a3d5433c6b8deb53ebb1b2fc664fa49ccb947d57f9f69e977c7f093700ccd81"
+    },
+    {
+      "file": "muzzle.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "b89697e95af81a97f8759c2816e3a94c0ddad9c13e4953b33651b983dfbfbb96"
+    },
+    {
+      "file": "butt.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "2a8386cb27d391fea1fed21b8bff22e02621876768f23fd4d32930eabe5c1e35"
+    },
+    {
+      "file": "lock.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "ca64b5bc0a7fc875c812e94572475dfe9d817fc43a775ee1c989b39740c2c879"
+    },
+    {
+      "file": "reverse.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "15020553dfbb88b8ad860c2a4be4901d935f56c681d8a52006351211e17aa771"
+    },
+    {
+      "file": "grip.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "149facc1dd13f085fc0b27b17ea04ae1f362a1ce37f384f539ec47d596512e35"
+    },
+    {
+      "file": "ramrod.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "a70e559ccf2dc8bd4da1b28f210aeb28e832b212f7e0bacc3257203d2f62d328"
+    },
+    {
+      "file": "photo-right.png",
+      "width": 1500,
+      "height": 1000,
+      "sha256": "fc5032048268d197e01cd3bf3547b266afecbe10e9552d572186b99b3ceb2f07"
+    },
+    {
+      "file": "photo-left.png",
+      "width": 1500,
+      "height": 1000,
+      "sha256": "6be3af96cce02e5ef45eaa8a1feefc3d27a342a2c4e9c65e74161c6a37b7f210"
+    },
+    {
+      "file": "photo-lock.png",
+      "width": 1500,
+      "height": 1000,
+      "sha256": "9048a51f2439dba83cce99569c064f5cf3bbf001c324d229455856ca755b6b6f"
     }
   ],
-  "galleryLocalLinksChecked": 102,
-  "acceptance": "incomplete",
-  "unfulfilledRequirements": [
-    "6: working cock/flint/frizzen kinetics and collision/contact check",
-    "7: functioning pan and ignition-path relationship",
-    "8: operating foot/spring interaction",
-    "11: functional sideplate fasteners through stock into lock"
-  ],
-  "limits": "Artifact integrity does not establish historical identity, working mechanics, or absence of every intersection. See PISTOL_REFINEMENT_REPORT.md."
+  "softwareChecks": "finite geometry, self-contained GLB roundtrip, named meshes and render artifacts",
+  "visualReview": "See PISTOL_REFINEMENT_REPORT.md for inspected views and limitations",
+  "mechanicalValidation": {
+    "performed": false,
+    "status": "Outside the user-defined scope"
+  }
 }
