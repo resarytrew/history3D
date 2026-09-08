@@ -1,0 +1,96 @@
+
+> historia-3d@0.1.0 test:e2e
+> playwright test
+
+[WebServer] (node:29536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 32 tests using 1 worker
+
+(node:30268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [chromium] › e2e\loading.spec.ts:3:1 › uses the same animated loader for viewer and model, without a poster (4.4s)
+  ok  2 [chromium] › e2e\loading.spec.ts:38:1 › stops loading and shows a text error when WebGL is unavailable (4.5s)
+  ok  3 [chromium] › e2e\museum.spec.ts:3:1 › loads Pokrov and exposes the museum controls (6.8s)
+  ok  4 [chromium] › e2e\museum.spec.ts:12:1 › switches to the Ivan IV helmet and loads its GLB scan (10.1s)
+  ok  5 [chromium] › e2e\museum.spec.ts:25:1 › opens a hotspot, resets camera and opens sources (13.2s)
+  ok  6 [chromium] › e2e\museum.spec.ts:45:1 › orbit changes the camera when WebGL is available (14.2s)
+  ok  7 [chromium] › e2e\museum.spec.ts:61:1 › keeps explanation behind an observation step (641ms)
+  -   8 [chromium] › e2e\museum.spec.ts:70:1 › uses a separate mobile composition and remains keyboard accessible
+  ok  9 [chromium] › e2e\museum.spec.ts:79:1 › honours reduced motion and survives repeated reloads (8.4s)
+  ok 10 [chromium] › e2e\musket.spec.ts:3:1 › musket loads, opens five details, resets and switches exhibits (33.0s)
+  ok 11 [chromium] › e2e\musket.spec.ts:55:1 › musket markers follow rotation, hide behind the object and return on reset (32.3s)
+  ok 12 [chromium] › e2e\pistol.spec.ts:3:1 › pistol GLB loads without a poster and supports six details, orbit, reset and switching (53.6s)
+  ok 13 [chromium] › e2e\shako.spec.ts:3:1 › allows an underside inspection and returns to the initial view (22.5s)
+  ok 14 [chromium] › e2e\shako.spec.ts:23:1 › detail markers follow the orbit and disappear on the back of the shako (19.9s)
+  ok 15 [chromium] › e2e\shako.spec.ts:52:1 › shako loads in WebGL, exposes all six details and survives collection switching (14.6s)
+  ok 16 [chromium] › e2e\url-state.spec.ts:3:1 › deep link, collections, Back/Forward and invalid ids use same document (8.0s)
+(node:29160) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 17 [mobile] › e2e\loading.spec.ts:3:1 › uses the same animated loader for viewer and model, without a poster (3.8s)
+  ok 18 [mobile] › e2e\loading.spec.ts:38:1 › stops loading and shows a text error when WebGL is unavailable (4.0s)
+  ok 19 [mobile] › e2e\museum.spec.ts:3:1 › loads Pokrov and exposes the museum controls (918ms)
+  ok 20 [mobile] › e2e\museum.spec.ts:12:1 › switches to the Ivan IV helmet and loads its GLB scan (6.4s)
+  ok 21 [mobile] › e2e\museum.spec.ts:25:1 › opens a hotspot, resets camera and opens sources (3.9s)
+  ok 22 [mobile] › e2e\museum.spec.ts:45:1 › orbit changes the camera when WebGL is available (4.4s)
+  ok 23 [mobile] › e2e\museum.spec.ts:61:1 › keeps explanation behind an observation step (438ms)
+  ok 24 [mobile] › e2e\museum.spec.ts:70:1 › uses a separate mobile composition and remains keyboard accessible (240ms)
+  ok 25 [mobile] › e2e\museum.spec.ts:79:1 › honours reduced motion and survives repeated reloads (3.7s)
+  ok 26 [mobile] › e2e\musket.spec.ts:3:1 › musket loads, opens five details, resets and switches exhibits (13.6s)
+  ok 27 [mobile] › e2e\musket.spec.ts:55:1 › musket markers follow rotation, hide behind the object and return on reset (44.1s)
+  ok 28 [mobile] › e2e\pistol.spec.ts:3:1 › pistol GLB loads without a poster and supports six details, orbit, reset and switching (27.9s)
+  ok 29 [mobile] › e2e\shako.spec.ts:3:1 › allows an underside inspection and returns to the initial view (19.3s)
+  ok 30 [mobile] › e2e\shako.spec.ts:23:1 › detail markers follow the orbit and disappear on the back of the shako (34.1s)
+  x  31 [mobile] › e2e\shako.spec.ts:52:1 › shako loads in WebGL, exposes all six details and survives collection switching (2.0m)
+(node:32488) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 32 [mobile] › e2e\url-state.spec.ts:3:1 › deep link, collections, Back/Forward and invalid ids use same document (3.7s)
+
+
+  1) [mobile] › e2e\shako.spec.ts:52:1 › shako loads in WebGL, exposes all six details and survives collection switching 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: locator.click: Test timeout of 120000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '6. Козырёк', exact: true })
+        - locator resolved to <button type="button" aria-label="6. Козырёк" class="hotspot-marker  " data-hotspot-id="shako-visor">6</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <nav aria-label="Экспонаты коллекции" class="exhibit-carousel is-pair is-trio">…</nav> intercepts pointer events
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <nav aria-label="Экспонаты коллекции" class="exhibit-carousel is-pair is-trio">…</nav> intercepts pointer events
+        - retrying click action
+          - waiting 100ms
+        211 × waiting for element to be visible, enabled and stable
+            - element is visible, enabled and stable
+            - scrolling into view if needed
+            - done scrolling
+            - <nav aria-label="Экспонаты коллекции" class="exhibit-carousel is-pair is-trio">…</nav> intercepts pointer events
+          - retrying click action
+            - waiting 500ms
+
+
+      68 |     const marker = page.getByRole('button', { name: `${i + 1}. ${label}`, exact: true })
+      69 |     await expect(marker).toBeVisible()
+    > 70 |     await marker.click()
+         |                  ^
+      71 |     await expect(page.locator('.hotspot-card')).toBeVisible()
+      72 |     await expect(page.locator('.hotspot-card details')).not.toHaveAttribute('open')
+      73 |     await page.locator('.hotspot-card summary').click()
+        at C:\Users\enekr\OneDrive\Документы\HISTORY3D\e2e\shako.spec.ts:70:18
+
+    Error Context: test-results\shako-shako-loads-in-WebGL-10e45-rvives-collection-switching-mobile\error-context.md
+
+  1 failed
+    [mobile] › e2e\shako.spec.ts:52:1 › shako loads in WebGL, exposes all six details and survives collection switching 
+  1 skipped
+  30 passed (9.1m)

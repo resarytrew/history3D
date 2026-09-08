@@ -1,0 +1,121 @@
+{
+  "triangles": 135876,
+  "meshes": 44,
+  "names": [
+    "WoodStock",
+    "mesh_1",
+    "mesh_1_1",
+    "BreechTang",
+    "LockPlate",
+    "LockPlateBorder",
+    "LockTailLine483",
+    "LockTailLine491",
+    "Cock",
+    "CockSpur",
+    "UpperJaw",
+    "JawScrew",
+    "JawScrewThread",
+    "JawScrewFinial",
+    "CockPivotHead",
+    "CockPivotSlot",
+    "Frizzen",
+    "Pan",
+    "FrizzenPivotHead",
+    "FrizzenPivotSlot",
+    "FrizzenSpring",
+    "SpringScrewHead",
+    "SpringScrewSlot",
+    "LockRearScrewHead",
+    "LockRearScrewSlot",
+    "Counterplate",
+    "CounterScrew472Head",
+    "CounterScrew472Slot",
+    "CounterScrew597Head",
+    "CounterScrew597Slot",
+    "CounterScrew831Head",
+    "CounterScrew831Slot",
+    "TriggerGuard",
+    "TriggerPlate",
+    "Trigger",
+    "MuzzleBand",
+    "FrontSight",
+    "WoodRamrod",
+    "RamrodTip",
+    "RamrodPipe",
+    "RamrodPipeMouth",
+    "ButtCapRight",
+    "ButtCapLeft",
+    "GripEscutcheon"
+  ],
+  "invalidValues": 0,
+  "missingUv": 0,
+  "roundtripBoundsError": 0,
+  "bounds": {
+    "min": [
+      -0.22934982180595398,
+      0,
+      -0.023420603945851326
+    ],
+    "max": [
+      0.23000000417232513,
+      0.15367671847343445,
+      0.02942049503326416
+    ],
+    "size": [
+      0.4593498259782791,
+      0.15367671847343445,
+      0.052841098979115486
+    ]
+  },
+  "calls": 45,
+  "renderedTriangles": 135878,
+  "bytes": 7291092,
+  "sha256": "8d8d84891b1dcacc45e5aac0de7d6f313fdc84daf660bc17167649fde17d093c",
+  "renders": {
+    "right": {
+      "calls": 44,
+      "renderedTriangles": 135876
+    },
+    "left": {
+      "calls": 44,
+      "renderedTriangles": 135876
+    },
+    "hero": {
+      "calls": 45,
+      "renderedTriangles": 135878
+    },
+    "top": {
+      "calls": 44,
+      "renderedTriangles": 135876
+    },
+    "bottom": {
+      "calls": 44,
+      "renderedTriangles": 135876
+    },
+    "muzzle": {
+      "calls": 44,
+      "renderedTriangles": 135876
+    },
+    "butt": {
+      "calls": 39,
+      "renderedTriangles": 131756
+    },
+    "lock": {
+      "calls": 36,
+      "renderedTriangles": 120984
+    },
+    "reverse": {
+      "calls": 37,
+      "renderedTriangles": 123192
+    },
+    "grip": {
+      "calls": 18,
+      "renderedTriangles": 120700
+    },
+    "ramrod": {
+      "calls": 9,
+      "renderedTriangles": 86216
+    }
+  },
+  "errors": []
+}

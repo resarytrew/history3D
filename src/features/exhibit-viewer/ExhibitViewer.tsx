@@ -54,6 +54,7 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
         controller = new ViewerController(canvas, {
           onReady: () => setReadyExhibitId(loadingExhibitId.current),
           onError: (message) => {
+            canvas.dataset.rendererError = message
             publishProjection([])
             setError(message)
           },
@@ -79,6 +80,7 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
       loadingExhibitId.current = exhibit.id
       setReadyExhibitId(null)
       setError(null)
+      if (canvasRef.current) delete canvasRef.current.dataset.rendererError
       publishProjection([])
       controllerRef.current.load(exhibit)
     }, [exhibit])

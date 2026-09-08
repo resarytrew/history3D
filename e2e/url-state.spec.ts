@@ -1,0 +1,21 @@
+import { expect, test } from '@playwright/test'
+
+test('deep link, collections, Back/Forward and invalid ids use same document', async ({ page }) => {
+  await page.goto('/?exhibit=russian-pistol-1798-1804&campaign=school#view')
+  await expect(page.locator('.collection-select')).toHaveValue('russian-empire')
+  const documentToken = await page.evaluate(() => { const token = Math.random(); Object.assign(window, { documentToken: token }); return token })
+  await page.locator('.collection-select').selectOption('ancient-rus')
+  await expect(page).toHaveURL(/exhibit=pokrov-na-nerli/)
+  await page.getByRole('button', { name: 'Шлем Ивана IV', exact: true }).click()
+  await expect(page).toHaveURL(/exhibit=ivan-iv-helmet/)
+  await page.goBack(); await expect(page.getByRole('heading', { name: 'Покрова на Нерли', exact: true })).toBeVisible()
+  await page.goBack(); await expect(page.locator('.collection-select')).toHaveValue('russian-empire')
+  await expect(page).toHaveURL(/exhibit=russian-pistol-1798-1804/)
+  await page.goForward(); await expect(page.locator('.collection-select')).toHaveValue('ancient-rus')
+  expect(await page.evaluate(() => (window as unknown as { documentToken: number }).documentToken)).toBe(documentToken)
+  expect(new URL(page.url()).searchParams.get('campaign')).toBe('school')
+  expect(new URL(page.url()).hash).toBe('#view')
+  await page.goto('/?exhibit=unknown&campaign=school')
+  await expect(page).toHaveURL(/exhibit=pokrov-na-nerli/)
+  await expect(page.getByRole('heading', { name: 'Покрова на Нерли', exact: true })).toBeVisible()
+})

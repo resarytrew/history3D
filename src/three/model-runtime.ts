@@ -22,7 +22,12 @@ async function loadProcedural(factoryId: string, signal: AbortSignal): Promise<G
 async function loadGlb(model: GlbExhibitModel, signal: AbortSignal): Promise<Group> {
   signal.throwIfAborted()
   const loader = new GLTFLoader()
-  const gltf = await loader.loadAsync(model.src)
+  const response = await fetch(model.src, { signal })
+  if (!response.ok) throw new Error(`Не удалось загрузить 3D-модель: HTTP ${response.status}`)
+  const buffer = await response.arrayBuffer()
+  signal.throwIfAborted()
+  const base = new URL('.', new URL(model.src, window.location.href)).href
+  const gltf = await loader.parseAsync(buffer, base)
   if (signal.aborted) {
     disposeObject3D(gltf.scene)
     signal.throwIfAborted()

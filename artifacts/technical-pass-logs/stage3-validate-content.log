@@ -1,0 +1,8 @@
+
+> historia-3d@0.1.0 validate:content
+> tsx scripts/validate-content.ts
+
+Warning: Exhibit: pokrov-na-nerli / model.developmentOnly: DEV_ONLY model included in review; blocked from production
+Warning: Exhibit: russian-musket-1808 / model.developmentOnly: DEV_ONLY model included in review; blocked from production
+Warning: Exhibit: russian-shako-1808 / model.developmentOnly: DEV_ONLY model included in review; blocked from production
+Content validation passed: 5 package(s), 3 review warning(s).

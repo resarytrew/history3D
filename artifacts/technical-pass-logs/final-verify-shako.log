@@ -1,0 +1,37 @@
+
+> historia-3d@0.1.0 verify:shako
+> tsx scripts/render-shako-verification.ts
+
+{
+  "pass": 5,
+  "triangles": 227284,
+  "visibleTriangles": 227284,
+  "meshes": 54,
+  "dimensionsMm": {
+    "shellHeight": 172.24375903606415,
+    "topDiameter": 264.58749175071716,
+    "bottomDiameter": 215.13750823251644,
+    "visorProjection": 76.19999512080233,
+    "vStrapWidth": 17.76664464600417,
+    "lowerBand": 20.319998264312744
+  },
+  "boundingBox": {
+    "min": [
+      -0.14523205161094666,
+      0.006430000066757202,
+      -0.13229374587535858
+    ],
+    "max": [
+      0.14521382749080658,
+      0.3009477851360063,
+      0.18376874923706055
+    ],
+    "size": [
+      0.29044587910175323,
+      0.2945177850692491,
+      0.31606249511241913
+    ]
+  },
+  "drawCalls": 54,
+  "renderedTriangles": 227284
+}

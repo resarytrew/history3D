@@ -1,0 +1,13 @@
+
+> historia-3d@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/enekr/OneDrive/Документы/HISTORY3D
+
+
+ Test Files  12 passed (12)
+      Tests  57 passed (57)
+   Start at  14:02:30
+   Duration  6.25s (transform 3.36s, setup 3.87s, import 6.49s, tests 11.25s, environment 16.84s)
+

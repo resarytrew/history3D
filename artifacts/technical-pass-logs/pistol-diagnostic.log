@@ -1,0 +1,43 @@
+(node:18452) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:26476) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [chromium] › e2e\pistol.spec.ts:3:1 › pistol GLB loads without a poster and supports six details, orbit, reset and switching (41.3s)
+
+
+  1) [chromium] › e2e\pistol.spec.ts:3:1 › pistol GLB loads without a poster and supports six details, orbit, reset and switching 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.viewer-stage')
+    Expected: "ready"
+    Received: "error"
+    Timeout:  30000ms
+
+    Call log:
+      - Expect "toHaveAttribute" with timeout 30000ms
+      - waiting for locator('.viewer-stage')
+        62 × locator resolved to <div aria-busy="false" data-state="error" class="viewer-stage" aria-label="Интерактивная 3D-модель: Пехотное ружьё">…</div>
+           - unexpected value "error"
+
+
+      64 |       await page.getByRole('button',{name:button,exact:true}).click()
+      65 |       await expect(page.getByRole('heading',{name:title})).toBeVisible()
+    > 66 |       await expect(stage).toHaveAttribute('data-state','ready',{timeout:30_000})
+         |                           ^
+      67 |     }
+      68 |     await page.getByRole('button',{name:'Переключить язык'}).click()
+      69 |     await expect(page.getByRole('heading',{name:'Cavalry pistol'})).toBeVisible()
+        at C:\Users\enekr\OneDrive\Документы\HISTORY3D\e2e\pistol.spec.ts:66:27
+
+    attachment #1: viewer-error (text/plain) ───────────────────────────────────────────────────────
+    Failed to fetch dynamically imported module: http://127.0.0.1:4173/src/content/exhibits/russian-musket-1808/procedural/createRussianMusket1808.ts
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\pistol-pistol-GLB-loads-wi-8fd74-s-orbit-reset-and-switching-chromium\error-context.md
+
+  1 failed
+    [chromium] › e2e\pistol.spec.ts:3:1 › pistol GLB loads without a poster and supports six details, orbit, reset and switching 

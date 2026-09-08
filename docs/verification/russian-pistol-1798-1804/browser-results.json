@@ -1,0 +1,1223 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--reporter=json"
+    ],
+    "configFile": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\playwright.config.ts",
+    "rootDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile",
+        "name": "mobile",
+        "testDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --host 127.0.0.1 --port 4173",
+      "url": "http://127.0.0.1:4173",
+      "reuseExistingServer": true
+    }
+  },
+  "suites": [
+    {
+      "title": "loading.spec.ts",
+      "file": "loading.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "uses the same animated loader for viewer and model, without a poster",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8840,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:02.724Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1be41964e0574414b0cd-60acf86ed973a75a6a4c",
+          "file": "loading.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "stops loading and shows a text error when WebGL is unavailable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5751,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:11.670Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1be41964e0574414b0cd-a7506b2a42a160e94381",
+          "file": "loading.spec.ts",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "uses the same animated loader for viewer and model, without a poster",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6722,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:07:49.844Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1be41964e0574414b0cd-d1c43596563d6f799883",
+          "file": "loading.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "stops loading and shows a text error when WebGL is unavailable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5964,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:07:56.778Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1be41964e0574414b0cd-d9fc78c5566c71d18947",
+          "file": "loading.spec.ts",
+          "line": 38,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "museum.spec.ts",
+      "file": "museum.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "loads Pokrov and exposes the museum controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1642,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:17.490Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-cd27b13537055ef57088",
+          "file": "museum.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "switches to the Ivan IV helmet and loads its GLB scan",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6114,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:19.589Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-a330a2e06a13577ea82e",
+          "file": "museum.spec.ts",
+          "line": 12,
+          "column": 1
+        },
+        {
+          "title": "opens a hotspot, resets camera and opens sources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4664,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:25.723Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-9e6c51eaafc6bda8f417",
+          "file": "museum.spec.ts",
+          "line": 25,
+          "column": 1
+        },
+        {
+          "title": "orbit changes the camera when WebGL is available",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1409,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:30.396Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-4a9124a12966563a0d7c",
+          "file": "museum.spec.ts",
+          "line": 45,
+          "column": 1
+        },
+        {
+          "title": "keeps explanation behind an observation step",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3368,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:31.815Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-a08a407e6ad1e4ab4666",
+          "file": "museum.spec.ts",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "uses a separate mobile composition and remains keyboard accessible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "mobile project only",
+                  "location": {
+                    "file": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\museum.spec.ts",
+                    "line": 71,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 81,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:35.194Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "mobile project only",
+                      "location": {
+                        "file": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\museum.spec.ts",
+                        "line": 71,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-0d893fa56f0256c060a0",
+          "file": "museum.spec.ts",
+          "line": 70,
+          "column": 1
+        },
+        {
+          "title": "honours reduced motion and survives repeated reloads",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3949,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:35.284Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-893bbcc628b40602b305",
+          "file": "museum.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "loads Pokrov and exposes the museum controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7038,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:02.941Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-eeae722728664112a043",
+          "file": "museum.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "switches to the Ivan IV helmet and loads its GLB scan",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9556,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:09.992Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-f1c27744d14fe0fdd95e",
+          "file": "museum.spec.ts",
+          "line": 12,
+          "column": 1
+        },
+        {
+          "title": "opens a hotspot, resets camera and opens sources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10662,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:19.564Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-fb82d33875e85fc6a19b",
+          "file": "museum.spec.ts",
+          "line": 25,
+          "column": 1
+        },
+        {
+          "title": "orbit changes the camera when WebGL is available",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14728,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:30.270Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-8a8aa075495affd9c307",
+          "file": "museum.spec.ts",
+          "line": 45,
+          "column": 1
+        },
+        {
+          "title": "keeps explanation behind an observation step",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 569,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:45.065Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-3ee88894ca9c8e69304e",
+          "file": "museum.spec.ts",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "uses a separate mobile composition and remains keyboard accessible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 351,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:45.658Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-08d9ce3b97ffe4707fba",
+          "file": "museum.spec.ts",
+          "line": 70,
+          "column": 1
+        },
+        {
+          "title": "honours reduced motion and survives repeated reloads",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8205,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:46.069Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5e1b554b8332ecd9026f-38c3c0c39b18aecbd589",
+          "file": "museum.spec.ts",
+          "line": 79,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "musket.spec.ts",
+      "file": "musket.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "musket loads, opens five details, resets and switches exhibits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20498,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:39.260Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "be7a450e7ffdd4758577-0d68de805ced18512730",
+          "file": "musket.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "musket markers follow rotation, hide behind the object and return on reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 26620,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:05:59.771Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "be7a450e7ffdd4758577-dd58fe1604a089b6f366",
+          "file": "musket.spec.ts",
+          "line": 55,
+          "column": 1
+        },
+        {
+          "title": "musket loads, opens five details, resets and switches exhibits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 25965,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:08:54.804Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "be7a450e7ffdd4758577-c24598ceb235312382b8",
+          "file": "musket.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "musket markers follow rotation, hide behind the object and return on reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 38935,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:09:20.781Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "be7a450e7ffdd4758577-dad84098f74989f23419",
+          "file": "musket.spec.ts",
+          "line": 55,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "pistol.spec.ts",
+      "file": "pistol.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "pistol GLB loads without a poster and supports six details, orbit, reset and switching",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20628,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:06:26.427Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3588d5d52b6ccc8c1fda-31cd5f7b97158e4ea6d5",
+          "file": "pistol.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "pistol GLB loads without a poster and supports six details, orbit, reset and switching",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 8904,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Кавалерийский пистолет' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Кавалерийский пистолет' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Кавалерийский пистолет' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Кавалерийский пистолет' })\u001b[22m\n\n    at C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\pistol.spec.ts:19:77",
+                    "location": {
+                      "file": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\pistol.spec.ts",
+                      "column": 77,
+                      "line": 19
+                    },
+                    "snippet": "  17 |     release();await page.emulateMedia({reducedMotion:'reduce'})\n  18 |     await expect(stage).toHaveAttribute('data-state','ready',{timeout:30_000})\n> 19 |     await expect(page.getByRole('heading',{name:'Пистолет кавалерии'})).toBeVisible()\n     |                                                                             ^\n  20 |     await expect(canvas).toHaveAttribute('data-contact-shadow','visible')\n  21 |     await expect(page.locator('.hotspot-marker:visible')).toHaveCount(6)\n  22 |     await page.screenshot({path:`docs/verification/russian-pistol-1798-1804/integration-${info.project.name}.png`})"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\pistol.spec.ts",
+                        "column": 77,
+                        "line": 19
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Кавалерийский пистолет' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Кавалерийский пистолет' })\u001b[22m\n\n\n  17 |     release();await page.emulateMedia({reducedMotion:'reduce'})\n  18 |     await expect(stage).toHaveAttribute('data-state','ready',{timeout:30_000})\n> 19 |     await expect(page.getByRole('heading',{name:'Пистолет кавалерии'})).toBeVisible()\n     |                                                                             ^\n  20 |     await expect(canvas).toHaveAttribute('data-contact-shadow','visible')\n  21 |     await expect(page.locator('.hotspot-marker:visible')).toHaveCount(6)\n  22 |     await page.screenshot({path:`docs/verification/russian-pistol-1798-1804/integration-${info.project.name}.png`})\n    at C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\pistol.spec.ts:19:77"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:09:59.772Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\test-results\\pistol-pistol-GLB-loads-wi-8fd74-s-orbit-reset-and-switching-mobile\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\pistol.spec.ts",
+                    "column": 77,
+                    "line": 19
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "3588d5d52b6ccc8c1fda-5d1dd0b528853b0cf3f7",
+          "file": "pistol.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "shako.spec.ts",
+      "file": "shako.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "allows an underside inspection and returns to the initial view",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17663,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:06:47.073Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1f70b8271ad4a15c7cd3-7f87a29b5d105a0f3f2f",
+          "file": "shako.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "detail markers follow the orbit and disappear on the back of the shako",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 22552,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:07:04.832Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1f70b8271ad4a15c7cd3-48f1617caa2d63c1a523",
+          "file": "shako.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "shako loads in WebGL, exposes all six details and survives collection switching",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14711,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:07:27.532Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1f70b8271ad4a15c7cd3-eec5d1e916707e0e51f6",
+          "file": "shako.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "allows an underside inspection and returns to the initial view",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17114,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:10:10.425Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1f70b8271ad4a15c7cd3-3e655cc85a12cfe5328c",
+          "file": "shako.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "detail markers follow the orbit and disappear on the back of the shako",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 26767,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:10:27.856Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1f70b8271ad4a15c7cd3-f6cc646ef4ebbb1fa90f",
+          "file": "shako.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "shako loads in WebGL, exposes all six details and survives collection switching",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 120060,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\shako.spec.ts",
+                        "column": 18,
+                        "line": 70
+                      },
+                      "message": "Error: locator.click: Test timeout of 120000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '6. Козырёк', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" aria-label=\"6. Козырёк\" class=\"hotspot-marker  \" data-hotspot-id=\"shako-visor\">6</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <nav aria-label=\"Экспонаты коллекции\" class=\"exhibit-carousel is-pair is-trio\">…</nav> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <nav aria-label=\"Экспонаты коллекции\" class=\"exhibit-carousel is-pair is-trio\">…</nav> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    209 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is visible, enabled and stable\u001b[22m\n\u001b[2m        - scrolling into view if needed\u001b[22m\n\u001b[2m        - done scrolling\u001b[22m\n\u001b[2m        - <nav aria-label=\"Экспонаты коллекции\" class=\"exhibit-carousel is-pair is-trio\">…</nav> intercepts pointer events\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\n\n  68 |     const marker = page.getByRole('button', { name: `${i + 1}. ${label}`, exact: true })\n  69 |     await expect(marker).toBeVisible()\n> 70 |     await marker.click()\n     |                  ^\n  71 |     await expect(page.locator('.hotspot-card')).toBeVisible()\n  72 |     await expect(page.locator('.hotspot-card details')).not.toHaveAttribute('open')\n  73 |     await page.locator('.hotspot-card summary').click()\n    at C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\e2e\\shako.spec.ts:70:18"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-08T06:10:54.669Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\test-results\\shako-shako-loads-in-WebGL-10e45-rvives-collection-switching-mobile\\error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1f70b8271ad4a15c7cd3-cb209085c0fc3bb3b2a5",
+          "file": "shako.spec.ts",
+          "line": 52,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-08T06:05:01.171Z",
+    "duration": 473784.712,
+    "expected": 27,
+    "skipped": 1,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

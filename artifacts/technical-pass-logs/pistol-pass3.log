@@ -1,0 +1,33 @@
+
+> historia-3d@0.1.0 build:pistol
+> tsx scripts/build-pistol.ts
+
+{
+  "triangles": 122336,
+  "meshes": 63,
+  "invalidValues": 0,
+  "missingUv": 0,
+  "roundtripBoundsError": 0,
+  "bounds": {
+    "min": [
+      -0.22934982180595398,
+      0,
+      -0.020303139463067055
+    ],
+    "max": [
+      0.23000000417232513,
+      0.14587102830410004,
+      0.02889571338891983
+    ],
+    "size": [
+      0.4593498259782791,
+      0.14587102830410004,
+      0.049198852851986885
+    ]
+  },
+  "calls": 64,
+  "renderedTriangles": 122338,
+  "bytes": 6349992,
+  "sha256": "4bcaf82cecef6e9714acf7a3753e16f9a40cf4b5580fec8df88e75275367e7b4",
+  "errors": []
+}

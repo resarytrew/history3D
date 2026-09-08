@@ -10,5 +10,4 @@ Factory создаёт `THREE.Group` и не владеет renderer. Геоме
 
 ## Delivery
 
-Poster показывается до первого подтверждённого кадра. Следующий экспонат можно preload в idle. Draco/Meshopt добавляются только когда реальные GLB оправдают decoder cost. Backgrounds и thumbnails поставляются WebP/AVIF; landscape и portrait — отдельные композиции.
-
+До первого подтверждённого кадра показывается анимированная полоса загрузки; фотография и poster не выводятся в области модели. Следующий экспонат можно preload в idle. Draco/Meshopt добавляются только когда реальные GLB оправдают decoder cost. Backgrounds и thumbnails поставляются WebP/AVIF; landscape и portrait — отдельные композиции.

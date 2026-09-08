@@ -12,6 +12,7 @@ import { HotspotCard } from '../features/hotspots/HotspotCard'
 import { useNarration } from '../features/narration/useNarration'
 import { ProvenanceDrawer } from '../features/provenance/ProvenanceDrawer'
 import { UiProvider, useUi } from '../i18n/ui'
+import { useMuseumController } from '../state/useMuseumController'
 
 const ExhibitViewer = lazy(async () => {
   const module = await import('../features/exhibit-viewer/ExhibitViewer')
@@ -20,10 +21,8 @@ const ExhibitViewer = lazy(async () => {
 
 function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; readonly setLocale: (locale: Locale) => void }) {
   const ui = useUi()
-  const [activeExhibitId, setActiveExhibitId] = useState(() => {
-    const requested = new URLSearchParams(window.location.search).get('exhibit')
-    return requested && getExhibit(requested) ? requested : collections[0].defaultExhibitId
-  })
+  const { activeExhibitId, selectedHotspot, researchOpen, sourcesOpen, compareScale, liveMessage,
+    setSelectedHotspot, setResearchOpen, setSourcesOpen, setCompareScale, announce, selectExhibit: changeExhibit } = useMuseumController()
   const exhibit = getExhibit(activeExhibitId)
   if (!exhibit) throw new Error('Default exhibit is missing from the catalog')
   const collection = collections.find((item) => item.id === exhibit.collectionId) ?? collections[0]
@@ -32,11 +31,6 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
 
   const viewerRef = useRef<ExhibitViewerHandle>(null)
   const sourcesTriggerRef = useRef<HTMLButtonElement | null>(null)
-  const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null)
-  const [researchOpen, setResearchOpen] = useState(false)
-  const [sourcesOpen, setSourcesOpen] = useState(false)
-  const [compareScale, setCompareScale] = useState(false)
-  const [liveMessage, setLiveMessage] = useState('')
   const narration = useNarration(content.narration, locale)
   const thumbnails = Object.fromEntries(
     collection.entries.flatMap((entry) => {
@@ -76,12 +70,8 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
   }
 
   const selectExhibit = (id: string) => {
-      narration.stop()
-      setSelectedHotspot(null)
-      setResearchOpen(false)
-      setSourcesOpen(false)
-      setCompareScale(false)
-      setActiveExhibitId(id)
+    narration.stop()
+    changeExhibit(id)
   }
 
   const selectCollectionEntry = (entryId: string) => {
@@ -89,8 +79,7 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
     if (entry?.exhibitId) {
       selectExhibit(entry.exhibitId)
     } else {
-      setLiveMessage(ui.draftMessage)
-      window.setTimeout(() => setLiveMessage(''), 4200)
+      announce(ui.draftMessage)
     }
   }
 

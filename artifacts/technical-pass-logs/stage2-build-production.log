@@ -1,0 +1,54 @@
+
+> historia-3d@0.1.0 build:production
+> tsx scripts/validate-content.ts --production && tsc -b && vite build --mode production
+
+Content validation failed with 12 error(s):
+
+Exhibit: ivan-iv-helmet
+Field: status
+Error: Production accepts only published exhibits; found technical-review
+
+Exhibit: pokrov-na-nerli
+Field: status
+Error: Production accepts only published exhibits; found technical-review
+
+Exhibit: pokrov-na-nerli
+Field: model.developmentOnly
+Error: DEV_ONLY model is forbidden in production
+
+Exhibit: pokrov-na-nerli
+Field: sources[1]
+Error: Source requires a URL, bibliography (author and publication), or museum inventory reference
+
+Exhibit: russian-musket-1808
+Field: status
+Error: Production accepts only published exhibits; found reconstruction
+
+Exhibit: russian-musket-1808
+Field: model.developmentOnly
+Error: DEV_ONLY model is forbidden in production
+
+Exhibit: russian-musket-1808
+Field: sources[2]
+Error: Source requires a URL, bibliography (author and publication), or museum inventory reference
+
+Exhibit: russian-pistol-1798-1804
+Field: status
+Error: Production accepts only published exhibits; found reconstruction
+
+Exhibit: russian-shako-1808
+Field: status
+Error: Production accepts only published exhibits; found historical-review
+
+Exhibit: russian-shako-1808
+Field: model.developmentOnly
+Error: DEV_ONLY model is forbidden in production
+
+Exhibit: russian-shako-1808
+Field: sources[3]
+Error: Source requires a URL, bibliography (author and publication), or museum inventory reference
+
+Catalog
+Field: exhibits
+Error: Production build has no published exhibits
+

@@ -1,0 +1,139 @@
+
+> historia-3d@0.1.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v4.1.11 C:/Users/enekr/OneDrive/Документы/HISTORY3D
+
+ ✓ tests/latest-request.test.ts > LatestRequestCoordinator > commits only the newest result and disposes stale data 10ms
+ ✓ tests/pokrov-procedural.test.ts > Pokrov-na-Nerli procedural reconstruction > contains the required architectural systems as real geometry 192ms
+ ✓ tests/pokrov-procedural.test.ts > Pokrov-na-Nerli procedural reconstruction > has materially different front, side and rear projections 222ms
+ ✓ tests/museum-state.test.ts > museum state > resets every exhibit-scoped field in one transition 13ms
+ ✓ tests/museum-state.test.ts > museum state > keeps independent panels and comparison updates scoped 1ms
+ ✓ tests/catalog.test.ts > exhibit catalog > places the source-based shako in its own collection with six grounded hotspots 71ms
+ ✓ tests/catalog.test.ts > exhibit catalog > discovers a self-contained Pokrov package 2ms
+ ✓ tests/catalog.test.ts > exhibit catalog > discovers the Ivan IV helmet scan package 11ms
+ ✓ tests/catalog.test.ts > exhibit catalog > keeps all ids and slugs unique 7ms
+ ✓ tests/catalog.test.ts > exhibit catalog > does not publish draft carousel entries 2ms
+ ✓ tests/viewer-systems.test.ts > RenderScheduler > coalesces invalidations and stops requesting frames at rest 54ms
+ ✓ tests/viewer-systems.test.ts > RenderScheduler > continues motion, preserves invalidation during a frame, pauses and disposes 8ms
+ ✓ tests/viewer-systems.test.ts > ModelHost > aborts replaced loads, drops stale errors and disposes late models 30ms
+ ✓ tests/viewer-systems.test.ts > ModelHost > reports an active loading error 15ms
+ ✓ tests/camera-rig.test.ts > CameraRig > preserves authored framing, instant reduced-motion focus, comparison and resize 127ms
+ ✓ tests/camera-rig.test.ts > CameraRig > interpolates motion, completes it, and settles without perpetual updates 34ms
+ ✓ tests/exhibit-url.test.ts > exhibit URL state > preserves unrelated parameters and existing path/hash links 53ms
+ ✓ tests/exhibit-url.test.ts > exhibit URL state > opens deep links, replaces invalid ids and avoids duplicate history entries 147ms
+ ✓ tests/exhibit-url.test.ts > exhibit URL state > restores the exhibit and clears panels/comparison on popstate 21ms
+ ✓ tests/content-validation.test.ts > runtime content validation > validates actual catalog values 215ms
+ ✓ tests/content-validation.test.ts > runtime content validation > reports unrelated shape and graph errors together with exact paths 36ms
+ ✓ tests/content-validation.test.ts > runtime content validation > checks duplicate ids across evidence groups and collection references 13ms
+ ✓ tests/content-validation.test.ts > runtime content validation > blocks unpublished and development-only content in production without changing review status 44ms
+ ✓ tests/content-validation.test.ts > runtime content validation > rejects malformed dates, missing assets, invalid vectors and camera constraints 30ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > separates the large internal size from the finished leather diameter 54ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > adds assumed felt thickness outside the documented internal bottom diameter 1ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > uses a three-inch visor projection, two-inch drop and assumed 3.5 mm thickness 34ms
+ ✓ tests/procedural-registry.test.ts > lazy procedural registry > keeps procedural exhibits registered and loads the shako through runtime 1969ms
+ ✓ tests/procedural-registry.test.ts > lazy procedural registry > rejects unknown ids and object-prototype names 13ms
+ ✓ tests/procedural-registry.test.ts > lazy procedural registry > respects cancellation before creating geometry 3ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > generates surface-following straps seven lines wide (0.2 mm chord tolerance) 8ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > uses converted bands and omits the grenadier plume pocket 1ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > has a visible top centre recessed one inch, with outward-facing normals 23ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > models a real rear slit in the felt, not a painted seam 6ms
+ ✓ tests/shako-procedural.test.ts > 1810 shako: converted specification, not artifact measurement > exposes the assembled interior and distinguishes cut length from folded height 125ms
+ ✓ tests/shako-procedural.test.ts > semantic, material and performance contract > routes the chinstrap clear of the solid visor 19ms
+ ✓ tests/shako-procedural.test.ts > semantic, material and performance contract > keeps the photo-guided grenade a thin embossed sheet with a front-facing bomb 28ms
+ ✓ tests/shako-procedural.test.ts > semantic, material and performance contract > has the asymmetric white cord assembly and all required identity nodes 6ms
+ ✓ tests/shako-procedural.test.ts > semantic, material and performance contract > seats the thin grenade outside the felt without an invented pocket step 65ms
+ ✓ tests/shako-procedural.test.ts > semantic, material and performance contract > separates matte felt, leather, cotton and brass; keeps the chinstrap leather 1ms
+ ✓ tests/shako-procedural.test.ts > semantic, material and performance contract > keeps the user-requested detail level within a measured 200,000 review budget including the prepared interior, with finite geometry 122ms
+ ✓ tests/shako-procedural.test.ts > semantic, material and performance contract > keeps the clay blockout free of ornaments and textures 30ms
+ ✓ tests/MuseumApp.test.tsx > MuseumApp > switches collections without losing the ancient Rus carousel 3373ms
+ × tests/MuseumApp.test.tsx > MuseumApp > opens the observation-first research flow 9855ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ↓ tests/pistol.test.ts > 1798/1804 cavalry pistol > uses metric geometry, correct barrel length and outward stock faces
+ ↓ tests/pistol.test.ts > 1798/1804 cavalry pistol > has complete barrel faces at every angle, a 17 mm recess and outward stock end caps
+ ↓ tests/pistol.test.ts > 1798/1804 cavalry pistol > keeps two hollow pipes connected to stock and the rod separate
+ ↓ tests/pistol.test.ts > 1798/1804 cavalry pistol > exports a self-contained GLB with PBR maps and no external resources
+ ↓ tests/pistol.test.ts > 1798/1804 cavalry pistol > keeps web geometry within budget with finite normals and UVs
+ ↓ tests/pistol.test.ts > 1798/1804 cavalry pistol > resolves all source claims and preserves uncertainty
+ ↓ tests/pistol.test.ts > 1798/1804 cavalry pistol > binds six visible front markers and occludes them on the reverse
+ ✓ tests/MuseumApp.test.tsx > MuseumApp > opens the sources and confidence drawer 1601ms
+ ✓ tests/hotspot-projection.test.ts > surface-bound hotspot projection > shows the six visible detail anchors in the initial camera 243ms
+ ✓ tests/hotspot-projection.test.ts > surface-bound hotspot projection > hides front insignia and the front cord on the rear, including above the silhouette 4ms
+ ✓ tests/MuseumApp.test.tsx > MuseumApp > translates the shako evidence record into visitor language 385ms
+ × tests/hotspot-projection.test.ts > surface-bound hotspot projection > projects the exact bound point across a continuous orbit, without clamping or offsets 14141ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ✓ tests/hotspot-projection.test.ts > surface-bound hotspot projection > ignores hidden internal meshes but hides anchors blocked by a visible object 152ms
+ ✓ tests/MuseumApp.test.tsx > MuseumApp > shows a restrained message for a draft exhibit 209ms
+ ✓ tests/MuseumApp.test.tsx > MuseumApp > switches to the Ivan IV helmet scene from the carousel 166ms
+ ↓ tests/musket-procedural.test.ts > 1808 musket exterior reconstruction > registers a review-only package with resolvable claims and sources
+ ↓ tests/musket-procedural.test.ts > 1808 musket exterior reconstruction > keeps the photo silhouette and typological barrel dimension distinct from assumed depth
+ ↓ tests/musket-procedural.test.ts > 1808 musket exterior reconstruction > has finite geometry, separate materials and truthful geometry metrics
+ ↓ tests/musket-procedural.test.ts > 1808 musket exterior reconstruction > keeps formed bands outside the stock and exposes the flint face
+ ↓ tests/musket-procedural.test.ts > 1808 musket exterior reconstruction > binds markers to surfaces and hides the right-side labels on the reverse
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/musket-procedural.test.ts > 1808 musket exterior reconstruction
+Error: Hook timed out in 10000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+ ❯ tests/musket-procedural.test.ts:13:3
+     11| describe('1808 musket exterior reconstruction', () => {
+     12|   let root: Group
+     13|   beforeAll(() => { root = createRussianMusket1808(); root.updateMatri…
+       |   ^
+     14|   afterAll(() => disposeObject3D(root))
+     15|   it('registers a review-only package with resolvable claims and sourc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/pistol.test.ts > 1798/1804 cavalry pistol
+Error: Hook timed out in 10000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+ ❯ tests/pistol.test.ts:13:3
+     11| describe('1798/1804 cavalry pistol',()=>{
+     12|   let root:Group
+     13|   beforeAll(()=>{root=createPistol();root.updateMatrixWorld(true)})
+       |   ^
+     14|   afterAll(()=>disposeObject3D(root))
+     15|   it('uses metric geometry, correct barrel length and outward stock fa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/hotspot-projection.test.ts > surface-bound hotspot projection > projects the exact bound point across a continuous orbit, without clamping or offsets
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/hotspot-projection.test.ts:27:3
+     25|     for (const id of ['shako-grenade', 'shako-repyok', 'shako-cord', '…
+     26|   })
+     27|   it('projects the exact bound point across a continuous orbit, withou…
+       |   ^
+     28|     for (let i = 0; i < 48; i++) {
+     29|       const angle = i / 48 * Math.PI * 2
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/MuseumApp.test.tsx > MuseumApp > opens the observation-first research flow
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/MuseumApp.test.tsx:26:3
+     24|     expect(screen.getByRole('heading', { name: 'Покрова на Нерли' })).…
+     25|   })
+     26|   it('opens the observation-first research flow', async () => {
+       |   ^
+     27|     const user = userEvent.setup()
+     28|     render(<MuseumApp />)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  4 failed | 10 passed (14)
+      Tests  2 failed | 50 passed | 12 skipped (64)
+   Start at  14:26:01
+   Duration  19.65s (transform 6.39s, setup 4.97s, import 13.61s, tests 66.43s, environment 23.31s)
+

@@ -1,0 +1,172 @@
+{
+  "checkedAt": "2026-09-08T10:55:30.138Z",
+  "model": {
+    "path": "src/content/exhibits/russian-pistol-1798-1804/models/pistol_1798_1804.glb",
+    "sha256": "bc440afa9146c5121b210d1393426a5bb863543031eda0977c8e71b93addf527",
+    "matchesRenderMetrics": true
+  },
+  "requestedRenders": [
+    {
+      "requirementNumber": 1,
+      "requirement": "right side",
+      "file": "01-right.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "82e4b14ceba8d6b2fb7793afcb38eff3b5e2dd0ee19ea006fc8b6694ba7d04d2",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 2,
+      "requirement": "left side",
+      "file": "02-left.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "bc545ce757d7c4f7b7dfb14d3d115465d9d0cd92d4380ef5dcdfbb88bd12fdd9",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 3,
+      "requirement": "right 3/4",
+      "file": "07-front-3-quarter.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "a1001f7ae82abe02e7b6d650f21a8c3cb541375f79f75143a9f131a8b5039daf",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 4,
+      "requirement": "left 3/4",
+      "file": "21-left-3-quarter.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "4da4dcea002b31cb6a0946566b983f15e7f2034ea1b4b311df864ec2e6f36cb3",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 5,
+      "requirement": "top",
+      "file": "03-top.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "5ad73a5100564f9b0c9be076f856ff21125570a3d3c8818c42e1dee6e7bb69e0",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 6,
+      "requirement": "bottom",
+      "file": "04-bottom.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "1e59b40c41229cad0bbaddbdfeb0bd4df9381e0ada4fec6acb9cd02aaee0ab64",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 7,
+      "requirement": "front",
+      "file": "05-front.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "1f08983a94b0badb413045d1d08be9ff20dc9c1a3b67528a580932e95b3870dc",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 8,
+      "requirement": "rear",
+      "file": "06-rear.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "23fb6d14ccbf9369049e789224df5fadfe8a6fa4fbb8df3ffacb8d554e567615",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 9,
+      "requirement": "lock complete",
+      "file": "09-lock.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "33c778660b85edcdbe21bf074e22104bd488e0b6d89d186ba88100bae0b8adf0",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 10,
+      "requirement": "cock",
+      "file": "10-cock.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "6669e2460ca5505f66a6a32345abe7ff7209163d460d5b72585308fd82cef248",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 11,
+      "requirement": "jaws and flint",
+      "file": "22-jaws-flint.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "4e778285849af427d7d83c2a47964eac91bd043592630e6ab48240188169fa9a",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 12,
+      "requirement": "frizzen",
+      "file": "23-frizzen.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "76da18ea67322f9096d381dd94508259d8c6af698485282b913b8d9c00690446",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 13,
+      "requirement": "pan",
+      "file": "24-pan.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "a7ed662591ca579094664b9e6c5875be3ee37c3eb277b19a0a745d019f45d5f9",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 14,
+      "requirement": "frizzen spring",
+      "file": "25-spring.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "23d21eba73347fcc3c49e4bc3e59823d1dd40fd24dc7b5939ccf92200b624ce9",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 15,
+      "requirement": "sideplate",
+      "file": "14-sideplate.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "1b4fd28cef2785fe121dbbd1d16589370bd2cb2e6272a0a78d8ff29436cfa8b2",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 16,
+      "requirement": "butt cap",
+      "file": "19-buttcap.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "18547ceca49e23e4d89f8f1c3af63f8a9fd79ca4d55273126bf584a1a086c7df",
+      "artifactPresent": true
+    },
+    {
+      "requirementNumber": 17,
+      "requirement": "muzzle",
+      "file": "13-muzzle.png",
+      "width": 1500,
+      "height": 900,
+      "sha256": "4e5306a83342c06ebf5c644b20ddf32955f2e96ee7c2fc5cb7dbe09b20160a40",
+      "artifactPresent": true
+    }
+  ],
+  "galleryLocalLinksChecked": 102,
+  "acceptance": "incomplete",
+  "unfulfilledRequirements": [
+    "6: working cock/flint/frizzen kinetics and collision/contact check",
+    "7: functioning pan and ignition-path relationship",
+    "8: operating foot/spring interaction",
+    "11: functional sideplate fasteners through stock into lock"
+  ],
+  "limits": "Artifact integrity does not establish historical identity, working mechanics, or absence of every intersection. See PISTOL_REFINEMENT_REPORT.md."
+}

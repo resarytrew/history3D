@@ -1,0 +1,50 @@
+
+> historia-3d@0.1.0 test:e2e
+> playwright test
+
+
+Running 36 tests using 1 worker
+
+(node:36924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [chromium] › e2e\content-validation.spec.ts:9:1 › runtime validation preserves lazy imports in an already open dev viewer (7.9s)
+  ok  2 [chromium] › e2e\loading.spec.ts:3:1 › uses the same animated loader for viewer and model, without a poster (14.2s)
+  ok  3 [chromium] › e2e\loading.spec.ts:38:1 › stops loading and shows a text error when WebGL is unavailable (3.7s)
+  ok  4 [chromium] › e2e\museum.spec.ts:3:1 › loads Pokrov and exposes the museum controls (7.1s)
+  ok  5 [chromium] › e2e\museum.spec.ts:12:1 › switches to the Ivan IV helmet and loads its GLB scan (9.9s)
+  ok  6 [chromium] › e2e\museum.spec.ts:25:1 › opens a hotspot, resets camera and opens sources (13.1s)
+  ok  7 [chromium] › e2e\museum.spec.ts:45:1 › orbit changes the camera when WebGL is available (13.5s)
+  ok  8 [chromium] › e2e\museum.spec.ts:61:1 › keeps explanation behind an observation step (1.1s)
+  -   9 [chromium] › e2e\museum.spec.ts:70:1 › uses a separate mobile composition and remains keyboard accessible
+  ok 10 [chromium] › e2e\museum.spec.ts:79:1 › honours reduced motion and survives repeated reloads (3.9s)
+  ok 11 [chromium] › e2e\musket.spec.ts:3:1 › musket loads, opens five details, resets and switches exhibits (17.7s)
+  ok 12 [chromium] › e2e\musket.spec.ts:55:1 › musket markers follow rotation, hide behind the object and return on reset (46.6s)
+  ok 13 [chromium] › e2e\pistol.spec.ts:3:1 › pistol GLB loads without a poster and supports six details, orbit, reset and switching (26.6s)
+  ok 14 [chromium] › e2e\shako.spec.ts:3:1 › allows an underside inspection and returns to the initial view (9.9s)
+  ok 15 [chromium] › e2e\shako.spec.ts:23:1 › detail markers follow the orbit and disappear on the back of the shako (28.7s)
+  ok 16 [chromium] › e2e\shako.spec.ts:52:1 › shako loads in WebGL, exposes all six details and survives collection switching (46.2s)
+  ok 17 [chromium] › e2e\url-state.spec.ts:3:1 › deep link, collections, Back/Forward and invalid ids use same document (9.4s)
+  ok 18 [chromium] › e2e\viewer-lifecycle.spec.ts:3:1 › WebGL sleeps at rest, wakes for orbit, and reports context loss (21.9s)
+(node:37448) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 19 [mobile] › e2e\content-validation.spec.ts:9:1 › runtime validation preserves lazy imports in an already open dev viewer (4.6s)
+  ok 20 [mobile] › e2e\loading.spec.ts:3:1 › uses the same animated loader for viewer and model, without a poster (15.9s)
+  ok 21 [mobile] › e2e\loading.spec.ts:38:1 › stops loading and shows a text error when WebGL is unavailable (4.1s)
+  ok 22 [mobile] › e2e\museum.spec.ts:3:1 › loads Pokrov and exposes the museum controls (1.4s)
+  ok 23 [mobile] › e2e\museum.spec.ts:12:1 › switches to the Ivan IV helmet and loads its GLB scan (14.8s)
+  ok 24 [mobile] › e2e\museum.spec.ts:25:1 › opens a hotspot, resets camera and opens sources (9.5s)
+  ok 25 [mobile] › e2e\museum.spec.ts:45:1 › orbit changes the camera when WebGL is available (10.7s)
+  ok 26 [mobile] › e2e\museum.spec.ts:61:1 › keeps explanation behind an observation step (570ms)
+  ok 27 [mobile] › e2e\museum.spec.ts:70:1 › uses a separate mobile composition and remains keyboard accessible (435ms)
+  ok 28 [mobile] › e2e\museum.spec.ts:79:1 › honours reduced motion and survives repeated reloads (8.3s)
+  ok 29 [mobile] › e2e\musket.spec.ts:3:1 › musket loads, opens five details, resets and switches exhibits (44.2s)
+  ok 30 [mobile] › e2e\musket.spec.ts:55:1 › musket markers follow rotation, hide behind the object and return on reset (1.0m)
+  ok 31 [mobile] › e2e\pistol.spec.ts:3:1 › pistol GLB loads without a poster and supports six details, orbit, reset and switching (25.5s)
+  ok 32 [mobile] › e2e\shako.spec.ts:3:1 › allows an underside inspection and returns to the initial view (19.0s)
+  ok 33 [mobile] › e2e\shako.spec.ts:23:1 › detail markers follow the orbit and disappear on the back of the shako (32.0s)
+  ok 34 [mobile] › e2e\shako.spec.ts:52:1 › shako loads in WebGL, exposes all six details and survives collection switching (32.6s)
+  ok 35 [mobile] › e2e\url-state.spec.ts:3:1 › deep link, collections, Back/Forward and invalid ids use same document (8.2s)
+  ok 36 [mobile] › e2e\viewer-lifecycle.spec.ts:3:1 › WebGL sleeps at rest, wakes for orbit, and reports context loss (17.2s)
+
+  1 skipped
+  35 passed (10.0m)

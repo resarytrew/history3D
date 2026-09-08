@@ -1,0 +1,37 @@
+
+> historia-3d@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/enekr/OneDrive/Документы/HISTORY3D
+
+ ❯ tests/camera-rig.test.ts (2 tests | 1 failed) 38ms
+     × interpolates motion, completes it, and settles without perpetual updates 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/camera-rig.test.ts > CameraRig > interpolates motion, completes it, and settles without perpetual updates
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/camera-rig.test.ts:24:29
+     22|     const rig=new CameraRig(document.createElement('canvas'),vi.fn()),…
+     23|     rig.configure(e); rig.focus(e.hotspots[0])
+     24|     expect(rig.update(460)).toBe(true)
+       |                             ^
+     25|     expect(rig.camera.position.z).toBeGreaterThan(e.hotspots[0].camera…
+     26|     rig.update(820); expect(rig.camera.position.z).toBeCloseTo(e.hotsp…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 13 passed (14)
+      Tests  1 failed | 63 passed (64)
+   Start at  14:23:15
+   Duration  5.59s (transform 3.59s, setup 5.21s, import 7.40s, tests 7.55s, environment 24.13s)
+

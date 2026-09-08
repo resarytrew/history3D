@@ -1,0 +1,30 @@
+import type { Exhibit } from '../../types'
+export const pistolReconstruction: Exhibit['reconstruction'] = {
+  type: 'source-based-reconstruction',
+  summary: 'Наружная реконструкция по пяти музейным фотографиям тульского пистолета 1803 года с уточнением силуэтов по рис. 128 Маковской. Обмер оригинала и независимая экспертиза пока не выполнены.',
+  known: [
+    { id: 'pistol-birch-furniture', kind: 'FACT', statement: 'Для базового образца 1798 года описаны берёзовая ложа с коричневой окраской, латунный прибор и две гранёные шомпольные трубки. Маковская описывает деревянный шомпол с латунной головкой.',
+      sourceIds: ['yurkevich-1798','makovskaya-1798'], confidence: 'high', sourceRefs: [
+        { sourceId: 'yurkevich-1798', locator: 'с. 679, описание кирасирского пистолета 1798 года', basis: 'author-reconstruction' },
+        { sourceId: 'makovskaya-1798', locator: 'PDF, страницы 75–76, описания образцов 1798 года', basis: 'author-reconstruction' },
+      ] },
+    { id: 'pistol-attribution', kind: 'FACT', statement: 'Музей атрибутирует экземпляр Тульскому оружейному заводу, 1803 год; тип — укороченный кирасирский и драгунский пистолет 1798/1804 гг.', sourceIds: ['padikovo-pistol'], confidence: 'high', sourceRefs: [{ sourceId: 'padikovo-pistol', locator: 'Заголовок и строка атрибуции', basis: 'catalogue-record' }] },
+    { id: 'pistol-barrel', kind: 'FACT', statement: 'Музей указывает гладкий ствол калибра 17 мм; при укорочении длина ствола уменьшалась с 370 до примерно 269 мм.', sourceIds: ['padikovo-news'], confidence: 'high', sourceRefs: [{ sourceId: 'padikovo-news', locator: '10.09.2024, первый экспонат, абзацы о калибре и переделке 1804 года', basis: 'catalogue-record' }] },
+    { id: 'pistol-period', kind: 'FACT', statement: 'По сообщению музея, пистолеты старого образца оставались на вооружении в 1812 году; массовая замена новым образцом развернулась позднее.', sourceIds: ['padikovo-news'], confidence: 'medium', sourceRefs: [{ sourceId: 'padikovo-news', locator: 'Первый экспонат, заключительный абзац о новом образце 1805 года', basis: 'catalogue-record' }] },
+  ],
+  inferred: [
+    { id: 'pistol-outline', kind: 'INFERENCE', statement: 'Силуэт ложи и положение ответной пластины сохранены по музейным боковым видам. Более лёгкие наружные контуры замка, накладки и колпачка уточнены по рис. 128 Маковской; перенос на экземпляр 1803 года остаётся интерпретацией.', sourceIds: ['padikovo-pistol','makovskaya-1798'], confidence: 'medium', sourceRefs: [{ sourceId: 'padikovo-pistol', locator: 'Галерея, l_1.jpg (справа), l_2.jpg (слева), l_3.jpg (замок)', basis: 'catalogue-record' }, { sourceId: 'makovskaya-1798', locator: 'Рис. 128, PDF страница 183, боковые виды базового образца', basis: 'author-reconstruction' }] },
+    { id: 'pistol-ramrod', kind: 'INFERENCE', statement: 'Коричневый шомпол с расширенным металлическим наконечником показан как деревянный с латунным прибором. Мушка расположена на стволе позади передней обоймицы.', sourceIds: ['padikovo-pistol'], confidence: 'medium', sourceRefs: [{ sourceId: 'padikovo-pistol', locator: 'Галерея, l_5.jpg, крупный план дульной части; l_1.jpg', basis: 'catalogue-record' }] },
+    { id: 'pistol-lock', kind: 'RECONSTRUCTION', statement: 'Наружные силуэты замка уточнены по рис. 128 Маковской; огниво показано поднятым. Тёмный кремень добавлен как визуальная интерпретация: на музейной фотографии губки пустые. Модель статическая; работоспособность, кинематика и внутренний механизм не реконструированы и не проверены.', sourceIds: ['padikovo-pistol','makovskaya-1798'], confidence: 'medium', sourceRefs: [{ sourceId: 'padikovo-pistol', locator: 'Галерея, l_3.jpg, крупный план замка', basis: 'catalogue-record' }, { sourceId: 'makovskaya-1798', locator: 'Рис. 128, PDF страница 183, общий вид', basis: 'author-reconstruction' }] },
+  ],
+  uncertain: [
+    { id: 'pistol-scale', kind: 'RECONSTRUCTION', statement: 'Общая длина около 460 мм — рабочая величина. Толщины, наружный диаметр ствола и глубины деталей восстановлены приблизительно; это не обмер музейного предмета.', sourceIds: ['padikovo-pistol'], confidence: 'low', note: 'Калибр и длина ствола заданы отдельно. Нет масштабной линейки, ортогональных видов сверху и снизу.' },
+    { id: 'pistol-surfaces', kind: 'RECONSTRUCTION', statement: 'Матовая коричневая берёза передаёт описанную отделку базового образца; железо и латунь имеют приглушённые поверхности. Точный состав и состояние покрытия конкретного предмета не подтверждены анализом.', sourceIds: ['padikovo-pistol','yurkevich-1798'], confidence: 'low', note: 'Авторские PBR-карты; глубокие повреждения музейного оригинала не скопированы.' },
+  ],
+  unknown: [
+    { id: 'pistol-provenance', kind: 'UNKNOWN', statement: 'Полк, владелец и участие этого экземпляра в войне 1812 года не установлены. История ремонтов и реставраций неизвестна.', sourceIds: ['padikovo-pistol'], confidence: 'unknown', note: 'TODO_RESEARCH: запросить инвентарную карточку, обмер и реставрационный паспорт.' },
+    { id: 'pistol-markings', kind: 'UNKNOWN', statement: 'Потёртые клейма и вензель на овальной накладке не воспроизведены: их точное чтение требует дополнительной проверки.', sourceIds: ['padikovo-pistol'], confidence: 'unknown', note: 'TODO_RESEARCH: сверить l_3.jpg и l_4.jpg с оригиналом; не придумывать надписи.' },
+  ],
+  versions: [{ version: '0.1.0', date: '2026-09-08', status: 'reconstruction', summary: 'Первая метрическая GLB-реконструкция наружного облика, авторские PBR-карты и шесть точек осмотра. Требует независимой экспертизы.' },
+    { version: '0.2.0', date: '2026-09-08', status: 'reconstruction', summary: 'Исправлена непрерывность ствола, посадка в ложу, наружный замок, трубки и прибор. Уточнена отделка берёзы. Кремень — поясняющее допущение. Контрольные виды и стабильные имена деталей; без внутренних механизмов и Assembly.' }],
+}

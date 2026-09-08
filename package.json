@@ -20,12 +20,15 @@
     "verify:3d": "tsx scripts/render-pokrov-verification.ts",
     "verify:shako": "tsx scripts/render-shako-verification.ts",
     "verify:musket": "tsx scripts/render-musket-verification.ts",
+    "build:pistol": "tsx scripts/build-pistol.ts",
+    "verify:pistol": "tsx scripts/build-pistol.ts && tsx scripts/pistol-refinement-audit.ts && tsx scripts/pistol-refinement-gallery.ts",
     "validate:content": "tsx scripts/validate-content.ts"
   },
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "three": "^0.185.0"
+    "three": "^0.185.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

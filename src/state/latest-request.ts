@@ -22,8 +22,10 @@ export class LatestRequestCoordinator<T> {
       }
       commit(value)
     } catch (error) {
-      if (!(error instanceof DOMException && error.name === 'AbortError')) throw error
       if (value !== undefined) disposeStale(value)
+      // Network/parser failures after replacement belong to the old request.
+      if (this.disposed || requestToken !== this.token || controller.signal.aborted) return
+      if (!(error instanceof DOMException && error.name === 'AbortError')) throw error
     }
   }
 
@@ -35,4 +37,3 @@ export class LatestRequestCoordinator<T> {
     this.controller = null
   }
 }
-

@@ -2,28 +2,32 @@
 
 ## Решение
 
-HISTORIA 3D — статическое React/Vite-приложение без backend. React хранит только UI-state; Three.js controller владеет renderer, scene, camera, controls и ресурсами. Это минимальнее глобального state framework и достаточно, пока нет совместного редактирования или server state.
+HISTORIA 3D — статическое React/Vite-приложение без backend. `MuseumApp` компонует интерфейс, `useMuseumController` управляет UI-state через reducer. `ViewerController` связывает отдельные подсистемы Three.js и владеет canvas/renderer/scene.
 
 ```text
 src/app/MuseumApp
+  ├─ state/useMuseumController → museum-state / exhibit-url
   ├─ content/catalog → collection → Exhibit
   ├─ ExhibitInfo / ResearchFlow / ProvenanceDrawer
   ├─ ExhibitCarousel
   └─ ExhibitViewer
-       ├─ model-runtime (GLB | procedural)
-       ├─ ViewerController
-       └─ projected hotspots
+       └─ ViewerController
+            ├─ CameraRig (OrbitControls, transitions, reduced motion)
+            ├─ LightingRig (environment, contact shadow, scale figure)
+            ├─ ModelHost → model-runtime (GLB | procedural)
+            ├─ HotspotSystem (surface anchors, projection, occlusion)
+            └─ RenderScheduler (requestAnimationFrame only when needed)
 ```
 
 ## Файловая структура
 
 ```text
 src/
-  app/                 composition and app state
+  app/                 composition
   components/          small shared UI primitives
   content/             types, registry, collections, exhibit packages
   features/            viewer, info, carousel, hotspots, narration, provenance
-  state/               latest-request-wins coordinator
+  state/               UI reducer/controller, URL helpers, latest-request coordinator
   three/               factories, loader, disposal, camera conventions
   styles/              tokens, global and responsive layouts
   utils/               pure utilities
@@ -35,7 +39,11 @@ tests/ e2e/            unit/integration and browser flows
 
 `ExhibitModel` is a discriminated union. A GLB descriptor gives `src`; a procedural descriptor gives stable `factoryId`. Both resolve to `LoadedExhibitModel { root, dispose }`. Coordinates are right-handed Three.js: +Y up, +Z toward the initial camera, model origin at ground-centre. Hotspot `position`, `cameraTarget` and optional `cameraPosition` use model-local metres.
 
-Every load receives an `AbortSignal` and monotonic token. Only the newest token may commit. Stale roots are disposed. Unmount stops the animation loop, disconnects ResizeObserver, removes context handlers, disposes controls, scene resources and renderer, then forces context loss.
+Every load receives an `AbortSignal` and monotonic token. GLB fetch is cancellable; parsing that finishes after replacement disposes its result. Only the newest token may commit; stale errors never replace the current scene with an error. ModelHost owns roots, LightingRig owns light/shadow/environment resources, CameraRig owns controls and its media-query listener. Unmount cancels scheduled frames, disconnects ResizeObserver, removes handlers and disposes all subsystems and the renderer.
+
+`RenderScheduler.invalidate()` coalesces work into one frame. Camera movement/damping requests subsequent frames; a settled scene has no pending RAF. Resize, model readiness, controls and comparison invalidate the frame. Context loss pauses scheduling and reports the existing viewer error. The scheduler accepts an injected frame clock for isolated tests.
+
+`museumReducer` atomically resets the selected hotspot, drawers, comparison and announcement on exhibit changes. `useMuseumController` owns callbacks and toast cleanup. The exhibit URL is normalized with `replaceState` at entry, changed with `pushState` on selection, and read on `popstate`. Unknown ids fall back to the first collection default. Path, unrelated query parameters and hash survive. Collection selection uses the same action. Future state/actions can be added to the reducer and URL helpers; Assembly behavior is not present.
 
 ## Publication boundary
 
@@ -48,5 +56,4 @@ Review build may include `developmentOnly` models. Production validation accepts
 - GPU leaks: single controller owner, abort/dispose protocol and repeated-switch E2E.
 - Mobile clipping: independent portrait composition and safe-area fit.
 - Adding a new object rewrites UI: catalog and package contracts keep object knowledge out of app components.
-- GLB variability: normalization contract, coordinate convention, size/triangle budgets and loader errors with poster fallback.
-
+- GLB variability: normalization contract, coordinate convention, size/triangle budgets and explicit loader errors. Loading uses the existing indicator.

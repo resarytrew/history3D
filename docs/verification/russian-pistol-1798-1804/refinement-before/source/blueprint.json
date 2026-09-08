@@ -1,0 +1,139 @@
+{
+  "object": "Russian shortened cuirassier and dragoon pistol, 1798/1804 pattern",
+  "prototype": "Tula 1803; Museum of Russian Military History, Padikovo",
+  "method": "M.C.M.T exterior analysis; manually authored reconstruction, not photogrammetry",
+  "referenceViews": [
+    "l_1.jpg right",
+    "l_2.jpg left",
+    "l_3.jpg lock",
+    "l_4.jpg escutcheon",
+    "l_5.jpg muzzle"
+  ],
+  "materials": [
+    {
+      "name": "wood",
+      "metalness": 0,
+      "roughness": "0.78–0.82, mapped",
+      "texture": "subtle longitudinal grain, muted brown finished birch",
+      "certainty": "birch and brown finish documented for base pattern; exact museum finish unmeasured"
+    },
+    {
+      "name": "steel",
+      "metalness": 0.92,
+      "roughness": "0.45–0.65, mapped",
+      "texture": "subtle processing striations and tonal patina",
+      "certainty": "appearance inferred"
+    },
+    {
+      "name": "brass",
+      "metalness": 0.92,
+      "roughness": "0.48–0.68, mapped",
+      "texture": "muted warmth, fine surface variation",
+      "certainty": "alloy untested"
+    }
+  ],
+  "components": [
+    {
+      "name": "WoodStock",
+      "geometry": "closed longitudinal elliptical loft with swept cavalry grip",
+      "visible": "side contour",
+      "inferred": "depth and cross sections"
+    },
+    {
+      "name": "Barrel",
+      "geometry": "complete tapered lathe exterior, annular muzzle and blind visual recess",
+      "documentedMm": {
+        "calibre": 17,
+        "shortenedLengthApprox": 269
+      },
+      "inferredMm": {
+        "outerMuzzleDiameter": 24
+      }
+    },
+    {
+      "name": "LockPlate",
+      "geometry": "rounded outline, tessellated and seated on stock",
+      "visible": "right photo and macro",
+      "inferred": "plate camber and depth"
+    },
+    {
+      "name": "Cock and Frizzen",
+      "geometry": "crowned curved exterior volumes, separate jaws and shortened screw; interpretive flint",
+      "visible": "empty jaws and raised frizzen",
+      "inferred": "depths, revised proportions and added flint; museum jaws are empty"
+    },
+    {
+      "name": "Pan",
+      "geometry": "open shallow bowl",
+      "visible": "exterior macro",
+      "inferred": "interior depth"
+    },
+    {
+      "name": "Counterplate",
+      "geometry": "serpentine seated plate and three heads",
+      "visible": "left photo",
+      "inferred": "depth"
+    },
+    {
+      "name": "TriggerGuard",
+      "geometry": "flattened elliptical swept strip",
+      "visible": "side silhouette",
+      "inferred": "width and section"
+    },
+    {
+      "name": "Ramrod",
+      "geometry": "separate wooden shaft and tapered brass head through two hollow faceted pipes with stock mounts",
+      "visible": "muzzle macro",
+      "inferred": "hidden portion"
+    },
+    {
+      "name": "ButtCap",
+      "geometry": "conforming curved shells with two long ears",
+      "visible": "both sides",
+      "inferred": "underside and thickness"
+    }
+  ],
+  "mechanicalComposition": {
+    "scope": "static exterior visualization",
+    "connections": [
+      "stock/barrel bedding",
+      "lock plate seat",
+      "one front band",
+      "ramrod guide",
+      "trigger guard and stock",
+      "butt cap around wood"
+    ],
+    "notReconstructed": [
+      "operating internals",
+      "working barrel bore and chamber",
+      "internal threads",
+      "unverified inscriptions"
+    ]
+  },
+  "textures": {
+    "originalProceduralMaps": true,
+    "museumPixelsEmbedded": false,
+    "sets": [
+      "wood",
+      "steel",
+      "brass"
+    ],
+    "channels": [
+      "sRGB base color",
+      "linear tangent normal",
+      "linear roughness"
+    ],
+    "resolution": [
+      512,
+      512
+    ],
+    "wear": "moderate maintained museum appearance, not archaeological corrosion"
+  },
+  "uncertainty": [
+    "overall length about 460 mm is assumed",
+    "photographs lack a scale",
+    "no top or bottom survey",
+    "regiment and battle provenance unknown",
+    "independent review pending"
+  ]
+}

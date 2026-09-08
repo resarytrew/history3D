@@ -1,0 +1,158 @@
+{
+  "freeze": [
+    {
+      "name": "barrel",
+      "unchanged": true,
+      "sha256": "cf7a26347161da3acb78141bf22ff366bc19658f1b774216c5e854b4d1551c74"
+    },
+    {
+      "name": "breech",
+      "unchanged": true,
+      "sha256": "2570806673ed894cde2bfe253c1377e0e109c7650ccff11a01f78e37dbb3a0f2"
+    },
+    {
+      "name": "breech_tang",
+      "unchanged": true,
+      "sha256": "52624d9f11a9199bfcde2e361da2ea2a5c13ea8d8ceed24ad20812cd555fda60"
+    },
+    {
+      "name": "ramrod",
+      "unchanged": true,
+      "sha256": "f4bce15ac8782b6bd69dff3a3a589d33c28aaad2ae0cceb16adc9265ad89fe9d"
+    },
+    {
+      "name": "ramrod_head",
+      "unchanged": true,
+      "sha256": "bdb51d5b7d19c9fba8f87128fcd4d58dcdb1e630e94f24ceb106c657ec0d383d"
+    },
+    {
+      "name": "ramrod_pipe_front",
+      "unchanged": true,
+      "sha256": "55dd9522aa00d8f578e0d37a76f8240c188ac8454dd23249ae4cda6079eeeaaa"
+    },
+    {
+      "name": "ramrod_pipe_rear",
+      "unchanged": true,
+      "sha256": "d9a507cc5387c24f0b96f24b2323a0fc8c2a558a6ec7722c15250f6e0dec28d7"
+    },
+    {
+      "name": "ramrod_pipe_mount_front",
+      "unchanged": true,
+      "sha256": "f04e38c427e184440574bebada15969f7fe849c035cb215d27a78825a569a7c7"
+    },
+    {
+      "name": "ramrod_pipe_mount_rear",
+      "unchanged": true,
+      "sha256": "7719b8d7f88cf17896ae3ffccc504651300c1c56b602140791ebf3aa6a2c158c"
+    },
+    {
+      "name": "grip_escutcheon",
+      "unchanged": true,
+      "sha256": "82fbff8cfc8dc6c929c822ea92fffca41a38f8aea9c74b2181dad59eaf720a02"
+    },
+    {
+      "name": "front_sight",
+      "unchanged": true,
+      "sha256": "93bb810fbe7333292910dc72c2389478e0ec759794aeb0bf6ef26052e558f9e6"
+    },
+    {
+      "name": "buttcap_heel",
+      "unchanged": true,
+      "sha256": "73cef8cea2e4c650968918a75b373c59e1544f49835117b5af8dab0b8bed6dc7"
+    },
+    {
+      "name": "buttcap_fastener",
+      "unchanged": true,
+      "sha256": "e70140a2e69cf09a192f969d414536a2f6ee6b6bb043bbabbb1f5b53e12cf2e3"
+    }
+  ],
+  "worldTransformsUnchanged": true,
+  "wood": {
+    "unchanged": true,
+    "sha256": {
+      "albedo": "bcc5ba86ae6b626a152e8a99d6525ff4f50628cb5bf59cdef64b5e836241aa8e",
+      "roughness": "d6371831f496ff498bedb7551c56870abe8ca42aa9087eaa4cc4769cc33ffacb",
+      "normal": "f38abcefedd348da1ee33485fb29050b95968e958070bab09bf79fb31672733b"
+    }
+  },
+  "stock": {
+    "silhouetteUnchanged": true,
+    "topologyUnchanged": true,
+    "uvUnchanged": true,
+    "changedLeftVertices": 1677,
+    "exception": "Removed only the unreferenced rectangular left-side flattening; right inlet, fore-end, UVs and wood maps preserved"
+  },
+  "appearance": [
+    {
+      "name": "lock_cock",
+      "surfaceAreaChangePercent": -44.12494456334316,
+      "beforeTriangles": 3066,
+      "afterTriangles": 2716
+    },
+    {
+      "name": "lock_upper_jaw",
+      "surfaceAreaChangePercent": -47.94325272456421,
+      "beforeTriangles": 1216,
+      "afterTriangles": 744
+    },
+    {
+      "name": "lock_lower_jaw",
+      "surfaceAreaChangePercent": -50.168808991707316,
+      "beforeTriangles": 1424,
+      "afterTriangles": 872
+    },
+    {
+      "name": "lock_jaw_screw_head",
+      "surfaceAreaChangePercent": -67.72456146987001,
+      "beforeTriangles": 384,
+      "afterTriangles": 240
+    },
+    {
+      "name": "lock_frizzen",
+      "surfaceAreaChangePercent": -53.378543453242685,
+      "beforeTriangles": 1652,
+      "afterTriangles": 1210
+    },
+    {
+      "name": "lock_pan",
+      "surfaceAreaChangePercent": -66.02128991034094,
+      "beforeTriangles": 1152,
+      "afterTriangles": 768
+    },
+    {
+      "name": "lock_lockplate",
+      "surfaceAreaChangePercent": -23.350334821750252,
+      "beforeTriangles": 7552,
+      "afterTriangles": 6934
+    },
+    {
+      "name": "sideplate",
+      "surfaceAreaChangePercent": -18.740871634007107,
+      "beforeTriangles": 6692,
+      "afterTriangles": 6540
+    },
+    {
+      "name": "buttcap_right",
+      "surfaceAreaChangePercent": -44.662173531621704,
+      "beforeTriangles": 9600,
+      "afterTriangles": 9600
+    },
+    {
+      "name": "buttcap_left",
+      "surfaceAreaChangePercent": -44.662173531621704,
+      "beforeTriangles": 9600,
+      "afterTriangles": 9600
+    }
+  ],
+  "measurements": {
+    "scope": "Rendered exterior and blind visual recess only; not manufacturing specifications",
+    "barrelLengthMm": 269.00000870227814,
+    "boreMm": 16.9999897480011,
+    "muzzleLipOutsideMm": 23.67492062125703,
+    "visibleLipWallMm": 3.3374654366279657
+  },
+  "mechanicalValidation": {
+    "performed": false,
+    "status": "Static exterior artwork; no operating kinetics, ignition path or functional mechanism has been designed or validated"
+  }
+}

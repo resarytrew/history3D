@@ -1,103 +1,90 @@
-import { access, readdir, readFile, stat } from 'node:fs/promises'
-import { join } from 'node:path'
+import { access, readdir, stat } from 'node:fs/promises'
+import { isAbsolute, join, relative, resolve } from 'node:path'
+import { createServer } from 'vite'
+import { collectAssetReferences, validateCatalog, formatContentIssue, type ContentIssue } from '../src/content/validation'
+import { proceduralModelRegistry } from '../src/three/proceduralModelRegistry'
 
-const root = process.cwd()
-const production = process.argv.includes('--production')
-const errors: string[] = []
-const warnings: string[] = []
-
-const requiredDocs = [
-  'README.md',
-  'docs/PRODUCT_VISION.md',
-  'docs/ARCHITECTURE.md',
-  'docs/REFERENCE_ANALYSIS.md',
-  'docs/EXHIBIT_AUTHORING_GUIDE.md',
-  'docs/HISTORICAL_ACCURACY_POLICY.md',
-  'docs/RECONSTRUCTION_WORKFLOW.md',
-  'docs/IMG2THREEJS_WORKFLOW.md',
-  'docs/MODEL_PIPELINE.md',
-  'docs/CONTENT_SCHEMA.md',
-  'docs/ROADMAP.md',
-  'docs/workshop-architecture.md',
-] as const
-
-async function exists(path: string): Promise<boolean> {
-  try {
-    await access(path)
-    return true
-  } catch {
-    return false
-  }
-}
-
+const root = process.cwd(), production = process.argv.includes('--production')
+const errors: ContentIssue[] = [], warnings: ContentIssue[] = []
+const requiredDocs = ['README.md', ...['PRODUCT_VISION', 'ARCHITECTURE', 'REFERENCE_ANALYSIS', 'EXHIBIT_AUTHORING_GUIDE',
+  'HISTORICAL_ACCURACY_POLICY', 'RECONSTRUCTION_WORKFLOW', 'IMG2THREEJS_WORKFLOW', 'MODEL_PIPELINE', 'CONTENT_SCHEMA', 'ROADMAP', 'workshop-architecture'].map(name => `docs/${name}.md`)]
 for (const path of requiredDocs) {
-  if (!(await exists(join(root, path)))) errors.push(`Missing required document: ${path}`)
+  try { await access(join(root, path)) } catch { errors.push({ entity: 'Repository', field: path, message: 'Missing required document' }) }
 }
 
-const exhibitsRoot = join(root, 'src/content/exhibits')
-const exhibitDirs = (await readdir(exhibitsRoot, { withFileTypes: true }))
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-const seenIds = new Set<string>()
-let publishedCount = 0
+// SSR transforms the exact content graph used by the application, including imported asset URLs.
+// Never inspect TypeScript source text to infer its runtime values.
+const server = await createServer({
+  // SSR validation must not invalidate an already-running dev viewer's optimized imports.
+  cacheDir: resolve(root, 'node_modules/.vite-content-validation'),
+  server: { middlewareMode: true, hmr: false, watch: null }, appType: 'custom', logLevel: 'silent',
+})
+let count: number
+try {
+  const packages = (await readdir(join(root, 'src/content/exhibits'), { withFileTypes: true })).filter(entry => entry.isDirectory())
+  const packageExhibits: unknown[] = []
+  for (const directory of packages) {
+    const entity = `Exhibit: ${directory.name}`
+    for (const file of ['exhibit.ts', 'content.ru.ts', 'content.en.ts', 'reconstruction.ts', 'hotspots.ts']) {
+      try { await access(join(root, 'src/content/exhibits', directory.name, file)) }
+      catch { errors.push({ entity, field: file, message: 'Missing package file' }) }
+    }
+    try {
+      const module = await server.ssrLoadModule(`/src/content/exhibits/${directory.name}/exhibit.ts`)
+      const values = Object.values(module).filter(value => value && typeof value === 'object' && 'id' in value)
+      if (values.length !== 1) errors.push({ entity, field: 'exhibit.ts', message: 'Package must export exactly one exhibit record' })
+      for (const value of values) {
+        packageExhibits.push(value)
+        const record = value as Record<string, unknown>
+        for (const field of ['id', 'slug']) if (record[field] !== directory.name) errors.push({ entity, field, message: 'Must match the package directory' })
+      }
+    } catch (error) { errors.push({ entity, field: 'exhibit.ts', message: `Cannot load runtime module: ${String(error)}` }) }
+  }
+  let collections: unknown[] = []
+  try {
+    const catalog = await server.ssrLoadModule('/src/content/catalog.ts')
+    collections = catalog.collections
+    const exported = new Set((catalog.exhibits as { id: string }[]).map(e => e.id))
+    for (const e of packageExhibits as { id: string }[]) if (!exported.has(e.id)) errors.push({ entity: `Exhibit: ${e.id}`, field: 'catalog', message: 'Package is missing from the runtime catalog' })
+    const packaged = new Set((packageExhibits as { id: string }[]).map(e => e.id))
+    for (const e of catalog.exhibits as { id: string }[]) if (!packaged.has(e.id)) errors.push({ entity: `Exhibit: ${e.id}`, field: 'catalog', message: 'Catalog exhibit has no loadable package' })
+    // Validate catalog duplicates too; package enumeration alone cannot find repeated imports.
+    const seen = new Set<string>()
+    for (const e of catalog.exhibits as { id: string }[]) {
+      if (seen.has(e.id)) errors.push({ entity: 'Catalog', field: 'exhibits', message: `Duplicate exhibit id "${e.id}"` })
+      seen.add(e.id)
+    }
+  } catch (error) { errors.push({ entity: 'Catalog', field: 'catalog.ts', message: `Cannot load runtime catalog: ${String(error)}` }) }
+  const report = validateCatalog(packageExhibits, collections, production)
+  errors.push(...report.errors); warnings.push(...report.warnings); count = packageExhibits.length
+  for (const value of packageExhibits) {
+    const e = value as { id?: unknown; model?: { kind?: unknown; factoryId?: unknown } }, entity = `Exhibit: ${String(e.id)}`
+    const assets = collectAssetReferences(value)
+    if (e.model?.kind === 'procedural' && typeof e.model.factoryId === 'string' && !Object.hasOwn(proceduralModelRegistry, e.model.factoryId))
+      errors.push({ entity, field: 'model.factoryId', message: `Unknown procedural factory "${e.model.factoryId}"` })
+    let backgroundBytes = 0
+    const backgrounds = new Set<string>()
+    for (const [field, url] of assets) {
+      if (url.startsWith('https://')) continue // Remote availability is not a deterministic build gate.
+      let path: string
+      try { path = decodeURIComponent(url.split('?')[0]) }
+      catch { errors.push({ entity, field, message: 'Malformed URL encoding in asset path' }); continue }
+      const local = path.startsWith('/@fs/') ? path.slice(5) : resolve(root, path.startsWith('/src/') ? path.slice(1) : `public/${path.replace(/^\//, '')}`)
+      const relativePath = relative(root, local)
+      if (relativePath.startsWith('..') || isAbsolute(relativePath)) { errors.push({ entity, field, message: 'Asset must be inside the repository' }); continue }
+      try {
+        const file = await stat(local)
+        if (!file.isFile() || file.size === 0) errors.push({ entity, field, message: `Asset is empty or not a file: ${url}` })
+        if (field.startsWith('assets.backgrounds') && !backgrounds.has(local)) { backgroundBytes += file.size; backgrounds.add(local) }
+      } catch { errors.push({ entity, field, message: `Missing asset: ${url}` }) }
+    }
+    if (backgroundBytes > 3_000_000) warnings.push({ entity, field: 'assets.backgrounds', message: 'Backgrounds exceed the 3 MB review target' })
+  }
+} finally { await server.close() }
 
-for (const directory of exhibitDirs) {
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(directory)) {
-    errors.push(`Invalid exhibit directory slug: ${directory}`)
-  }
-  const packageRoot = join(exhibitsRoot, directory)
-  const requiredPackageFiles = [
-    'exhibit.ts', 'content.ru.ts', 'content.en.ts', 'reconstruction.ts', 'hotspots.ts',
-  ]
-  for (const path of requiredPackageFiles) {
-    if (!(await exists(join(packageRoot, path)))) errors.push(`${directory}: missing ${path}`)
-  }
-  const exhibitSource = await readFile(join(packageRoot, 'exhibit.ts'), 'utf8')
-  const id = exhibitSource.match(/\bid:\s*'([^']+)'/)?.[1]
-  const slug = exhibitSource.match(/\bslug:\s*'([^']+)'/)?.[1]
-  const status = exhibitSource.match(/\bstatus:\s*'([^']+)'/)?.[1]
-  if (!id || id !== directory) errors.push(`${directory}: package id must match its directory`)
-  if (!slug || slug !== directory) errors.push(`${directory}: slug must match its directory`)
-  if (id && seenIds.has(id)) errors.push(`Duplicate exhibit id: ${id}`)
-  if (id) seenIds.add(id)
-  if (!exhibitSource.includes('reconstruction:') || !exhibitSource.includes('sources:') || !exhibitSource.includes('credits:')) {
-    errors.push(`${directory}: missing reconstruction, sources, or credits`)
-  }
-  const hotspotSource = await readFile(join(packageRoot, 'hotspots.ts'), 'utf8')
-  const hotspotCount = (hotspotSource.match(/\bnumber:\s*\d+/g) ?? []).length
-  if (hotspotCount < 3) errors.push(`${directory}: at least three hotspots are required`)
-  if (!hotspotSource.includes('cameraTarget') || !hotspotSource.includes('evidenceIds')) {
-    errors.push(`${directory}: hotspot camera targets and evidence references are required`)
-  }
-  const reconstructionSource = await readFile(join(packageRoot, 'reconstruction.ts'), 'utf8')
-  if (!reconstructionSource.includes("kind: 'UNKNOWN'") || !reconstructionSource.includes('TODO_RESEARCH')) {
-    errors.push(`${directory}: unknown evidence and TODO_RESEARCH must remain explicit`)
-  }
-  const backgroundsRoot = join(packageRoot, 'backgrounds')
-  const backgroundFiles = (await exists(backgroundsRoot))
-    ? (await readdir(backgroundsRoot)).filter((path) => /\.(?:avif|jpe?g|png|webp)$/i.test(path))
-    : []
-  if (backgroundFiles.length === 0) errors.push(`${directory}: at least one background image is required`)
-  const backgroundBytes = (await Promise.all(backgroundFiles.map((path) => stat(join(backgroundsRoot, path)))))
-    .reduce((total, file) => total + file.size, 0)
-  if (backgroundBytes > 3_000_000) warnings.push(`${directory}: backgrounds exceed the 3 MB review target`)
-  if (status === 'published') publishedCount += 1
-  if (production) {
-    if (status !== 'published') errors.push(`${directory}: production accepts only published exhibits; found ${status ?? 'missing status'}`)
-    if (exhibitSource.includes('developmentOnly: true')) errors.push(`${directory}: DEV_ONLY model is forbidden in production`)
-    if (!exhibitSource.includes('url: \'https://')) errors.push(`${directory}: published content requires a web source`)
-  } else if (exhibitSource.includes('developmentOnly: true')) {
-    warnings.push(`${directory}: DEV_ONLY model included in review build and blocked from production`)
-  }
-}
-
-if (production && publishedCount === 0) errors.push('Production build has no published exhibits')
-
-for (const warning of warnings) console.warn(`warning: ${warning}`)
+for (const warning of warnings) console.warn(`Warning: ${warning.entity} / ${warning.field}: ${warning.message}`)
 if (errors.length) {
-  console.error(`Content validation failed with ${errors.length} error(s):`)
-  errors.forEach((error) => console.error(`- ${error}`))
+  console.error(`Content validation failed with ${errors.length} error(s):\n`)
+  errors.forEach(error => console.error(`${formatContentIssue(error)}\n`))
   process.exitCode = 1
-} else {
-  console.log(`Content validation passed: ${exhibitDirs.length} package(s), ${warnings.length} review warning(s).`)
-}
+} else console.log(`Content validation passed: ${count} package(s), ${warnings.length} review warning(s).`)
