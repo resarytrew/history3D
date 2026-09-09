@@ -3,6 +3,7 @@ import { isAbsolute, join, relative, resolve } from 'node:path'
 import { createServer } from 'vite'
 import { collectAssetReferences, validateCatalog, formatContentIssue, type ContentIssue } from '../src/content/validation'
 import { proceduralModelRegistry } from '../src/three/proceduralModelRegistry'
+import { suspendedProceduralModelRegistry } from '../src/three/suspendedProceduralModelRegistry'
 
 const root = process.cwd(), production = process.argv.includes('--production')
 const errors: ContentIssue[] = [], warnings: ContentIssue[] = []
@@ -41,11 +42,17 @@ try {
     } catch (error) { errors.push({ entity, field: 'exhibit.ts', message: `Cannot load runtime module: ${String(error)}` }) }
   }
   let collections: unknown[] = []
+  let activeIds = new Set<string>()
+  let suspendedIds = new Set<string>()
   try {
     const catalog = await server.ssrLoadModule('/src/content/catalog.ts')
-    collections = catalog.collections
+    const suspended = await server.ssrLoadModule('/src/content/suspended-catalog.ts')
+    collections = [...catalog.collections, ...suspended.suspendedCollections]
+    suspendedIds = new Set((suspended.suspendedExhibits as { id: string }[]).map(e => e.id))
     const exported = new Set((catalog.exhibits as { id: string }[]).map(e => e.id))
-    for (const e of packageExhibits as { id: string }[]) if (!exported.has(e.id)) errors.push({ entity: `Exhibit: ${e.id}`, field: 'catalog', message: 'Package is missing from the runtime catalog' })
+    activeIds = exported
+    for (const id of suspendedIds) if (exported.has(id)) errors.push({ entity: `Exhibit: ${id}`, field: 'catalog', message: 'Exhibit cannot be both active and suspended' })
+    for (const e of packageExhibits as { id: string }[]) if (!exported.has(e.id) && !suspendedIds.has(e.id)) errors.push({ entity: `Exhibit: ${e.id}`, field: 'catalog', message: 'Package is missing from both active and suspended catalogs' })
     const packaged = new Set((packageExhibits as { id: string }[]).map(e => e.id))
     for (const e of catalog.exhibits as { id: string }[]) if (!packaged.has(e.id)) errors.push({ entity: `Exhibit: ${e.id}`, field: 'catalog', message: 'Catalog exhibit has no loadable package' })
     // Validate catalog duplicates too; package enumeration alone cannot find repeated imports.
@@ -55,12 +62,18 @@ try {
       seen.add(e.id)
     }
   } catch (error) { errors.push({ entity: 'Catalog', field: 'catalog.ts', message: `Cannot load runtime catalog: ${String(error)}` }) }
-  const report = validateCatalog(packageExhibits, collections, production)
+  const report = validateCatalog(packageExhibits, collections, false)
+  if (production) {
+    const activeCatalog = await server.ssrLoadModule('/src/content/catalog.ts')
+    const productionReport = validateCatalog(packageExhibits.filter(value => activeIds.has((value as { id: string }).id)), activeCatalog.collections, true)
+    errors.push(...productionReport.errors)
+  }
   errors.push(...report.errors); warnings.push(...report.warnings); count = packageExhibits.length
   for (const value of packageExhibits) {
     const e = value as { id?: unknown; model?: { kind?: unknown; factoryId?: unknown } }, entity = `Exhibit: ${String(e.id)}`
     const assets = collectAssetReferences(value)
-    if (e.model?.kind === 'procedural' && typeof e.model.factoryId === 'string' && !Object.hasOwn(proceduralModelRegistry, e.model.factoryId))
+    const registry = suspendedIds.has(String(e.id)) ? { ...proceduralModelRegistry, ...suspendedProceduralModelRegistry } : proceduralModelRegistry
+    if (e.model?.kind === 'procedural' && typeof e.model.factoryId === 'string' && !Object.hasOwn(registry, e.model.factoryId))
       errors.push({ entity, field: 'model.factoryId', message: `Unknown procedural factory "${e.model.factoryId}"` })
     let backgroundBytes = 0
     const backgrounds = new Set<string>()

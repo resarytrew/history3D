@@ -7,6 +7,7 @@ import { X, Y } from '../src/content/exhibits/russian-pistol-1798-1804/source/di
 import { russianPistol1798 as exhibit } from '../src/content/exhibits/russian-pistol-1798-1804/exhibit'
 import { bindSurfaceAnchor, projectSurfaceHotspots } from '../src/three/hotspotProjection'
 import { disposeObject3D } from '../src/three/dispose'
+import { SemanticSceneIndex } from '../src/three/SemanticSceneIndex'
 
 describe('1798/1804 cavalry pistol',()=>{
   let root:Group
@@ -122,7 +123,8 @@ describe('1798/1804 cavalry pistol',()=>{
     expect(exhibit.status).toBe('reconstruction');expect(r.unknown.length).toBeGreaterThan(0)
   })
   it('binds six visible front markers and occludes them on the reverse',()=>{
-    const hotspots=exhibit.hotspots,anchors=new Map(hotspots.map(h=>[h.id,bindSurfaceAnchor(root,h)]))
+    const index = new SemanticSceneIndex(root, exhibit.semantics!)
+    const hotspots=exhibit.hotspots,anchors=new Map(hotspots.map(h=>[h.id,bindSurfaceAnchor(root,h,index)]))
     for(const hotspot of hotspots) {
       const surface=hotspot.surface!,normal=new Vector3().fromArray(surface.normal).normalize()
       const point=new Vector3().fromArray(hotspot.position)

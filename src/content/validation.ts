@@ -38,6 +38,28 @@ export function validateCatalog(exhibits: readonly unknown[], collections: reado
     const e = record(value), entity = `Exhibit: ${String(e.id ?? index)}`
     const parsed = ExhibitSchema.safeParse(value)
     if (!parsed.success) for (const issue of parsed.error.issues) add(entity, fieldPath(issue.path), issue.message)
+    const semantics = array(e.semantics).map(record)
+    const semanticIds = new Map(semantics.map(item => [item.id, item]))
+    unique(semantics, entity, 'semantics')
+    semantics.forEach((item, i) => {
+      const seen = new Set([item.id])
+      let parent = item.parentId
+      while (parent !== undefined) {
+        if (seen.has(parent)) { add(entity, `semantics[${i}].parentId`, 'Semantic part-of cycle'); break }
+        seen.add(parent)
+        const ancestor = semanticIds.get(parent)
+        if (!ancestor) { add(entity, `semantics[${i}].parentId`, `Unknown semantic parent "${String(parent)}"`); break }
+        parent = ancestor.parentId
+      }
+      if (item.kind === 'part' && !array(record(item.geometry).objectNames).length) add(entity, `semantics[${i}].geometry`, 'Physical part requires geometry')
+      if (item.explodeOffset && item.kind !== 'part' && item.kind !== 'assembly') add(entity, `semantics[${i}].explodeOffset`, 'Only parts and assemblies can move')
+    })
+    array(e.hotspots).forEach((hotspot, i) => {
+      for (const key of ['anchor', 'target']) {
+        const reference = record(record(hotspot)[key])
+        if (reference.entityId !== undefined && !semanticIds.has(reference.entityId)) add(entity, `hotspots[${i}].${key}.entityId`, `Unknown semantic entity "${String(reference.entityId)}"`)
+      }
+    })
     const sources = array(e.sources), sourceIds = new Set(sources.map(s => record(s).id))
     unique(sources, entity, 'sources'); unique(array(e.hotspots), entity, 'hotspots'); unique(array(e.hotspots), entity, 'hotspots', 'number'); unique(array(e.credits), entity, 'credits')
     const reconstruction = record(e.reconstruction), evidenceIds = new Set<unknown>()

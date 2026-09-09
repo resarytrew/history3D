@@ -1,5 +1,6 @@
 import type { Group, PerspectiveCamera } from 'three'
 import type { Exhibit } from '../content/types'
+import type { SemanticSceneIndex } from './SemanticSceneIndex'
 import { bindSurfaceAnchor, projectSurfaceHotspots, type SurfaceAnchor, type ProjectedHotspot } from './hotspotProjection'
 
 export class HotspotSystem {
@@ -9,11 +10,11 @@ export class HotspotSystem {
 
   constructor(private readonly publish: (positions: readonly ProjectedHotspot[]) => void) {}
 
-  bind(root: Group, exhibit: Exhibit): void {
+  bind(root: Group, exhibit: Exhibit, semanticScene?: SemanticSceneIndex): void {
     this.clear()
     this.root = root
     this.exhibit = exhibit
-    for (const hotspot of exhibit.hotspots) this.anchors.set(hotspot.id, bindSurfaceAnchor(root, hotspot))
+    for (const hotspot of exhibit.hotspots) this.anchors.set(hotspot.id, bindSurfaceAnchor(root, hotspot, semanticScene))
   }
 
   project(camera: PerspectiveCamera, hidden: boolean): void {

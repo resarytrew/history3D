@@ -1,3 +1,4 @@
+import type { SemanticAnchor, SemanticEntity } from './semantics'
 export type Locale = 'ru' | 'en'
 export type ReviewStatus =
   | 'draft'
@@ -60,6 +61,9 @@ export interface EvidenceItem {
 }
 
 export interface Hotspot {
+  readonly anchor?: SemanticAnchor
+  /** Semantic target for migration of legacy exhibit-local surface coordinates. */
+  readonly target?: { readonly entityId: string }
   readonly id: string
   readonly number: number
   readonly label: string
@@ -140,6 +144,7 @@ export interface ReconstructionVersion {
 }
 
 export interface Exhibit {
+  readonly semantics?: readonly SemanticEntity[]
   readonly id: string
   readonly slug: string
   readonly collectionId: string

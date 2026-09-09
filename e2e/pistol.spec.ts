@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
 
-test('pistol GLB loads without a poster and supports six details, orbit, reset and switching',async({page},info)=>{
+test('procedural pistol loads without a poster and supports six details, orbit, reset and switching',async({page},info)=>{
   test.setTimeout(120_000)
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
   const photos:string[]=[];page.on('request',r=>{if(r.resourceType()==='image'&&r.url().includes('/images/poster.'))photos.push(r.url())})
   let release!:()=>void
   const gate=new Promise<void>(r=>{release=r})
-  await page.route('**/models/pistol_1798_1804.glb',async r=>{await gate;await r.continue()})
+  await page.route('**/source/createPistol.ts*',async r=>{await gate;await r.continue()})
   try{
     await page.goto('/?exhibit=russian-pistol-1798-1804',{waitUntil:'domcontentloaded'})
     const stage=page.locator('.viewer-stage'),canvas=page.locator('canvas.viewer-canvas')
@@ -42,7 +42,17 @@ test('pistol GLB loads without a poster and supports six details, orbit, reset a
       await page.getByRole('button',{name:'Сбросить ракурс'}).click()
       await expect(page.locator('.hotspot-card')).toHaveCount(0)
     }
-    const bounds=(await canvas.boundingBox())!,start=bounds.x+bounds.width*.88,y=bounds.y+bounds.height*.3
+    const bounds=(await canvas.boundingBox())!
+    // Start on exposed canvas, avoiding the device controls and hotspot buttons.
+    const gesture = await canvas.evaluate(element => {
+      const box = element.getBoundingClientRect()
+      for (const y of [.65, .55, .4, .75]) for (const x of [.85, .75, .65]) {
+        const point = { x: box.x + box.width * x, y: box.y + box.height * y }
+        if (document.elementFromPoint(point.x, point.y) === element && point.x - box.height * .49 > box.x) return point
+      }
+      throw new Error('No exposed canvas region for orbit gesture')
+    })
+    const start = gesture.x, y = gesture.y
     const marker=page.locator('[data-hotspot-id="pistol-lock"]'),before=await marker.evaluate(el=>el.style.left)
     await page.mouse.move(start,y);await page.mouse.down();await page.mouse.move(start-bounds.height*.04,y,{steps:4})
     await expect.poll(()=>marker.evaluate(el=>el.style.left)).not.toBe(before)
@@ -70,6 +80,7 @@ test('pistol GLB loads without a poster and supports six details, orbit, reset a
     expect(errors).toEqual([]);expect(photos).toEqual([])
   }finally{
     release()
+    if (info.status !== info.expectedStatus) await page.screenshot({path:`artifacts/pistol-flow-failure-${info.project.name}.png`}).catch(()=>{})
     const detail=await page.locator('canvas.viewer-canvas').getAttribute('data-renderer-error').catch(()=>null)
     if(detail)await info.attach('viewer-error',{body:detail,contentType:'text/plain'})
   }

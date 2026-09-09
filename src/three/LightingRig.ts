@@ -36,6 +36,8 @@ export class LightingRig {
   private readonly groundShadow: Mesh
   private readonly sun: DirectionalLight
   private contactShadow: ReturnType<typeof createContactShadow> | null = null
+  private modified = false
+  setModelModified(modified: boolean): void { this.modified = modified }
   get comparing() { return this.scaleFigure.visible }
   constructor(private readonly scene: Scene, private readonly renderer: WebGLRenderer) {
     const roomEnvironment = new RoomEnvironment()
@@ -99,6 +101,7 @@ export class LightingRig {
     }
   }
   clear(canvas: HTMLCanvasElement): void {
+    this.modified = false
     this.contactShadow?.dispose()
     this.contactShadow = null
     this.scaleFigure.visible = false
@@ -111,7 +114,7 @@ export class LightingRig {
   update(camera: PerspectiveCamera, exhibit: Exhibit | null, canvas: HTMLCanvasElement): void {
     this.groundShadow.visible = !this.contactShadow && (exhibit?.presentation.lighting !== 'artifact-studio' || camera.position.y > this.groundShadow.position.y)
     if (this.contactShadow) {
-      this.contactShadow.mesh.visible = !this.comparing && camera.position.y > this.contactShadow.mesh.position.y
+      this.contactShadow.mesh.visible = !this.modified && !this.comparing && camera.position.y > this.contactShadow.mesh.position.y
       canvas.dataset.contactShadow = this.contactShadow.mesh.visible ? 'visible' : 'hidden'
     }
   }

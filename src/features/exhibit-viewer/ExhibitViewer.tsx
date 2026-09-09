@@ -3,6 +3,7 @@ import type { Exhibit, Hotspot } from '../../content/types'
 import { ViewerController, type ProjectedHotspot } from '../../three/ViewerController'
 import { useUi } from '../../i18n/ui'
 import { ViewerLoading } from './ViewerLoading'
+import { AssemblyControls } from './AssemblyControls'
 
 export interface ExhibitViewerHandle {
   readonly reset: () => void
@@ -105,6 +106,9 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
               </button>
           ))}
         </div>
+        {ready && !error && exhibit.semantics && <AssemblyControls key={exhibit.id} entities={exhibit.semantics}
+          onAmount={(amount, animate) => animate ? controllerRef.current?.animateAssembly(amount) : controllerRef.current?.setAssemblyAmount(amount)}
+          onSelect={(id, mode) => controllerRef.current?.selectEntity(id, mode)} />}
         {!ready && !error && <ViewerLoading />}
         {error && <div className="viewer-error" role="alert">{ui.viewerUnavailable}</div>}
       </div>

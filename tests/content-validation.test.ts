@@ -29,16 +29,16 @@ describe('runtime content validation', () => {
   it('checks duplicate ids across evidence groups and collection references', () => {
     const e = exhibits[0], item = e.reconstruction.known[0]
     const broken = { ...e, sources: [...e.sources, e.sources[0]], reconstruction: { ...e.reconstruction, inferred: [item] } }
-    const report = validateCatalog([broken, broken, ...exhibits.slice(1)], [{ ...collections[0], defaultExhibitId: 'absent', entries: [{ ...collections[0].entries[0], exhibitId: 'absent' }] }, collections[1]])
+    const report = validateCatalog([broken, broken, ...exhibits.slice(1)], [{ ...collections[0], defaultExhibitId: 'absent', entries: [{ ...collections[0].entries[0], exhibitId: 'absent' }] }, ...collections.slice(1)])
     expect(report.errors.some(e => e.message === `Duplicate evidence id "${item.id}"`)).toBe(true)
-    expect(report.errors.some(e => e.field === 'sources[2].id')).toBe(true)
+    expect(report.errors.some(error => error.field === `sources[${e.sources.length}].id`)).toBe(true)
     expect(report.errors.some(e => e.field === 'exhibits[1].id')).toBe(true)
     expect(report.errors.some(e => e.field === 'entries[0].exhibitId')).toBe(true)
   })
   it('blocks unpublished and development-only content in production without changing review status', () => {
     const report = validateCatalog(exhibits, collections, true)
-    expect(report.errors.filter(e => e.field === 'status')).toHaveLength(5)
-    expect(report.errors.filter(e => e.field === 'model.developmentOnly')).toHaveLength(3)
+    expect(report.errors.filter(e => e.field === 'status')).toHaveLength(exhibits.filter(e => e.status !== 'published').length)
+    expect(report.errors.filter(e => e.field === 'model.developmentOnly')).toHaveLength(exhibits.filter(e => e.model.developmentOnly).length)
     const published = exhibits.map(e => ({ ...e, status: 'published', model: { kind: 'glb', src: '/model.glb' },
       sources: e.sources.map(s => ({ ...s, url: 'https://museum.example/source' })) }))
     expect(validateCatalog(published, collections, true).errors).toEqual([])
@@ -47,6 +47,6 @@ describe('runtime content validation', () => {
     expect(ExhibitSchema.safeParse({ ...exhibits[0], assets: {} }).success).toBe(false)
     expect(HistoricalSourceSchema.safeParse({ ...exhibits[0].sources[0], accessDate: '2026-02-30' }).success).toBe(false)
     expect(HotspotSchema.safeParse({ ...exhibits[0].hotspots[0], position: [0, NaN, 0] }).success).toBe(false)
-    expect(PresentationSchema.safeParse({ ...exhibits[0].presentation, maxDistance: 1 }).success).toBe(false)
+    expect(PresentationSchema.safeParse({ ...exhibits[0].presentation, minDistance: 2, maxDistance: 1 }).success).toBe(false)
   })
 })

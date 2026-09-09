@@ -18,6 +18,7 @@ export class CameraRig {
   private exhibit: Exhibit | null = null
   private transition: Transition | null = null
   private interactionStart: Vector3 | null = null
+  private assemblyAmount = 0
 
   constructor(private readonly canvas: HTMLCanvasElement, private readonly invalidate: () => void) {
     this.controls = new OrbitControls(this.camera, canvas)
@@ -32,6 +33,7 @@ export class CameraRig {
   }
 
   prepare(exhibit: Exhibit): void {
+    this.assemblyAmount = 0
     this.exhibit = exhibit
     this.transition = null
     this.interactionStart = null
@@ -56,13 +58,23 @@ export class CameraRig {
   resize(aspect: number): void {
     this.camera.aspect = aspect
     const reference = this.exhibit?.presentation.referenceAspect
-    this.camera.zoom = reference ? Math.min(1, aspect / reference) : 1
+    this.camera.zoom = (reference ? Math.min(1, aspect / reference) : 1) / (1 + this.assemblyAmount * .3)
     this.camera.updateProjectionMatrix()
   }
 
   focus(hotspot: Hotspot): void {
     const target = vector(hotspot.cameraTarget)
     this.move(hotspot.cameraPosition ? vector(hotspot.cameraPosition) : target.clone().add(new Vector3(4.4, 1.3, 6.4)), target)
+  }
+
+  focusPoint(target: Vector3): void {
+    const offset = this.camera.position.clone().sub(this.controls.target)
+    this.move(target.clone().add(offset), target)
+  }
+
+  frameAssembly(amount: number): void {
+    this.assemblyAmount = amount
+    this.resize(this.camera.aspect)
   }
 
   reset(): void {

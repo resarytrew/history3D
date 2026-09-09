@@ -3,7 +3,7 @@ import { pistolContentRu } from './content.ru'
 import { pistolContentEn } from './content.en'
 import { pistolReconstruction } from './reconstruction'
 import { pistolHotspots } from './hotspots'
-import modelSrc from './models/pistol_1798_1804.glb?url'
+import { pistolSemantics } from './semantics'
 import poster from './images/poster.png'
 import thumbnail from './images/thumbnail.png'
 import studio from './backgrounds/studio.png'
@@ -13,7 +13,8 @@ export const russianPistol1798: Exhibit = {
   chronology: { label: 'Образец 1798/1804 гг. · прототип 1803 года', from: 1803, to: 1804 },
   geography: { place: 'Тула', region: 'Российская империя' },
   reconstruction: pistolReconstruction,
-  model: { kind: 'glb', src: modelSrc },
+  model: { kind: 'procedural', factoryId: 'russian-pistol-1798-1804-v1', developmentOnly: false, approximateTriangles: 249480 },
+  semantics: pistolSemantics,
   presentation: {
     initialYaw: 0, cameraPosition: [0.025, 0.23, 0.76], cameraTarget: [0, 0.08, 0],
     minDistance: 0.045, maxDistance: 3, safeAreaPadding: 0.13, referenceAspect: 1.5,

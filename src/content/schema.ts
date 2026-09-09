@@ -33,6 +33,8 @@ export const ReconstructionVersionSchema = z.object({
   version: text, date: z.iso.date(), summary: text, modelHash: text.optional(), status: ReviewStatusSchema,
 })
 export const HotspotSchema = z.object({
+  anchor: z.object({ entityId: id, localPoint: vector, localNormal: vector.refine(v => Math.hypot(...v) > 0, 'Anchor normal must not be zero').optional() }).optional(),
+  target: z.object({ entityId: id }).optional(),
   id, number: number.int().positive(), label: text, category: z.enum(['form', 'construction', 'decoration', 'context']),
   position: vector, labelOffset: pair.optional(), cameraTarget: vector, cameraPosition: vector.optional(),
   surface: z.object({ objectName: text, normal: vector.refine(v => Math.hypot(...v) > 0, 'Surface normal must not be zero'), searchDistance: positive }).optional(),
@@ -67,6 +69,11 @@ export const ExhibitContentSchema = z.object({
   narration: z.object({ durationSeconds: positive, transcript: text, audioSrc: asset.optional(), reviewStatus: z.enum(['synthetic-preview', 'human-reviewed']) }).optional(),
 })
 export const ExhibitSchema = z.object({
+  semantics: z.array(z.object({
+    id, kind: z.enum(['object', 'assembly', 'part', 'region', 'feature']),
+    label: z.object({ ru: text, en: text.optional() }), parentId: id.optional(),
+    geometry: z.object({ objectNames: z.array(text) }), explodeOffset: vector.optional(),
+  })).optional(),
   id: slug, slug, collectionId: slug, category, status: ReviewStatusSchema,
   chronology: z.object({ label: text, from: number.int().optional(), to: number.int().optional(), circa: z.boolean().optional() }),
   geography: z.object({ place: text.optional(), region: text.optional(), culture: text.optional() }),
