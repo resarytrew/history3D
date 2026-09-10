@@ -1,4 +1,4 @@
-import { ACESFilmicToneMapping, PCFShadowMap, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three'
+import { ACESFilmicToneMapping, Box3, PCFShadowMap, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three'
 import type { Exhibit, Hotspot } from '../content/types'
 import { CameraRig } from './CameraRig'
 import { LightingRig } from './LightingRig'
@@ -74,6 +74,8 @@ export class ViewerController {
     canvas.addEventListener('pointerleave', this.pointerLeave)
     this.resizeObserver = new ResizeObserver(this.resize)
     this.resizeObserver.observe(canvas.parentElement ?? canvas)
+    const workspace = canvas.closest('.viewer-stage')?.querySelector('.layout-workspace')
+    if (workspace) this.resizeObserver.observe(workspace)
     this.resize()
   }
 
@@ -135,8 +137,9 @@ export class ViewerController {
     } else {
       const layout = this.exhibit.assembly?.layouts.find(layout => layout.id === context.layoutId)
       if (!layout || !this.exhibit.assembly) return false
+      const viewport = this.layoutViewport()
       const result = new AssemblyLayoutSolver().solve({ objects: this.bounds, entities: this.exhibit.semantics!, layout,
-        referenceView: this.exhibit.assembly.referenceView, width: this.canvas.clientWidth, height: this.canvas.clientHeight })
+        referenceView: this.exhibit.assembly.referenceView, width: viewport.width, height: viewport.height })
       if (!result.ok) { this.callbacks.onAssemblyError?.(result.error); return false }
       this.assembly.animateTo(result.pose, performance.now(), window.matchMedia('(prefers-reduced-motion: reduce)').matches)
       this.reference = result.view; this.showReference(result.view)
@@ -149,13 +152,23 @@ export class ViewerController {
   private showReference(view: ReferenceView): void {
     const root = this.semanticScene?.root
     root?.updateWorldMatrix(true, false)
-    this.cameraRig.showReference(root ? { cameraPosition: root.localToWorld(new Vector3().fromArray(view.cameraPosition)).toArray(), cameraTarget: root.localToWorld(new Vector3().fromArray(view.cameraTarget)).toArray() } : view)
+    this.cameraRig.showReference(root ? { cameraPosition: root.localToWorld(new Vector3().fromArray(view.cameraPosition)).toArray(), cameraTarget: root.localToWorld(new Vector3().fromArray(view.cameraTarget)).toArray() } : view, this.layoutViewport())
+  }
+  private layoutViewport() {
+    const canvas = this.canvas.getBoundingClientRect()
+    const region = this.canvas.closest('.viewer-stage')?.querySelector('.layout-workspace')?.getBoundingClientRect()
+    const active = region && region.width > 0 && region.height > 0 ? region : canvas
+    return { width: active.width, height: active.height, left: active.left - canvas.left, top: active.top - canvas.top, fullWidth: canvas.width, fullHeight: canvas.height }
   }
   returnReference(): void { if (this.reference) this.showReference(this.reference); else this.cameraRig.reset() }
   focusEntity(id: string): void {
     if (!this.semanticScene) return
     const anchor = this.semanticScene.getEntity(id).focusAnchor
-    this.cameraRig.focusPoint(anchor ? this.semanticScene.getWorldPoint(anchor) : this.semanticScene.getWorldPosition(id))
+    this.semanticScene.root.updateWorldMatrix(true, true)
+    const bounds = new Box3()
+    for (const object of this.semanticScene.getSupportingObjects(id)) bounds.expandByObject(object)
+    const radius = bounds.isEmpty() ? undefined : bounds.getSize(new Vector3()).length() * (anchor ? .12 : .5)
+    this.cameraRig.focusPoint(anchor ? this.semanticScene.getWorldPoint(anchor) : this.semanticScene.getWorldPosition(id), radius)
   }
   private pick(x: number, y: number): Selection {
     if (!this.semanticScene || !this.semanticPresentation || this.lighting.comparing) return null

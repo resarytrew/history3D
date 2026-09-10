@@ -30,6 +30,9 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
   if (!content) throw new Error(`Exhibit ${exhibit.id} has no usable content record`)
 
   const viewerRef = useRef<ExhibitViewerHandle>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
+  const [structureQuery, setStructureQuery] = useState('')
+  const [panelsHidden, setPanelsHidden] = useState(false)
   const sourcesTriggerRef = useRef<HTMLButtonElement | null>(null)
   const narration = useNarration(content.narration, locale)
   const thumbnails = Object.fromEntries(
@@ -43,6 +46,15 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
     document.documentElement.lang = locale
   }, [locale])
 
+  useEffect(() => {
+    const shortcut = (event: KeyboardEvent) => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || (event.target instanceof HTMLElement && event.target.isContentEditable)) return
+      if (searchRef.current) { event.preventDefault(); setPanelsHidden(false); requestAnimationFrame(() => searchRef.current?.focus()) }
+    }
+    window.addEventListener('keydown', shortcut)
+    return () => window.removeEventListener('keydown', shortcut)
+  }, [])
+
   const selectHotspot = useCallback((hotspot: Hotspot) => {
     setSelectedHotspot(hotspot)
     viewerRef.current?.focusHotspot(hotspot)
@@ -52,6 +64,11 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
     setSourcesOpen(false)
     window.requestAnimationFrame(() => sourcesTriggerRef.current?.focus())
   }, [setSourcesOpen])
+
+  const openSources = () => {
+    sourcesTriggerRef.current = document.activeElement instanceof HTMLButtonElement ? document.activeElement : null
+    setSourcesOpen(true)
+  }
 
   const toggleCompare = () => {
     const next = !compareScale
@@ -71,6 +88,8 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
 
   const selectExhibit = (id: string) => {
     narration.stop()
+    setStructureQuery('')
+    setPanelsHidden(false)
     changeExhibit(id)
   }
 
@@ -84,24 +103,19 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
   }
 
   return (
-    <main className={`museum-shell ${exhibit.reconstruction.type === 'source-based-reconstruction' ? 'studio-exhibit' : ''}`}>
-      <picture className="scene-background" aria-hidden="true">
-        <source media="(max-width: 720px), (orientation: portrait)" srcSet={exhibit.assets.backgrounds.portrait} />
-        <img src={exhibit.assets.backgrounds.landscape} alt="" />
-      </picture>
-      <div className="scene-vignette" aria-hidden="true" />
-
+    <main className={`museum-shell ${exhibit.reconstruction.type === 'source-based-reconstruction' ? 'studio-exhibit' : ''} ${exhibit.semantics ? 'semantic-exhibit' : ''} ${panelsHidden ? 'panels-hidden' : ''}`}>
       <header className="museum-header">
         <div className="collection-navigation">
           <Brand subtitle={content.collectionLabel} />
-          <select className="collection-select" aria-label={locale === 'ru' ? 'Коллекция' : 'Collection'} value={collection.id} onChange={(event) => {
+          {collections.length > 1 && <select className="collection-select" aria-label={locale === 'ru' ? 'Коллекция' : 'Collection'} value={collection.id} onChange={(event) => {
             const next = collections.find((item) => item.id === event.target.value)
             if (next) selectExhibit(next.defaultExhibitId)
           }}>
             {collections.map((item) => <option key={item.id} value={item.id}>{locale === 'en' ? (getExhibit(item.defaultExhibitId)?.content.en?.collectionLabel ?? item.title) : item.title}</option>)}
-          </select>
+          </select>}
         </div>
         <div className="top-controls">
+          {exhibit.semantics && <label className="structure-search"><Icon name="search" /><input ref={searchRef} type="search" aria-label={locale === 'ru' ? 'Найти деталь' : 'Find a structure'} placeholder={locale === 'ru' ? 'Найти деталь' : 'Find a structure'} value={structureQuery} onChange={event => setStructureQuery(event.target.value)} onKeyDown={event => { if (event.key === 'Escape') { setStructureQuery(''); event.currentTarget.blur() } }} /><kbd>/</kbd></label>}
           <button className="top-button language-button" type="button" onClick={() => {
             setSelectedHotspot(null)
             setResearchOpen(false)
@@ -110,29 +124,31 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
           }} aria-label="Переключить язык">
             <Icon name="globe" />{locale.toUpperCase()}
           </button>
-          <button className={`top-button scale-button ${compareScale ? 'is-active' : ''}`} type="button" onClick={toggleCompare} aria-pressed={compareScale}>
-            <Icon name="scale" />{ui.compareScale}
-          </button>
-          <button className="top-button icon-only" type="button" onClick={resetView} aria-label={ui.reset} title={ui.reset}><Icon name="reset" /></button>
-          <button className="top-button icon-only" type="button" onClick={() => void enterFullscreen()} aria-label={ui.fullscreen} title={ui.fullscreen}><Icon name="expand" /></button>
+          <button className="top-button icon-only" type="button" onClick={openSources} aria-label={locale === 'ru' ? 'Об экспонате и источниках' : 'About this exhibit and sources'} title={ui.sources}><Icon name="info" /></button>
         </div>
       </header>
+
+      <nav className="viewer-tools" aria-label={locale === 'ru' ? 'Управление видом' : 'View controls'}>
+        <button type="button" onClick={() => setPanelsHidden(!panelsHidden)} aria-pressed={panelsHidden} aria-label={locale === 'ru' ? (panelsHidden ? 'Показать панели' : 'Скрыть панели') : (panelsHidden ? 'Show panels' : 'Hide panels')} title={locale === 'ru' ? (panelsHidden ? 'Показать панели' : 'Скрыть панели') : (panelsHidden ? 'Show panels' : 'Hide panels')}><Icon name="eye" /></button>
+        <button type="button" onClick={resetView} aria-label={ui.reset} title={ui.reset}><Icon name="reset" /></button>
+        <button className={compareScale ? 'is-active' : ''} type="button" onClick={toggleCompare} aria-label={ui.compareScale} title={ui.compareScale} aria-pressed={compareScale}><Icon name="scale" /></button>
+        <span className="viewer-tools-divider" />
+        <button type="button" onClick={() => void enterFullscreen()} aria-label={ui.fullscreen} title={ui.fullscreen}><Icon name="expand" /></button>
+      </nav>
 
       <Suspense fallback={(
         <div className="viewer-stage viewer-suspense" data-state="loading" aria-busy="true" aria-label={ui.preparing}>
           <ViewerLoading />
         </div>
       )}>
-        <ExhibitViewer ref={viewerRef} exhibit={exhibit} selectedHotspotId={selectedHotspot?.id ?? null} onSelectHotspot={selectHotspot} />
+        <ExhibitViewer ref={viewerRef} exhibit={exhibit} structureQuery={structureQuery} selectedHotspotId={selectedHotspot?.id ?? null} onSelectHotspot={selectHotspot} />
       </Suspense>
 
-      <div className="left-panel-wrap">
+      <div className={`left-panel-wrap ${researchOpen ? 'is-research' : ''}`}>
         {researchOpen ? (
           <ResearchFlow content={content} onClose={() => setResearchOpen(false)} />
         ) : (
-          <div ref={(node) => {
-            sourcesTriggerRef.current = node?.querySelector<HTMLButtonElement>('.button-icon-label') ?? null
-          }}>
+          <div>
             <ExhibitInfo
               content={content}
               isScan={exhibit.reconstruction.type === 'scan'}
@@ -140,7 +156,7 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
               narrationState={narration.state}
               onNarration={() => void narration.toggle()}
               onResearch={() => setResearchOpen(true)}
-              onSources={() => setSourcesOpen(true)}
+              onSources={openSources}
             />
           </div>
         )}
@@ -155,10 +171,10 @@ function MuseumExperience({ locale, setLocale }: { readonly locale: Locale; read
         onSelect={selectCollectionEntry}
       />
 
-      <aside className="exhibit-mode" aria-label={ui.exhibitMode}>
-        <span><Icon name="eye" /></span>
-        <div><strong>{ui.exhibitMode}</strong><p>{exhibit.category !== 'architecture' ? `${content.categoryLabel} • 360°` : ui.exterior}</p></div>
-      </aside>
+      <footer className="viewer-footer">
+        <p>{locale === 'ru' ? 'Перетащите, чтобы вращать · Масштабируйте жестом · Нажмите, чтобы исследовать' : 'Drag to orbit · Pinch to zoom · Tap to inspect'}</p>
+        <button type="button" onClick={openSources}>{locale === 'ru' ? 'Источники и авторство' : 'Sources & credits'}<Icon name="sources" /></button>
+      </footer>
 
       <div className="development-notice">
         {exhibit.reconstruction.type === 'scan' ? '3D-СКАН • CC BY 4.0' : exhibit.reconstruction.type === 'source-based-reconstruction' ? ui.pendingHistoricalReview : 'DEV_ONLY • не научная реконструкция'}

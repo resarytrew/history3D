@@ -38,3 +38,20 @@ it('shows virtual groups outside part-of and forbids physical actions for a feat
   expect(screen.queryByRole('button', { name: 'Isolate' })).toBeNull()
   expect(screen.queryByRole('button', { name: 'Open assembly' })).toBeNull()
 })
+
+it('searches localized structures, keeps their ancestors and navigates only matching branches', () => {
+  const onChange = vi.fn()
+  const props = { exhibit: russianPistol1798, state: assembledState, onChange, onFocus: vi.fn(), onReference: vi.fn() }
+  const { rerender } = render(<AssemblyControls {...props} searchQuery="ТУЛА" />)
+  const tree = screen.getByRole('tree')
+  expect(within(tree).getAllByRole('treeitem').map(item => item.getAttribute('aria-label'))).toEqual(['Пистолет', 'Кремнёвый замок', 'Замочная доска', 'Клеймо «ТУЛА 1803»'])
+  const root = within(tree).getByRole('treeitem', { name: 'Пистолет' })
+  root.focus(); fireEvent.keyDown(root, { key: 'ArrowRight' })
+  expect(within(tree).getByRole('treeitem', { name: 'Кремнёвый замок' })).toHaveFocus()
+  fireEvent.keyDown(document.activeElement!, { key: 'End' })
+  fireEvent.keyDown(document.activeElement!, { key: 'Enter' })
+  expect(onChange.mock.lastCall?.[0].selection).toEqual({ kind: 'entity', entityId: 'marking.tula-1803' })
+  rerender(<AssemblyControls {...props} searchQuery="несуществующая деталь" />)
+  expect(screen.getByRole('status')).toHaveTextContent('Ничего не найдено')
+  expect(within(tree).queryAllByRole('treeitem')).toHaveLength(0)
+})

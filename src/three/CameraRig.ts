@@ -11,6 +11,7 @@ interface Transition {
   fromTarget: Vector3
   toTarget: Vector3
 }
+export interface LayoutViewport { width: number; height: number; left: number; top: number; fullWidth: number; fullHeight: number }
 
 export class CameraRig {
   readonly camera = new PerspectiveCamera(34, 1, 0.05, 100)
@@ -25,6 +26,7 @@ export class CameraRig {
     this.controls.enableDamping = !this.motion.matches
     this.controls.dampingFactor = 0.065
     this.controls.enablePan = false
+    this.controls.zoomToCursor = true
     this.controls.minPolarAngle = 0.72
     this.controls.maxPolarAngle = 1.56
     this.controls.addEventListener('start', this.handleStart)
@@ -48,6 +50,7 @@ export class CameraRig {
     this.controls.minDistance = p.minDistance
     this.controls.maxDistance = p.maxDistance
     this.camera.near = Math.min(0.05, p.minDistance / 20)
+    this.camera.clearViewOffset()
     this.resize(this.camera.aspect)
     this.camera.position.copy(vector(p.cameraPosition))
     this.controls.target.copy(vector(p.cameraTarget))
@@ -67,8 +70,13 @@ export class CameraRig {
     this.move(hotspot.cameraPosition ? vector(hotspot.cameraPosition) : target.clone().add(new Vector3(4.4, 1.3, 6.4)), target)
   }
 
-  focusPoint(target: Vector3): void {
+  focusPoint(target: Vector3, radius?: number): void {
     const offset = this.camera.position.clone().sub(this.controls.target)
+    if (radius && radius > 0) {
+      const halfFov = Math.atan(Math.tan(this.camera.fov * Math.PI / 360) / this.camera.zoom)
+      const distance = radius / Math.sin(halfFov) * 1.2
+      offset.setLength(Math.max(this.controls.minDistance, Math.min(this.controls.maxDistance, distance)))
+    }
     this.move(target.clone().add(offset), target)
   }
 
@@ -76,10 +84,14 @@ export class CameraRig {
     if (this.exhibit) this.move(vector(this.exhibit.presentation.cameraPosition), vector(this.exhibit.presentation.cameraTarget))
   }
 
-  showReference(view: ReferenceView): void {
+  showReference(view: ReferenceView, viewport?: LayoutViewport): void {
     this.clearDamping()
     this.transition = null
-    this.camera.zoom = 1
+    this.camera.clearViewOffset()
+    this.camera.zoom = viewport ? viewport.height / viewport.fullHeight : 1
+    if (viewport) this.camera.setViewOffset(viewport.fullWidth, viewport.fullHeight,
+      viewport.fullWidth / 2 - (viewport.left + viewport.width / 2),
+      viewport.fullHeight / 2 - (viewport.top + viewport.height / 2), viewport.fullWidth, viewport.fullHeight)
     this.camera.updateProjectionMatrix()
     this.controls.maxDistance = Math.max(this.exhibit?.presentation.maxDistance ?? 3, vector(view.cameraPosition).distanceTo(vector(view.cameraTarget)) * 4)
     this.camera.position.copy(vector(view.cameraPosition)); this.controls.target.copy(vector(view.cameraTarget))

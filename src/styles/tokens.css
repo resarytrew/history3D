@@ -1,20 +1,20 @@
 :root {
-  --historia-bg: #dbe5e4;
-  --historia-panel: #f5f0e7;
-  --historia-panel-strong: #fffdf8;
-  --historia-text: #183a31;
-  --historia-muted: #62706a;
-  --historia-accent: #185442;
-  --historia-accent-strong: #0e3d31;
-  --historia-border: rgba(28, 57, 48, 0.22);
+  --historia-bg: #f0f2f3;
+  --historia-panel: #ffffff;
+  --historia-panel-strong: #ffffff;
+  --historia-text: #252c32;
+  --historia-muted: #73818f;
+  --historia-accent: #283f4b;
+  --historia-accent-strong: #1c303b;
+  --historia-border: #e3e8ec;
   --historia-danger: #8a3c31;
   --historia-evidence-scan: #315f72;
   --historia-evidence-reconstruction: #42654d;
   --historia-evidence-inference: #9a7038;
   --historia-evidence-unknown: #7d6960;
   --historia-gold: #d6ad58;
-  --historia-shadow: 0 24px 70px rgba(18, 40, 34, 0.18);
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --historia-shadow: 0 16px 40px rgba(36, 52, 65, 0.06);
+  --font-display: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+  --font-ui: 'Segoe UI', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 

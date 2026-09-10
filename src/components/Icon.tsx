@@ -1,11 +1,13 @@
 import type { SVGProps } from 'react'
 
 interface IconProps extends SVGProps<SVGSVGElement> {
-  readonly name: 'audio' | 'search' | 'sources' | 'reset' | 'expand' | 'scale' | 'globe' | 'eye' | 'close' | 'arrow' | 'cube'
+  readonly name: 'audio' | 'search' | 'sources' | 'reset' | 'expand' | 'scale' | 'globe' | 'eye' | 'close' | 'arrow' | 'cube' | 'info' | 'isolate'
 }
 
 export function Icon({ name, ...props }: IconProps) {
   const paths = {
+    info: <><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.1"/></>,
+    isolate: <><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3"/><circle cx="12" cy="12" r="3"/></>,
     audio: <><path d="M4 14v-4a8 8 0 0 1 16 0v4"/><path d="M4 14a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2v-2Zm16 0a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2v-2Z"/></>,
     search: <><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></>,
     sources: <><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h6"/></>,

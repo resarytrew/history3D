@@ -13,13 +13,14 @@ export interface ExhibitViewerHandle {
 }
 
 interface ExhibitViewerProps {
+  readonly structureQuery?: string
   readonly exhibit: Exhibit
   readonly selectedHotspotId: string | null
   readonly onSelectHotspot: (hotspot: Hotspot) => void
 }
 
 export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>(
-  function ExhibitViewer({ exhibit, selectedHotspotId, onSelectHotspot }, ref) {
+  function ExhibitViewer({ exhibit, structureQuery = '', selectedHotspotId, onSelectHotspot }, ref) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const ui = useUi()
     const controllerRef = useRef<ViewerController | null>(null)
@@ -103,6 +104,7 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
     return (
       <div className={`viewer-stage ${exhibit.semantics ? 'semantic-stage' : ''}`} data-state={error ? 'error' : ready ? 'ready' : 'loading'} aria-busy={!ready && !error} aria-label={`Интерактивная 3D-модель: ${exhibit.content.ru?.title ?? exhibit.id}`}>
         <div className="canvas-workspace"><canvas ref={canvasRef} className="viewer-canvas" tabIndex={ready && !error ? 0 : -1} aria-label={ui.viewerLabel} /></div>
+        {exhibit.semantics && <div className="layout-workspace" aria-hidden="true" />}
         <div ref={hotspotLayerRef} className="hotspot-layer" aria-label="Точки исследования">
           {!exhibit.semantics && exhibit.hotspots.map((hotspot) => (
               <button
@@ -120,7 +122,7 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
               </button>
           ))}
         </div>
-        {ready && !error && exhibit.semantics && <AssemblyControls key={exhibit.id} exhibit={exhibit} state={semanticState}
+        {ready && !error && exhibit.semantics && <AssemblyControls key={exhibit.id} exhibit={exhibit} state={semanticState} searchQuery={structureQuery}
           onChange={changeSemanticState} onFocus={id => controllerRef.current?.focusEntity(id)} onReference={() => controllerRef.current?.returnReference()} />}
         {assemblyError && <p className="assembly-error" role="alert">{ui.assemblyUnavailable}</p>}
         {!ready && !error && <ViewerLoading />}
