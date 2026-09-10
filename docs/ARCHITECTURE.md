@@ -1,59 +1,79 @@
 # Архитектура
 
-## Решение
+[← Документация](README.md)
 
-HISTORIA 3D — статическое React/Vite-приложение без backend. `MuseumApp` компонует интерфейс, `useMuseumController` управляет UI-state через reducer. `ViewerController` связывает отдельные подсистемы Three.js и владеет canvas/renderer/scene.
+HISTORIA 3D — статическое приложение React/Vite. Content packages описывают экспонаты, React компонует интерфейс, а отдельные подсистемы Three.js управляют моделью и её представлением.
 
-```text
-src/app/MuseumApp
-  ├─ state/useMuseumController → museum-state / exhibit-url
-  ├─ content/catalog → collection → Exhibit
-  ├─ ExhibitInfo / ResearchFlow / ProvenanceDrawer
-  ├─ ExhibitCarousel
-  └─ ExhibitViewer
-       └─ ViewerController
-            ├─ CameraRig (OrbitControls, transitions, reduced motion)
-            ├─ LightingRig (environment, contact shadow, scale figure)
-            ├─ ModelHost → model-runtime (GLB | procedural)
-            ├─ HotspotSystem (surface anchors, projection, occlusion)
-            └─ RenderScheduler (requestAnimationFrame only when needed)
-```
-
-## Файловая структура
+## Слои
 
 ```text
-src/
-  app/                 composition
-  components/          small shared UI primitives
-  content/             types, registry, collections, exhibit packages
-  features/            viewer, info, carousel, hotspots, narration, provenance
-  state/               UI reducer/controller, URL helpers, latest-request coordinator
-  three/               factories, loader, disposal, camera conventions
-  styles/              tokens, global and responsive layouts
-  utils/               pure utilities
-scripts/               content and production-boundary validation
-tests/ e2e/            unit/integration and browser flows
+MuseumApp
+├─ useMuseumController → museum-state / exhibit-url
+├─ content/catalog → коллекция → Exhibit
+├─ сведения / исследование / источники / карусель
+└─ ExhibitViewer
+   ├─ SemanticState → AssemblyControls → дерево / карточка
+   └─ ViewerController
+      ├─ ModelHost → model-runtime → GLB | lazy factory
+      ├─ SemanticSceneIndex → frames / ownership / anchors
+      ├─ SemanticPicker → resolveSelection
+      ├─ SemanticPresentation → материалы / видимость / picking-policy
+      ├─ AssemblyLayoutSolver → AssemblyPose → AssemblySystem
+      ├─ CameraRig / LightingRig
+      ├─ HotspotSystem — для несемантических экспонатов
+      └─ RenderScheduler
 ```
 
-## Viewer contract
+## Владение состоянием
 
-`ExhibitModel` is a discriminated union. A GLB descriptor gives `src`; a procedural descriptor gives stable `factoryId`. Both resolve to `LoadedExhibitModel { root, dispose }`. Coordinates are right-handed Three.js: +Y up, +Z toward the initial camera, model origin at ground-centre. Hotspot `position`, `cameraTarget` and optional `cameraPosition` use model-local metres.
+`useMuseumController` хранит состояние оболочки: активный экспонат, выбранный hotspot, панели, сравнение масштаба и сообщения. URL меняется через History API; `popstate` использует тот же сценарий смены экспоната.
 
-Every load receives an `AbortSignal` and monotonic token. GLB fetch is cancellable; parsing that finishes after replacement disposes its result. Only the newest token may commit; stale errors never replace the current scene with an error. ModelHost owns roots, LightingRig owns light/shadow/environment resources, CameraRig owns controls and its media-query listener. Unmount cancels scheduled frames, disconnects ResizeObserver, removes handlers and disposes all subsystems and the renderer.
+`ExhibitViewer` хранит единый `SemanticState`: `selection`, `displayMode`, `assemblyContext`. Дерево, карточка и runtime получают его через общую команду. Runtime держит применённое представление и переходы; hover остаётся локальным runtime-состоянием. Самостоятельного React-state `selectedEntityId` нет.
 
-`RenderScheduler.invalidate()` coalesces work into one frame. Camera movement/damping requests subsequent frames; a settled scene has no pending RAF. Resize, model readiness, controls and comparison invalidate the frame. Context loss pauses scheduling and reports the existing viewer error. The scheduler accepts an injected frame clock for isolated tests.
+Выбор и камера разделены. Переход в layout может рассчитать позу и reference view; обычный выбор solver не запускает и камеру не двигает.
 
-`museumReducer` atomically resets the selected hotspot, drawers, comparison and announcement on exhibit changes. `useMuseumController` owns callbacks and toast cleanup. The exhibit URL is normalized with `replaceState` at entry, changed with `pushState` on selection, and read on `popstate`. Unknown ids fall back to the first collection default. Path, unrelated query parameters and hash survive. Collection selection uses the same action. Future state/actions can be added to the reducer and URL helpers; Assembly behavior is not present.
+## Семантика и представление
 
-## Publication boundary
+**`part-of` описывает предмет; `Exhibit.assembly` описывает способ его исследования.**
 
-Review build may include `developmentOnly` models. Production validation accepts only `published` exhibits, complete sources, review records, credits and non-development assets. Original references belong in ignored `assets/source-references`; candidate work belongs in ignored `assets/candidates`; runtime content lives only in an approved package.
+`SemanticSceneIndex` проверяет IDs, parent-связи и исключительное владение геометрией. Для semantic entities создаются frames, а исходная геометрия подключается через замороженные промежуточные группы. Это сохраняет импортированные transforms.
 
-## Risks and mitigations
+`AssemblyLayoutSolver` получает снимки локальных bounds и baseline matrices, конфигурацию и workspace в CSS px. Он не изменяет сцену. `AssemblySystem` применяет абсолютные смещения относительно baseline и интерполирует их за 550 мс. Потомок наследует итоговое смещение родителя либо заменяет его явным offset.
 
-- Historical overclaim: typed evidence and claim-level sources; unknowns remain explicit.
-- Temporary model mistaken for history: persistent DEV badge and blocked production build.
-- GPU leaks: single controller owner, abort/dispose protocol and repeated-switch E2E.
-- Mobile clipping: independent portrait composition and safe-area fit.
-- Adding a new object rewrites UI: catalog and package contracts keep object knowledge out of app components.
-- GLB variability: normalization contract, coordinate convention, size/triangle budgets and explicit loader errors. Loading uses the existing indicator.
+Виртуальная группа может объединять несколько частей для исследования. Она не появляется в semantic tree или breadcrumb. [Подробные контракты и алгоритм →](SEMANTIC_ASSEMBLY.md)
+
+## Загрузка и ресурсы
+
+`ExhibitModel` — union GLB/procedural. Оба пути возвращают `LoadedExhibitModel { root, dispose }`. Procedural factories загружаются лениво через `proceduralModelRegistry`.
+
+Загрузкой управляют AbortSignal и правило latest-request-wins. Устаревший результат освобождается и не заменяет текущую сцену. ModelHost владеет моделью, LightingRig — освещением и окружением, CameraRig — OrbitControls и переходами, SemanticPresentation — собственными копиями материалов.
+
+Unmount останавливает планировщик, отключает ResizeObserver и listeners, освобождает подсистемы и renderer. Обычная очистка не вызывает принудительную потерю WebGL-контекста, чтобы повторное подключение в StrictMode оставалось корректным.
+
+## Отрисовка и взаимодействие
+
+`RenderScheduler.invalidate()` объединяет запросы в один кадр. Камера, damping и анимация поз поддерживают следующие кадры; в покое непрерывного RAF нет. Контекст WebGL2 запрашивается явно. При потере контекста показывается ошибка.
+
+Picker рассматривает ближайшую видимую поверхность. Пропуск разрешён только явной policy `pick-through`; opacity недостаточно. Hover ограничен одним raycast за кадр. Порог click/drag считается по максимальному отклонению за весь жест.
+
+Workspace исключает панели. Layout пересчитывается при переходе и после resize с debounce 150 мс. Гарантия зазора относится к конечной позе в reference view.
+
+## Каталог и публикация
+
+`content/catalog.ts` содержит три активных экспоната одной review-коллекции. `suspended-catalog.ts` хранит два отключённых пакета без runtime-импорта. Валидатор отдельно проверяет оба набора.
+
+Активность в review-каталоге и статус `published` — разные понятия. Production-проверка требует опубликованных записей и запрещает DEV_ONLY. Текущий каталог не является прошедшей production-публикацией.
+
+## Навигация по исходникам
+
+| Путь | Ответственность |
+| --- | --- |
+| `src/app/`, `src/state/` | Компоновка музея, reducer, URL и загрузочные координаторы |
+| `src/content/` | Контракты, схемы, валидация, коллекции и пакеты |
+| `src/features/` | Посетительский интерфейс и React-обвязка viewer |
+| `src/three/` | Загрузка, сцена, выбор, позы, освещение и disposal |
+| `src/i18n/`, `src/styles/` | UI-тексты и оформление |
+| `scripts/` | Валидация, авторинг, экспорт и контрольные рендеры |
+| `tests/`, `e2e/` | Unit/integration и браузерные сценарии |
+
+Backend, CMS, физическая симуляция и редактор схем не входят в текущую архитектуру runtime.

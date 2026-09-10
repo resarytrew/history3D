@@ -1,29 +1,67 @@
-# Content schema
+# Контракты данных
 
-Главные сущности: `Exhibit`, `HistoricalSource`, `EvidenceItem`, `Hotspot`, `ReconstructionRecord`, `Credit`, `StudentAuthor`, `Collection`. Русский и английский контент — отдельные полные записи; исторический текст не смешивается с UI translations.
+[← Документация](README.md)
 
-`ClaimKind` поддерживает `FACT`, `DERIVED`, `RECONSTRUCTION`, `UNKNOWN`; прежнее `INFERENCE` сохранено для совместимости существующих пакетов. `DERIVED` обозначает вычисление из исходных данных и не выдаётся за отдельно измеренный факт. `uniform` — категория обмундирования. Несколько коллекций регистрируются в `catalog.ts`; lazy procedural factories — в `three/proceduralModelRegistry.ts`.
+Источники истины: [types.ts](../src/content/types.ts), [semantics.ts](../src/content/semantics.ts), [assembly.ts](../src/content/assembly.ts), [schema.ts](../src/content/schema.ts) и [validation.ts](../src/content/validation.ts).
 
-Publication lifecycle: `draft → research → reconstruction → historical-review → technical-review → approved → published`. Обычная public collection содержит только `published`; review build может показывать остальные с явным статусом.
+## Пакет экспоната
 
-Версии реконструкции неизменяемы по смыслу: version, date, summary, evidence changes, model hash и reviewers. Это позволяет показать, как историческое знание уточняется.
+`Exhibit` объединяет идентичность, chronology/geography, reconstruction record, модель, presentation, hotspots, RU/EN content, sources, credits и assets. Необязательные `semantics`, `annotations` и `assembly` подключают прямое исследование структуры.
 
-## Runtime-проверка
+| Контракт | Назначение |
+| --- | --- |
+| `HistoricalSource` | Библиография или музейная запись, адрес, дата обращения, оговорки |
+| `EvidenceItem` | Утверждение, тип, confidence, sourceIds и точные sourceRefs |
+| `ReconstructionVersion` | Версия, дата, summary, status, необязательный modelHash |
+| `Hotspot` | Пространственная точка, наблюдение и evidence references для прежнего UI |
+| `SemanticEntity` | Стабильный ID, kind, parentId, geometry binding и focusAnchor |
+| `EntityAnnotation` | Материал о сущности, независимый от места наблюдения |
+| `AssemblyConfig` | Reference view и именованные схемы представления |
+| `Credit` | Роль автора/группы и сведения об использовании материалов |
 
-`src/content/schema.ts` содержит Zod-схемы реальных значений: экспоната, источников, evidence, версий, hotspots, GLB/procedural descriptor, presentation, credits, assets, RU/EN visitor content и коллекций. Проверяются конечные числа/векторы, даты, HTTPS-ссылки, обязательные строки и диапазоны камеры.
+`ExhibitModel` различает `{ kind: 'glb', src, normalization? }` и `{ kind: 'procedural', factoryId, developmentOnly, approximateTriangles }`. Поле в типе ещё не означает готовую runtime-функцию: например, загрузчик сейчас не подключает Draco-декодер только по наличию `dracoDecoderPath`.
 
-`src/content/validation.ts` независимо выполняет schema- и graph-проходы: уникальные id/slug/номера точек, sourceIds/sourceRefs, evidenceIds, коллекции и их default/entries. Повреждённое поле не скрывает остальные ошибки. Production принимает только published, запрещает DEV_ONLY и требует полноценные источники и английскую запись.
+## Утверждения и статусы
 
-`scripts/validate-content.ts` загружает исходные модули через Vite SSR, включая реальные asset imports, и сравнивает пакеты с каталогом. Затем проверяет существование/ненулевой размер файлов, размещение внутри репозитория и наличие procedural factory. Asset-проверки продолжаются при ошибках других полей. Сетевой доступ к внешним assets не является условием воспроизводимой сборки; синтаксис URL проверяется схемой.
+`ClaimKind`: `FACT`, `DERIVED`, `INFERENCE`, `RECONSTRUCTION`, `UNKNOWN`. Уровень уверенности хранится отдельно: `high | medium | low | unknown`.
 
-SSR-валидатор использует отдельный `node_modules/.vite-content-validation`. Общий с dev-сервером кэш Vite использовать нельзя: пересоздание оптимизированных зависимостей ломает ещё не загруженные dynamic imports в открытом viewer. Регрессионный E2E запускает валидацию между показом GLB и первой загрузкой procedural factory в том же документе.
-
-Ошибки собираются в один отчёт, например:
+Жизненный цикл записи:
 
 ```text
-Exhibit: russian-musket-1808
-Field: reconstruction.known[2].sourceIds[0]
-Error: Unknown source id "missing-source"
+draft → research → reconstruction → historical-review
+      → technical-review → approved → published
 ```
 
-`npm run validate:content` — review-проверка. `npm run build:production` запускает тот же граф в production-режиме до компиляции; статусы исследований не повышаются автоматически ради успешной сборки.
+Это статусы данных, а не автоматический процесс согласования. Review-сборка может показывать неопубликованную запись; production validator её отклонит.
+
+## Семантические сущности
+
+`kind` различает `object`, `assembly`, `part`, `region`, `feature`. `parentId` описывает историческое отношение принадлежности. `geometry.objectNames` задаёт владение именованными объектами модели; для физической части binding обязателен.
+
+Region/feature могут не иметь собственной геометрии. Их `focusAnchor.entityId` должен совпадать с ID сущности. При авторинге мировая точка переводится в её frame через `anchorFromWorld`, даже если луч попал в mesh несущей детали.
+
+Прежнее `explodeOffset` сохраняется в типах для совместимости данных. Новый Assembly им не управляется: целевые смещения задаются через `AssemblyPose`.
+
+## Аннотации
+
+`EntityAnnotation.entityId` определяет, **о чём материал**. Необязательный `anchor` определяет, **где наблюдать**. Эти ссылки могут различаться. Нельзя автоматически назначать весь текст владельцу mesh, в который попал луч.
+
+Сохраняются ID, описание, observationQuestion и evidenceIds. Материалы о целом показываются отдельно от описания выбранной детали. Для пистолета аудит шести исходных материалов закреплён тестами.
+
+## Представление Assembly
+
+Группа содержит ID, RU/EN label, `selectionTarget`, `memberEntityIds`, `moveEntityIds`, экранное `preferredDirection`, необязательные `fixed` и `drilldownLayoutId`. Группы с несколькими семантическими соответствиями выбираются как `layout-group`.
+
+`AssemblyPose.offsets` хранит суммарные абсолютные смещения относительно baseline. Дубли не перезаписываются: фабрика позы отклоняет их до создания Map. Конфигурация не меняет `part-of`.
+
+[Полная спецификация →](SEMANTIC_ASSEMBLY.md)
+
+## Валидация
+
+Zod проверяет форму значений, строки, конечные векторы, даты и URL. Независимые graph-проходы проверяют ссылки и уникальность, semantic parents, memberships, move frames, переходы layouts и evidence.
+
+`validate-content.ts` загружает реальные модули через Vite SSR, проверяет обязательные файлы пакетов и assets, активный и отключённый каталоги, регистрацию factories. Отдельный кэш SSR не должен нарушать lazy imports открытого dev-viewer.
+
+Текущая схема по-прежнему требует `hotspots` с минимум тремя элементами и файл `hotspots.ts` даже у семантического пакета. Runtime пистолета не рисует эти кружки, но удалять legacy-поле без миграции схемы нельзя. Точно так же файл `content.en.ts` обязателен для пакета, хотя `Exhibit.content.en` в review-схеме необязателен.
+
+Автоматический валидатор не проверяет содержание внешнего источника и не заменяет историческую экспертизу.

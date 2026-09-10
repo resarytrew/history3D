@@ -1,5 +1,7 @@
 # Pokrov-na-Nerli procedural reconstruction spec
 
+> **Спецификация сохранённого экспериментального пакета.** Покров на Нерли исключён из активного runtime-каталога. Пропорции и ограничения ниже относятся к ранней DEV_ONLY-модели, а не к натурному обмеру. [Текущая архитектура](ARCHITECTURE.md) · [Документация](README.md).
+
 Method: reference analysis → macro/meso/micro decomposition → blockout → structure → form → material → review → correction. The workflow follows the locally audited `img2threejs` authoring methodology; no package code or runtime dependency is copied.
 
 ## Coordinate and scale convention
@@ -50,4 +52,3 @@ Method: reference analysis → macro/meso/micro decomposition → blockout → s
 - Side views must expose real depth, side portals and the facade rhythm.
 - Rear view must reveal three independent apses, proving it is not a billboard or textured plane.
 - Remaining uncertainty is explicitly historical: this is a source-guided interpretive reconstruction, not a scan or measured conservation model.
-
