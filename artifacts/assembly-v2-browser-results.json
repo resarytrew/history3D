@@ -1,0 +1,491 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "e2e/assembly.spec.ts",
+      "e2e/pistol.spec.ts",
+      "e2e/content-validation.spec.ts",
+      "e2e/viewer-lifecycle.spec.ts",
+      "--reporter=json"
+    ],
+    "configFile": "C:\\Users\\enekr\\OneDrive\\Документы\\HISTORY3D\\playwright.config.ts",
+    "rootDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile",
+        "name": "mobile",
+        "testDir": "C:/Users/enekr/OneDrive/Документы/HISTORY3D/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --host 127.0.0.1 --port 4173",
+      "url": "http://127.0.0.1:4173",
+      "reuseExistingServer": true
+    }
+  },
+  "suites": [
+    {
+      "title": "assembly.spec.ts",
+      "file": "assembly.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "named layouts, virtual groups, keyboard tree and exhibit replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 32867,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:12:45.929Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d88d8e7e612b907d803e-a663f8cc49b811648ccd",
+          "file": "assembly.spec.ts",
+          "line": 4,
+          "column": 1
+        },
+        {
+          "title": "actual GLB snapshots solve all layouts at supported CSS sizes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20711,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:13:18.896Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "glb-layout-results",
+                      "contentType": "application/json",
+                      "body": "ewogICJyZXN1bHRzIjogWwogICAgewogICAgICAid2lkdGgiOiAzMDQsCiAgICAgICJsYXlvdXQiOiAib3ZlcnZpZXciLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImNvcnJlY3RpdmUtc29sdmUiLAogICAgICAgICJmYWxsYmFjayIsCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDMwNCwKICAgICAgImxheW91dCI6ICJsb2NrIiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiAzMDQsCiAgICAgICJsYXlvdXQiOiAidHJpZ2dlciIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfSwKICAgIHsKICAgICAgIndpZHRoIjogMzc0LAogICAgICAibGF5b3V0IjogIm92ZXJ2aWV3IiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJjb3JyZWN0aXZlLXNvbHZlIiwKICAgICAgICAiZmFsbGJhY2siLAogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiAzNzQsCiAgICAgICJsYXlvdXQiOiAibG9jayIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfSwKICAgIHsKICAgICAgIndpZHRoIjogMzc0LAogICAgICAibGF5b3V0IjogInRyaWdnZXIiLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDQxMCwKICAgICAgImxheW91dCI6ICJvdmVydmlldyIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiY29ycmVjdGl2ZS1zb2x2ZSIsCiAgICAgICAgImZhbGxiYWNrIiwKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfSwKICAgIHsKICAgICAgIndpZHRoIjogNDEwLAogICAgICAibGF5b3V0IjogImxvY2siLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDQxMCwKICAgICAgImxheW91dCI6ICJ0cmlnZ2VyIiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiA5MjIsCiAgICAgICJsYXlvdXQiOiAib3ZlcnZpZXciLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDkyMiwKICAgICAgImxheW91dCI6ICJsb2NrIiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiA5MjIsCiAgICAgICJsYXlvdXQiOiAidHJpZ2dlciIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfQogIF0sCiAgInJlc2V0RXJyb3IiOiAwCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d88d8e7e612b907d803e-84b00467034080ac8fe6",
+          "file": "assembly.spec.ts",
+          "line": 49,
+          "column": 1
+        },
+        {
+          "title": "named layouts, virtual groups, keyboard tree and exhibit replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 65420,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:14:47.935Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d88d8e7e612b907d803e-920ee4461d2e2e30966d",
+          "file": "assembly.spec.ts",
+          "line": 4,
+          "column": 1
+        },
+        {
+          "title": "actual GLB snapshots solve all layouts at supported CSS sizes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 29003,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:15:53.468Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "glb-layout-results",
+                      "contentType": "application/json",
+                      "body": "ewogICJyZXN1bHRzIjogWwogICAgewogICAgICAid2lkdGgiOiAzMDQsCiAgICAgICJsYXlvdXQiOiAib3ZlcnZpZXciLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImNvcnJlY3RpdmUtc29sdmUiLAogICAgICAgICJmYWxsYmFjayIsCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDMwNCwKICAgICAgImxheW91dCI6ICJsb2NrIiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiAzMDQsCiAgICAgICJsYXlvdXQiOiAidHJpZ2dlciIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfSwKICAgIHsKICAgICAgIndpZHRoIjogMzc0LAogICAgICAibGF5b3V0IjogIm92ZXJ2aWV3IiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJjb3JyZWN0aXZlLXNvbHZlIiwKICAgICAgICAiZmFsbGJhY2siLAogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiAzNzQsCiAgICAgICJsYXlvdXQiOiAibG9jayIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfSwKICAgIHsKICAgICAgIndpZHRoIjogMzc0LAogICAgICAibGF5b3V0IjogInRyaWdnZXIiLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDQxMCwKICAgICAgImxheW91dCI6ICJvdmVydmlldyIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiY29ycmVjdGl2ZS1zb2x2ZSIsCiAgICAgICAgImZhbGxiYWNrIiwKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfSwKICAgIHsKICAgICAgIndpZHRoIjogNDEwLAogICAgICAibGF5b3V0IjogImxvY2siLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDQxMCwKICAgICAgImxheW91dCI6ICJ0cmlnZ2VyIiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiA5MjIsCiAgICAgICJsYXlvdXQiOiAib3ZlcnZpZXciLAogICAgICAib2siOiB0cnVlLAogICAgICAiZGlhZ25vc3RpY3MiOiBbCiAgICAgICAgImZpbmFsLXZhbGlkYXRpb24iCiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJ3aWR0aCI6IDkyMiwKICAgICAgImxheW91dCI6ICJsb2NrIiwKICAgICAgIm9rIjogdHJ1ZSwKICAgICAgImRpYWdub3N0aWNzIjogWwogICAgICAgICJmaW5hbC12YWxpZGF0aW9uIgogICAgICBdCiAgICB9LAogICAgewogICAgICAid2lkdGgiOiA5MjIsCiAgICAgICJsYXlvdXQiOiAidHJpZ2dlciIsCiAgICAgICJvayI6IHRydWUsCiAgICAgICJkaWFnbm9zdGljcyI6IFsKICAgICAgICAiZmluYWwtdmFsaWRhdGlvbiIKICAgICAgXQogICAgfQogIF0sCiAgInJlc2V0RXJyb3IiOiAwCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d88d8e7e612b907d803e-fe0e2696b4834fe9ba8c",
+          "file": "assembly.spec.ts",
+          "line": 49,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "content-validation.spec.ts",
+      "file": "content-validation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "runtime validation preserves lazy imports in an already open dev viewer",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 22120,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:13:39.689Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "runtime-validation",
+                      "contentType": "text/plain",
+                      "body": "Q29udGVudCB2YWxpZGF0aW9uIHBhc3NlZDogNSBwYWNrYWdlKHMpLCAzIHJldmlldyB3YXJuaW5nKHMpLgoobm9kZToxNDkyOCkgV2FybmluZzogVGhlICdOT19DT0xPUicgZW52IGlzIGlnbm9yZWQgZHVlIHRvIHRoZSAnRk9SQ0VfQ09MT1InIGVudiBiZWluZyBzZXQuCihVc2UgYG5vZGUgLS10cmFjZS13YXJuaW5ncyAuLi5gIHRvIHNob3cgd2hlcmUgdGhlIHdhcm5pbmcgd2FzIGNyZWF0ZWQpCihub2RlOjM2OTYpIFdhcm5pbmc6IFRoZSAnTk9fQ09MT1InIGVudiBpcyBpZ25vcmVkIGR1ZSB0byB0aGUgJ0ZPUkNFX0NPTE9SJyBlbnYgYmVpbmcgc2V0LgooVXNlIGBub2RlIC0tdHJhY2Utd2FybmluZ3MgLi4uYCB0byBzaG93IHdoZXJlIHRoZSB3YXJuaW5nIHdhcyBjcmVhdGVkKQpXYXJuaW5nOiBFeGhpYml0OiBwb2tyb3YtbmEtbmVybGkgLyBtb2RlbC5kZXZlbG9wbWVudE9ubHk6IERFVl9PTkxZIG1vZGVsIGluY2x1ZGVkIGluIHJldmlldzsgYmxvY2tlZCBmcm9tIHByb2R1Y3Rpb24KV2FybmluZzogRXhoaWJpdDogcnVzc2lhbi1tdXNrZXQtMTgwOCAvIG1vZGVsLmRldmVsb3BtZW50T25seTogREVWX09OTFkgbW9kZWwgaW5jbHVkZWQgaW4gcmV2aWV3OyBibG9ja2VkIGZyb20gcHJvZHVjdGlvbgpXYXJuaW5nOiBFeGhpYml0OiBydXNzaWFuLXNoYWtvLTE4MDggLyBtb2RlbC5kZXZlbG9wbWVudE9ubHk6IERFVl9PTkxZIG1vZGVsIGluY2x1ZGVkIGluIHJldmlldzsgYmxvY2tlZCBmcm9tIHByb2R1Y3Rpb24K"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e74f7a43fb96250dbf64-fd5bb26c08cbdcfd7d25",
+          "file": "content-validation.spec.ts",
+          "line": 9,
+          "column": 1
+        },
+        {
+          "title": "runtime validation preserves lazy imports in an already open dev viewer",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12009,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:16:22.496Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "runtime-validation",
+                      "contentType": "text/plain",
+                      "body": "Q29udGVudCB2YWxpZGF0aW9uIHBhc3NlZDogNSBwYWNrYWdlKHMpLCAzIHJldmlldyB3YXJuaW5nKHMpLgoobm9kZToyNjMzMikgV2FybmluZzogVGhlICdOT19DT0xPUicgZW52IGlzIGlnbm9yZWQgZHVlIHRvIHRoZSAnRk9SQ0VfQ09MT1InIGVudiBiZWluZyBzZXQuCihVc2UgYG5vZGUgLS10cmFjZS13YXJuaW5ncyAuLi5gIHRvIHNob3cgd2hlcmUgdGhlIHdhcm5pbmcgd2FzIGNyZWF0ZWQpCihub2RlOjI0NjE2KSBXYXJuaW5nOiBUaGUgJ05PX0NPTE9SJyBlbnYgaXMgaWdub3JlZCBkdWUgdG8gdGhlICdGT1JDRV9DT0xPUicgZW52IGJlaW5nIHNldC4KKFVzZSBgbm9kZSAtLXRyYWNlLXdhcm5pbmdzIC4uLmAgdG8gc2hvdyB3aGVyZSB0aGUgd2FybmluZyB3YXMgY3JlYXRlZCkKV2FybmluZzogRXhoaWJpdDogcG9rcm92LW5hLW5lcmxpIC8gbW9kZWwuZGV2ZWxvcG1lbnRPbmx5OiBERVZfT05MWSBtb2RlbCBpbmNsdWRlZCBpbiByZXZpZXc7IGJsb2NrZWQgZnJvbSBwcm9kdWN0aW9uCldhcm5pbmc6IEV4aGliaXQ6IHJ1c3NpYW4tbXVza2V0LTE4MDggLyBtb2RlbC5kZXZlbG9wbWVudE9ubHk6IERFVl9PTkxZIG1vZGVsIGluY2x1ZGVkIGluIHJldmlldzsgYmxvY2tlZCBmcm9tIHByb2R1Y3Rpb24KV2FybmluZzogRXhoaWJpdDogcnVzc2lhbi1zaGFrby0xODA4IC8gbW9kZWwuZGV2ZWxvcG1lbnRPbmx5OiBERVZfT05MWSBtb2RlbCBpbmNsdWRlZCBpbiByZXZpZXc7IGJsb2NrZWQgZnJvbSBwcm9kdWN0aW9uCg=="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e74f7a43fb96250dbf64-0cd022efb3820a361212",
+          "file": "content-validation.spec.ts",
+          "line": 9,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "pistol.spec.ts",
+      "file": "pistol.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "procedural pistol has direct interaction, orbit and localized structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 32894,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:14:01.835Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3588d5d52b6ccc8c1fda-8035b7f3e28b2045156e",
+          "file": "pistol.spec.ts",
+          "line": 4,
+          "column": 1
+        },
+        {
+          "title": "procedural pistol has direct interaction, orbit and localized structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 18319,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:16:34.526Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3588d5d52b6ccc8c1fda-215c7a9252cc7ed467ec",
+          "file": "pistol.spec.ts",
+          "line": 4,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "viewer-lifecycle.spec.ts",
+      "file": "viewer-lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "WebGL sleeps at rest, wakes for orbit, and reports context loss",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11550,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:14:34.795Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1574926bf4d9f48f9c41-dfbd1b3aea379d720898",
+          "file": "viewer-lifecycle.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "WebGL sleeps at rest, wakes for orbit, and reports context loss",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12523,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-09T19:16:52.867Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1574926bf4d9f48f9c41-282a100b1336055293f1",
+          "file": "viewer-lifecycle.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-09T19:12:44.413Z",
+    "duration": 262875.265,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

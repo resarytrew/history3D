@@ -4,6 +4,7 @@ import type { SemanticEntity } from '../src/content/semantics'
 import type { Hotspot } from '../src/content/types'
 import { SemanticSceneIndex, validateSemantics } from '../src/three/SemanticSceneIndex'
 import { AssemblySystem } from '../src/three/AssemblySystem'
+import { assemblyPose } from '../src/content/assembly'
 import { bindSurfaceAnchor } from '../src/three/hotspotProjection'
 
 function fixture() {
@@ -45,10 +46,10 @@ describe('semantic scene and absolute assembly transforms', () => {
     const before = index.getWorldPoint(anchor)
     const mesh = root.getObjectByName('face')!, meshBefore = mesh.getWorldPosition(new Vector3())
     const expectedDelta = new Vector3(.2, 0, .1).applyMatrix3(new Matrix3().setFromMatrix4(root.matrixWorld))
-    assembly.setAmount(1)
+    assembly.setPose(assemblyPose([['lock', [0, 0, .1]], ['frizzen', [.2, 0, .1]]]))
     expect(index.getWorldPoint(anchor).distanceTo(before.clone().add(expectedDelta))).toBeLessThan(1e-12)
     expect(mesh.getWorldPosition(new Vector3()).distanceTo(meshBefore.clone().add(expectedDelta))).toBeLessThan(1e-12)
-    for (let i = 0; i < 100; i++) { assembly.setAmount(.83); assembly.reset() }
+    for (let i = 0; i < 100; i++) { assembly.setPose(assemblyPose([['lock', [.1, 0, .3]], ['frizzen', [.2, 0, .1]]])); assembly.reset() }
     expect(index.getWorldPoint(anchor).distanceTo(before)).toBeLessThan(1e-12)
     expect(mesh.getWorldPosition(new Vector3()).distanceTo(meshBefore)).toBeLessThan(1e-12)
   })

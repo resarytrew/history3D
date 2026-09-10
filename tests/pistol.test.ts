@@ -1,11 +1,11 @@
 /// <reference types="node" />
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { Box3, Group, Mesh, PerspectiveCamera, Raycaster, Vector3 } from 'three'
+import { Box3, Group, Mesh, Raycaster, Vector3 } from 'three'
 import { createPistol } from '../src/content/exhibits/russian-pistol-1798-1804/source/createPistol'
 import { X, Y } from '../src/content/exhibits/russian-pistol-1798-1804/source/dimensions'
 import { russianPistol1798 as exhibit } from '../src/content/exhibits/russian-pistol-1798-1804/exhibit'
-import { bindSurfaceAnchor, projectSurfaceHotspots } from '../src/three/hotspotProjection'
+import { bindSurfaceAnchor } from '../src/three/hotspotProjection'
 import { disposeObject3D } from '../src/three/dispose'
 import { SemanticSceneIndex } from '../src/three/SemanticSceneIndex'
 
@@ -122,7 +122,7 @@ describe('1798/1804 cavalry pistol',()=>{
     for(const fact of r.known)expect(fact.sourceRefs?.length).toBeGreaterThan(0)
     expect(exhibit.status).toBe('reconstruction');expect(r.unknown.length).toBeGreaterThan(0)
   })
-  it('binds six visible front markers and occludes them on the reverse',()=>{
+  it('preserves six material anchors and authors meshless focus targets in their own frames',()=>{
     const index = new SemanticSceneIndex(root, exhibit.semantics!)
     const hotspots=exhibit.hotspots,anchors=new Map(hotspots.map(h=>[h.id,bindSurfaceAnchor(root,h,index)]))
     for(const hotspot of hotspots) {
@@ -133,10 +133,14 @@ describe('1798/1804 cavalry pistol',()=>{
       expect(hits.length,`${hotspot.id} must hit its named surface, not use the fallback`).toBeGreaterThan(0)
       expect(anchors.get(hotspot.id)!.point.distanceTo(hits[0].point)).toBeLessThan(1e-6)
     }
-    const camera=new PerspectiveCamera(34,1.5,.001,10)
-    camera.position.fromArray(exhibit.presentation.cameraPosition);camera.lookAt(new Vector3().fromArray(exhibit.presentation.cameraTarget));camera.updateMatrixWorld(true)
-    expect(projectSurfaceHotspots(root,camera,hotspots,anchors,.0003).filter(h=>h.visible).map(h=>h.id)).toEqual(hotspots.map(h=>h.id))
-    camera.position.set(0,.15,-.7);camera.lookAt(0,.08,0);camera.updateMatrixWorld(true)
-    expect(projectSurfaceHotspots(root,camera,hotspots,anchors,.0003).every(h=>!h.visible)).toBe(true)
+    const focused = exhibit.semantics!.filter(entity => entity.focusAnchor)
+    expect(focused.map(entity => entity.id)).toEqual(['stock.grip', 'barrel.muzzle', 'marking.tula-1803'])
+    for (const entity of focused) {
+      expect(entity.focusAnchor!.entityId).toBe(entity.id)
+      expect(entity.geometry.objectNames).toEqual([])
+      const bounds = new Box3()
+      for (const object of index.getSupportingObjects(entity.id)) bounds.expandByObject(object)
+      expect(bounds.containsPoint(index.getWorldPoint(entity.focusAnchor!))).toBe(true)
+    }
   })
 })

@@ -1,6 +1,7 @@
 import { PerspectiveCamera, Vector3 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { Exhibit, Hotspot } from '../content/types'
+import type { ReferenceView } from '../content/assembly'
 
 const vector = (tuple: readonly [number, number, number]) => new Vector3(...tuple)
 interface Transition {
@@ -18,7 +19,6 @@ export class CameraRig {
   private exhibit: Exhibit | null = null
   private transition: Transition | null = null
   private interactionStart: Vector3 | null = null
-  private assemblyAmount = 0
 
   constructor(private readonly canvas: HTMLCanvasElement, private readonly invalidate: () => void) {
     this.controls = new OrbitControls(this.camera, canvas)
@@ -33,7 +33,7 @@ export class CameraRig {
   }
 
   prepare(exhibit: Exhibit): void {
-    this.assemblyAmount = 0
+    this.clearDamping()
     this.exhibit = exhibit
     this.transition = null
     this.interactionStart = null
@@ -58,7 +58,7 @@ export class CameraRig {
   resize(aspect: number): void {
     this.camera.aspect = aspect
     const reference = this.exhibit?.presentation.referenceAspect
-    this.camera.zoom = (reference ? Math.min(1, aspect / reference) : 1) / (1 + this.assemblyAmount * .3)
+    this.camera.zoom = reference ? Math.min(1, aspect / reference) : 1
     this.camera.updateProjectionMatrix()
   }
 
@@ -72,13 +72,23 @@ export class CameraRig {
     this.move(target.clone().add(offset), target)
   }
 
-  frameAssembly(amount: number): void {
-    this.assemblyAmount = amount
-    this.resize(this.camera.aspect)
-  }
-
   reset(): void {
     if (this.exhibit) this.move(vector(this.exhibit.presentation.cameraPosition), vector(this.exhibit.presentation.cameraTarget))
+  }
+
+  showReference(view: ReferenceView): void {
+    this.clearDamping()
+    this.transition = null
+    this.camera.zoom = 1
+    this.camera.updateProjectionMatrix()
+    this.controls.maxDistance = Math.max(this.exhibit?.presentation.maxDistance ?? 3, vector(view.cameraPosition).distanceTo(vector(view.cameraTarget)) * 4)
+    this.camera.position.copy(vector(view.cameraPosition)); this.controls.target.copy(vector(view.cameraTarget))
+    this.controls.update(); this.invalidate()
+  }
+
+  private clearDamping(): void {
+    const damping = this.controls.enableDamping
+    this.controls.enableDamping = false; this.controls.update(); this.controls.enableDamping = damping
   }
 
   compare(visible: boolean): void {

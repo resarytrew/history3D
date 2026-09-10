@@ -8,4 +8,5 @@ coverage/
 assets/candidates/
 assets/source-references/
 .handoff/
-
+artifacts/assembly-v2-baseline-source/
+artifacts/assembly-v2-baseline-source.tar

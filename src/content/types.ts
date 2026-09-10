@@ -1,4 +1,5 @@
-import type { SemanticAnchor, SemanticEntity } from './semantics'
+import type { EntityAnnotation, SemanticAnchor, SemanticEntity } from './semantics'
+import type { AssemblyConfig } from './assembly'
 export type Locale = 'ru' | 'en'
 export type ReviewStatus =
   | 'draft'
@@ -144,6 +145,8 @@ export interface ReconstructionVersion {
 }
 
 export interface Exhibit {
+  readonly assembly?: AssemblyConfig
+  readonly annotations?: readonly EntityAnnotation[]
   readonly semantics?: readonly SemanticEntity[]
   readonly id: string
   readonly slug: string

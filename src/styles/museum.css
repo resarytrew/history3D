@@ -388,6 +388,7 @@
 .assembly-controls select, .assembly-controls input { width: 100%; min-width: 0; }
 .assembly-controls select, .assembly-actions button { font: inherit; color: inherit; padding: 8px; border: 1px solid #c9cabe; border-radius: 4px; background: #fffdf7; }
 .assembly-actions { display: flex; gap: 8px; }
+.assembly-actions { flex-wrap: wrap; }
 .assembly-actions button { flex: 1; cursor: pointer; }
 .assembly-path { line-height: 1.8; }
 .assembly-path button { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
@@ -398,4 +399,31 @@
   .assembly-controls[open] { left: 12px; right: 12px; top: auto; bottom: calc(10px - 31vh); width: auto; }
   .assembly-controls-body { max-height: 30vh; }
   .museum-shell:has(.assembly-controls[open]) .exhibit-carousel { display: none; }
+}
+.canvas-workspace { position: absolute; inset: 0; }
+.semantic-stage { inset: 126px 16px 254px 16px; }
+.semantic-stage .canvas-workspace { right: 326px; }
+.semantic-stage .assembly-controls, .semantic-stage .assembly-controls[open] { left: auto; right: 0; top: 0; bottom: 0; width: 310px; }
+.semantic-stage .assembly-controls:not([open]) { bottom: auto; }
+.semantic-stage:has(.assembly-controls:not([open])) .canvas-workspace { left: 370px; right: 0; top: 56px; }
+.semantic-stage .assembly-controls-body { position: absolute; inset: 44px 0 0; height: auto; max-height: none; box-sizing: border-box; overflow-y: auto; }
+.semantic-stage .assembly-controls h3, .semantic-stage .assembly-controls h4 { margin: 8px 0; }
+.semantic-tree [role="group"] { margin-left: 12px; border-left: 1px solid #c9cabe; padding-left: 6px; }
+.semantic-tree .tree-row { padding: 7px 4px; cursor: pointer; border-radius: 3px; }
+.semantic-tree [role="treeitem"][aria-selected="true"] > .tree-row, .layout-groups button[aria-pressed="true"] { background: #dfd8be; }
+.semantic-tree [data-group-member="true"] > .tree-row { border-bottom: 2px dotted #816326; }
+.semantic-tree button { border: 0; color: inherit; background: none; width: 24px; font: inherit; }
+.layout-groups { display: flex; flex-wrap: wrap; gap: 5px; }
+.layout-groups button { padding: 8px; border: 1px solid #c9cabe; background: #fffdf7; color: inherit; font: inherit; cursor: pointer; }
+.semantic-card { border-top: 1px solid #c9cabe; padding-top: 10px; line-height: 1.5; }
+.semantic-card small { text-transform: uppercase; letter-spacing: .06em; }
+.assembly-error { position: absolute; left: 24px; bottom: 0; background: #fff4e0; color: #553a28; padding: 10px; }
+@media (max-width: 760px) {
+  .semantic-stage { inset: 126px 8px 12px; }
+  .semantic-stage .canvas-workspace { right: 0; bottom: 230px; }
+  .semantic-stage .assembly-controls, .semantic-stage .assembly-controls[open] { left: 0; right: 0; top: auto; bottom: 0; width: auto; height: 218px; }
+  .semantic-stage .assembly-controls:not([open]) { height: auto; }
+  .semantic-stage .assembly-controls:not([open]) { left: auto; top: 0; bottom: auto; }
+  .semantic-stage:has(.assembly-controls:not([open])) .canvas-workspace { left: 0; top: 56px; bottom: calc(31vh + 88px); }
+  .semantic-stage .assembly-controls-body { max-height: 170px; }
 }

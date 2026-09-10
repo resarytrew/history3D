@@ -15,6 +15,7 @@ test('runtime validation preserves lazy imports in an already open dev viewer', 
   expect(result.stdout).toContain('Content validation passed')
   await info.attach('runtime-validation', { body: result.stdout + result.stderr, contentType: 'text/plain' })
   // This factory and its optimized modifier import have not been requested in this document yet.
+  await page.getByText('Устройство', { exact: true }).click()
   await page.getByRole('button', { name: 'Ружьё 1808 года', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Пехотное ружьё' })).toBeVisible()
   await expect(stage).toHaveAttribute('data-state', 'ready', { timeout: 30_000 })

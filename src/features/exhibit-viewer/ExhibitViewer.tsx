@@ -4,6 +4,7 @@ import { ViewerController, type ProjectedHotspot } from '../../three/ViewerContr
 import { useUi } from '../../i18n/ui'
 import { ViewerLoading } from './ViewerLoading'
 import { AssemblyControls } from './AssemblyControls'
+import { assembledState, type SemanticState } from '../../content/assembly'
 
 export interface ExhibitViewerHandle {
   readonly reset: () => void
@@ -26,6 +27,13 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
     const loadingExhibitId = useRef(exhibit.id)
     const ready = readyExhibitId === exhibit.id
     const [error, setError] = useState<string | null>(null)
+    const [semanticState, setSemanticState] = useState<SemanticState>(assembledState)
+    const semanticStateRef = useRef(semanticState)
+    const [assemblyError, setAssemblyError] = useState<string | null>(null)
+    const changeSemanticState = (state: SemanticState) => {
+      if (!controllerRef.current?.setSemanticState(state.selection, state.displayMode, state.assemblyContext)) return
+      semanticStateRef.current = state; setSemanticState(state); setAssemblyError(null)
+    }
     const hotspotLayerRef = useRef<HTMLDivElement>(null)
     // Write projection in the renderer's frame; React state would introduce a frame of lag.
     const publishProjection = (positions: readonly ProjectedHotspot[]) => {
@@ -44,7 +52,10 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
     useImperativeHandle(ref, () => ({
       reset: () => controllerRef.current?.reset(),
       focusHotspot: (hotspot) => controllerRef.current?.focusHotspot(hotspot),
-      setScaleComparison: (visible) => controllerRef.current?.setScaleComparison(visible),
+      setScaleComparison: (visible) => {
+        if (visible) { semanticStateRef.current = assembledState; setSemanticState(assembledState) }
+        controllerRef.current?.setScaleComparison(visible)
+      },
     }), [])
 
     useEffect(() => {
@@ -60,6 +71,8 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
             setError(message)
           },
           onHotspots: publishProjection,
+          onSelection: (selection) => changeSemanticState({ ...semanticStateRef.current, selection, displayMode: selection ? semanticStateRef.current.displayMode : 'all' }),
+          onAssemblyError: (message) => setAssemblyError(message),
         })
       } catch (cause) {
         const detail = cause instanceof Error ? cause.message : 'Неизвестная ошибка инициализации viewer.'
@@ -81,16 +94,17 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
       loadingExhibitId.current = exhibit.id
       setReadyExhibitId(null)
       setError(null)
+      semanticStateRef.current = assembledState; setSemanticState(assembledState); setAssemblyError(null)
       if (canvasRef.current) delete canvasRef.current.dataset.rendererError
       publishProjection([])
       controllerRef.current.load(exhibit)
     }, [exhibit])
 
     return (
-      <div className="viewer-stage" data-state={error ? 'error' : ready ? 'ready' : 'loading'} aria-busy={!ready && !error} aria-label={`Интерактивная 3D-модель: ${exhibit.content.ru?.title ?? exhibit.id}`}>
-        <canvas ref={canvasRef} className="viewer-canvas" tabIndex={ready && !error ? 0 : -1} aria-label={ui.viewerLabel} />
+      <div className={`viewer-stage ${exhibit.semantics ? 'semantic-stage' : ''}`} data-state={error ? 'error' : ready ? 'ready' : 'loading'} aria-busy={!ready && !error} aria-label={`Интерактивная 3D-модель: ${exhibit.content.ru?.title ?? exhibit.id}`}>
+        <div className="canvas-workspace"><canvas ref={canvasRef} className="viewer-canvas" tabIndex={ready && !error ? 0 : -1} aria-label={ui.viewerLabel} /></div>
         <div ref={hotspotLayerRef} className="hotspot-layer" aria-label="Точки исследования">
-          {exhibit.hotspots.map((hotspot) => (
+          {!exhibit.semantics && exhibit.hotspots.map((hotspot) => (
               <button
                 key={hotspot.id}
                 type="button"
@@ -106,9 +120,9 @@ export const ExhibitViewer = forwardRef<ExhibitViewerHandle, ExhibitViewerProps>
               </button>
           ))}
         </div>
-        {ready && !error && exhibit.semantics && <AssemblyControls key={exhibit.id} entities={exhibit.semantics}
-          onAmount={(amount, animate) => animate ? controllerRef.current?.animateAssembly(amount) : controllerRef.current?.setAssemblyAmount(amount)}
-          onSelect={(id, mode) => controllerRef.current?.selectEntity(id, mode)} />}
+        {ready && !error && exhibit.semantics && <AssemblyControls key={exhibit.id} exhibit={exhibit} state={semanticState}
+          onChange={changeSemanticState} onFocus={id => controllerRef.current?.focusEntity(id)} onReference={() => controllerRef.current?.returnReference()} />}
+        {assemblyError && <p className="assembly-error" role="alert">{ui.assemblyUnavailable}</p>}
         {!ready && !error && <ViewerLoading />}
         {error && <div className="viewer-error" role="alert">{ui.viewerUnavailable}</div>}
       </div>

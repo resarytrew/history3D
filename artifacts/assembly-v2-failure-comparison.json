@@ -1,0 +1,100 @@
+{
+  "unchanged": true,
+  "added": [],
+  "removed": [],
+  "incompleteSuites": [],
+  "baseline": [
+    {
+      "suite": "pistol.test.ts",
+      "name": "1798/1804 cavalry pistol keeps web geometry within budget with finite normals and UVs",
+      "reason": "AssertionError: expected 249480 to be less than 150000"
+    },
+    {
+      "suite": "catalog.test.ts",
+      "name": "exhibit catalog discovers a self-contained Pokrov package",
+      "reason": "AssertionError: expected undefined to be defined"
+    },
+    {
+      "suite": "catalog.test.ts",
+      "name": "exhibit catalog discovers the Ivan IV helmet scan package",
+      "reason": "AssertionError: expected undefined to be defined"
+    },
+    {
+      "suite": "exhibit-url.test.ts",
+      "name": "exhibit URL state opens deep links, replaces invalid ids and avoids duplicate history entries",
+      "reason": "AssertionError: expected 'russian-shako-1808' to be 'pokrov-na-nerli' // Object.is equality"
+    },
+    {
+      "suite": "exhibit-url.test.ts",
+      "name": "exhibit URL state restores the exhibit and clears panels/comparison on popstate",
+      "reason": "AssertionError: expected 'russian-shako-1808' to be 'ivan-iv-helmet' // Object.is equality"
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp opens the sources and confidence drawer",
+      "reason": "TestingLibraryElementError: Unable to find an element with the text: White Monuments of Vladimir and Suzdal. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp shows a restrained message for a draft exhibit",
+      "reason": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Топор/`"
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp switches collections without losing the ancient Rus carousel",
+      "reason": "TestingLibraryElementError: Value \"ancient-rus\" not found in options"
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp switches to the Ivan IV helmet scene from the carousel",
+      "reason": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name \"Шлем Ивана IV\""
+    }
+  ],
+  "current": [
+    {
+      "suite": "pistol.test.ts",
+      "name": "1798/1804 cavalry pistol keeps web geometry within budget with finite normals and UVs",
+      "reason": "AssertionError: expected 249480 to be less than 150000"
+    },
+    {
+      "suite": "catalog.test.ts",
+      "name": "exhibit catalog discovers a self-contained Pokrov package",
+      "reason": "AssertionError: expected undefined to be defined"
+    },
+    {
+      "suite": "catalog.test.ts",
+      "name": "exhibit catalog discovers the Ivan IV helmet scan package",
+      "reason": "AssertionError: expected undefined to be defined"
+    },
+    {
+      "suite": "exhibit-url.test.ts",
+      "name": "exhibit URL state opens deep links, replaces invalid ids and avoids duplicate history entries",
+      "reason": "AssertionError: expected 'russian-shako-1808' to be 'pokrov-na-nerli' // Object.is equality"
+    },
+    {
+      "suite": "exhibit-url.test.ts",
+      "name": "exhibit URL state restores the exhibit and clears panels/comparison on popstate",
+      "reason": "AssertionError: expected 'russian-shako-1808' to be 'ivan-iv-helmet' // Object.is equality"
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp opens the sources and confidence drawer",
+      "reason": "TestingLibraryElementError: Unable to find an element with the text: White Monuments of Vladimir and Suzdal. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp shows a restrained message for a draft exhibit",
+      "reason": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Топор/`"
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp switches collections without losing the ancient Rus carousel",
+      "reason": "TestingLibraryElementError: Value \"ancient-rus\" not found in options"
+    },
+    {
+      "suite": "MuseumApp.test.tsx",
+      "name": "MuseumApp switches to the Ivan IV helmet scene from the carousel",
+      "reason": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name \"Шлем Ивана IV\""
+    }
+  ]
+}

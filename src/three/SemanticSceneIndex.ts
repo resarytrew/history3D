@@ -13,6 +13,7 @@ export function validateSemantics(root: Object3D, entities: readonly SemanticEnt
   }
   const owners = new Map<Object3D, string>()
   for (const entity of entities) {
+    if (entity.focusAnchor && (entity.focusAnchor.entityId !== entity.id || ![...entity.focusAnchor.localPoint, ...(entity.focusAnchor.localNormal ?? [])].every(Number.isFinite) || entity.focusAnchor.localNormal && Math.hypot(...entity.focusAnchor.localNormal) === 0)) throw new Error(`Invalid focus anchor: ${entity.id}`)
     const seen = new Set<string>([entity.id])
     let parent = entity.parentId
     while (parent) {

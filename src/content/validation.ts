@@ -1,4 +1,5 @@
-import { CollectionSchema, ExhibitSchema } from './schema'
+import { AssemblyConfigSchema, CollectionSchema, ExhibitSchema } from './schema'
+import { validateAssembly } from './assembly'
 
 export interface ContentIssue { entity: string; field: string; message: string }
 export interface ValidationReport { errors: ContentIssue[]; warnings: ContentIssue[] }
@@ -38,10 +39,16 @@ export function validateCatalog(exhibits: readonly unknown[], collections: reado
     const e = record(value), entity = `Exhibit: ${String(e.id ?? index)}`
     const parsed = ExhibitSchema.safeParse(value)
     if (!parsed.success) for (const issue of parsed.error.issues) add(entity, fieldPath(issue.path), issue.message)
+    const assembly = AssemblyConfigSchema.safeParse(e.assembly), definitions = ExhibitSchema.shape.semantics.safeParse(e.semantics)
+    if (e.assembly && assembly.success && definitions.success) {
+      try { validateAssembly(assembly.data, definitions.data ?? []) }
+      catch (error) { add(entity, 'assembly', error instanceof Error ? error.message : String(error)) }
+    }
     const semantics = array(e.semantics).map(record)
     const semanticIds = new Map(semantics.map(item => [item.id, item]))
     unique(semantics, entity, 'semantics')
     semantics.forEach((item, i) => {
+      if (item.focusAnchor && record(item.focusAnchor).entityId !== item.id) add(entity, `semantics[${i}].focusAnchor.entityId`, 'Focus anchor must belong to its own entity')
       const seen = new Set([item.id])
       let parent = item.parentId
       while (parent !== undefined) {
@@ -79,6 +86,13 @@ export function validateCatalog(exhibits: readonly unknown[], collections: reado
     array(e.hotspots).forEach((value, i) => array(record(value).evidenceIds).forEach((id, j) => {
       if (!evidenceIds.has(id)) add(entity, `hotspots[${i}].evidenceIds[${j}]`, `Unknown evidence id "${String(id)}"`)
     }))
+    unique(array(e.annotations), entity, 'annotations')
+    array(e.annotations).forEach((value, i) => {
+      const annotation = record(value)
+      if (!semanticIds.has(annotation.entityId)) add(entity, `annotations[${i}].entityId`, 'Unknown semantic annotation target')
+      if (annotation.anchor && !semanticIds.has(record(annotation.anchor).entityId)) add(entity, `annotations[${i}].anchor.entityId`, 'Unknown anchor frame')
+      array(annotation.evidenceIds).forEach((id, j) => { if (!evidenceIds.has(id)) add(entity, `annotations[${i}].evidenceIds[${j}]`, 'Unknown annotation evidence') })
+    })
     if (!collectionMap.has(e.collectionId)) add(entity, 'collectionId', `Unknown collection id "${String(e.collectionId)}"`)
     const chronology = record(e.chronology)
     if (typeof chronology.from === 'number' && typeof chronology.to === 'number' && chronology.to < chronology.from) add(entity, 'chronology.to', 'Must be at least chronology.from')

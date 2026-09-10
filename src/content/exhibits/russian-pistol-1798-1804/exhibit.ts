@@ -4,6 +4,8 @@ import { pistolContentEn } from './content.en'
 import { pistolReconstruction } from './reconstruction'
 import { pistolHotspots } from './hotspots'
 import { pistolSemantics } from './semantics'
+import { pistolAssembly } from './assembly'
+import { pistolAnnotations } from './annotations'
 import poster from './images/poster.png'
 import thumbnail from './images/thumbnail.png'
 import studio from './backgrounds/studio.png'
@@ -15,6 +17,8 @@ export const russianPistol1798: Exhibit = {
   reconstruction: pistolReconstruction,
   model: { kind: 'procedural', factoryId: 'russian-pistol-1798-1804-v1', developmentOnly: false, approximateTriangles: 249480 },
   semantics: pistolSemantics,
+  assembly: pistolAssembly,
+  annotations: pistolAnnotations,
   presentation: {
     initialYaw: 0, cameraPosition: [0.025, 0.23, 0.76], cameraTarget: [0, 0.08, 0],
     minDistance: 0.045, maxDistance: 3, safeAreaPadding: 0.13, referenceAspect: 1.5,

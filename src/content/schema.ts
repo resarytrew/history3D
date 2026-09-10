@@ -7,6 +7,16 @@ const number = z.number().finite()
 const positive = number.positive()
 const vector = z.tuple([number, number, number])
 const pair = z.tuple([number, number])
+const anchor = z.object({ entityId: id, localPoint: vector, localNormal: vector.refine(v => Math.hypot(...v) > 0, 'Anchor normal must not be zero').optional() })
+export const AssemblyConfigSchema = z.object({
+  referenceView: z.object({ cameraPosition: vector, cameraTarget: vector }),
+  layouts: z.array(z.object({ id, parentLayoutId: id.optional(), groups: z.array(z.object({
+    id, label: z.object({ ru: text, en: text }),
+    selectionTarget: z.discriminatedUnion('kind', [z.object({ kind: z.literal('entity'), entityId: id }), z.object({ kind: z.literal('layout-group') })]),
+    memberEntityIds: z.array(id).min(1), moveEntityIds: z.array(id).min(1), preferredDirection: pair,
+    fixed: z.boolean().optional(), drilldownLayoutId: id.optional(),
+  })).min(1) })).min(1),
+})
 const https = z.url({ protocol: /^https$/ })
 const asset = text.refine(value => {
   if (value.startsWith('//')) return false
@@ -69,10 +79,12 @@ export const ExhibitContentSchema = z.object({
   narration: z.object({ durationSeconds: positive, transcript: text, audioSrc: asset.optional(), reviewStatus: z.enum(['synthetic-preview', 'human-reviewed']) }).optional(),
 })
 export const ExhibitSchema = z.object({
+  assembly: AssemblyConfigSchema.optional(),
+  annotations: z.array(z.object({ id, entityId: id, anchor: anchor.optional(), label: text, description: text, observationQuestion: text, evidenceIds: z.array(id).min(1) })).optional(),
   semantics: z.array(z.object({
     id, kind: z.enum(['object', 'assembly', 'part', 'region', 'feature']),
     label: z.object({ ru: text, en: text.optional() }), parentId: id.optional(),
-    geometry: z.object({ objectNames: z.array(text) }), explodeOffset: vector.optional(),
+    geometry: z.object({ objectNames: z.array(text) }), explodeOffset: vector.optional(), focusAnchor: anchor.optional(),
   })).optional(),
   id: slug, slug, collectionId: slug, category, status: ReviewStatusSchema,
   chronology: z.object({ label: text, from: number.int().optional(), to: number.int().optional(), circa: z.boolean().optional() }),

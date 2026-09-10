@@ -1,7 +1,13 @@
 import type { Point3, SemanticEntity } from '../../semantics'
 
+const english: Readonly<Record<string, string>> = {
+  stock: 'Stock', barrel: 'Barrel', 'lock.plate': 'Lock plate', 'lock.cock': 'Cock', 'lock.frizzen': 'Frizzen', 'lock.pan': 'Pan', 'lock.spring': 'Frizzen spring',
+  sideplate: 'Sideplate', 'trigger.guard': 'Trigger guard', trigger: 'Trigger', foreend: 'Fore-end cap', ramrod: 'Ramrod',
+  'ramrod.pipe.rear': 'Rear ramrod pipe', 'ramrod.pipe.front': 'Front ramrod pipe', 'barrel.pins': 'Barrel fasteners', buttcap: 'Butt cap', escutcheon: 'Grip escutcheon',
+}
+
 const part = (id: string, ru: string, parentId: string, names: string[], explodeOffset: Point3): SemanticEntity => ({
-  id, kind: 'part', label: { ru }, parentId,
+  id, kind: 'part', label: { ru, en: english[id] }, parentId,
   geometry: { objectNames: names.map(name => `pistol_${name}`) }, explodeOffset,
 })
 
@@ -9,12 +15,12 @@ const part = (id: string, ru: string, parentId: string, names: string[], explode
 export const pistolSemantics: readonly SemanticEntity[] = [
   { id: 'pistol', kind: 'object', label: { ru: 'Пистолет', en: 'Pistol' }, geometry: { objectNames: [] } },
   part('stock', 'Ложа', 'pistol', ['stock'], [0, 0, 0]),
-  { id: 'stock.grip', kind: 'region', label: { ru: 'Рукоять' }, parentId: 'stock', geometry: { objectNames: [] } },
+  { id: 'stock.grip', kind: 'region', label: { ru: 'Рукоять', en: 'Grip' }, parentId: 'stock', geometry: { objectNames: [] }, focusAnchor: { entityId: 'stock.grip', localPoint: [-.1682, .0676, .01509459851326389], localNormal: [-.003400672464691366, .1585918045831589, .9873383791516691] } },
   part('barrel', 'Ствол', 'pistol', ['barrel', 'breech_tang', 'breech', 'breech_tang_screw', 'front_sight'], [0, .07, 0]),
-  { id: 'barrel.muzzle', kind: 'region', label: { ru: 'Дульная часть' }, parentId: 'barrel', geometry: { objectNames: [] } },
+  { id: 'barrel.muzzle', kind: 'region', label: { ru: 'Дульная часть', en: 'Muzzle' }, parentId: 'barrel', geometry: { objectNames: [] }, focusAnchor: { entityId: 'barrel.muzzle', localPoint: [.223, .105, .011928745971757554], localNormal: [-.009346631731681734, .024540755682163004, .9996551364274685] } },
   { id: 'lock', kind: 'assembly', label: { ru: 'Кремнёвый замок', en: 'Flintlock' }, parentId: 'pistol', geometry: { objectNames: [] }, explodeOffset: [0, .015, .075] },
   part('lock.plate', 'Замочная доска', 'lock', ['lock_lockplate', 'lock_plate_rib0', 'lock_plate_rib1', 'lock_plate_rear_moulding', 'lock_plate_inscription'], [0, 0, 0]),
-  { id: 'marking.tula-1803', kind: 'feature', label: { ru: 'Клеймо «ТУЛА 1803»' }, parentId: 'lock.plate', geometry: { objectNames: [] } },
+  { id: 'marking.tula-1803', kind: 'feature', label: { ru: 'Клеймо «ТУЛА 1803»', en: 'TULA 1803 marking' }, parentId: 'lock.plate', geometry: { objectNames: [] }, focusAnchor: { entityId: 'marking.tula-1803', localPoint: [-.03328618733212352, .085202658859392, .018339695428486236], localNormal: [.003274094734677882, .004836691384007223, .9999829432145951] } },
   part('lock.cock', 'Курок', 'lock', ['lock_cock', 'lock_cock_spur', 'lock_lower_jaw', 'lock_upper_jaw', 'lock_jaw_screw', 'upper_jaw_shoulder', 'lock_jaw_screw_head', 'jaw_screw_slot_floor', 'jaw_finial_collar', 'cock_pivot_seat', 'cock_pivot_surround', 'cock_pivot_head', 'cock_pivot_rim', 'cock_pivot_slot_floor', 'cock_raised_margin'], [-.025, .04, .035]),
   part('lock.frizzen', 'Батарея', 'lock', ['lock_frizzen', 'lock_frizzen_foot', 'frizzen_shoe', 'frizzen_pivot_lobe', 'frizzen_pivot_seat', 'frizzen_pivot_head', 'frizzen_pivot_rim', 'frizzen_pivot_slot_floor'], [.03, .04, .035]),
   part('lock.pan', 'Полка', 'lock', ['lock_pan', 'pan_lip', 'lock_pan_connection'], [.025, .008, .02]),

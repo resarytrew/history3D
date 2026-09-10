@@ -1,4 +1,4 @@
-import { ACESFilmicToneMapping, PCFShadowMap, Scene, SRGBColorSpace, WebGLRenderer } from 'three'
+import { ACESFilmicToneMapping, PCFShadowMap, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three'
 import type { Exhibit, Hotspot } from '../content/types'
 import { CameraRig } from './CameraRig'
 import { LightingRig } from './LightingRig'
@@ -9,12 +9,17 @@ import { SemanticSceneIndex } from './SemanticSceneIndex'
 import { AssemblySystem } from './AssemblySystem'
 import { SemanticPresentation, type SemanticDisplayMode } from './SemanticPresentation'
 import type { ProjectedHotspot } from './hotspotProjection'
+import { resolveSelection, selectionKey, validateAssembly, type AssemblyContext, type DisplayMode, type Selection, type ReferenceView } from '../content/assembly'
+import { AssemblyLayoutSolver, snapshotBounds, type BoundsSnapshot } from './AssemblyLayoutSolver'
+import { SemanticPicker, SelectionGesture } from './SemanticPicker'
 export type { ProjectedHotspot } from './hotspotProjection'
 
 interface ViewerCallbacks {
   readonly onReady: () => void
   readonly onError: (message: string) => void
   readonly onHotspots: (positions: readonly ProjectedHotspot[]) => void
+  readonly onSelection?: (selection: Selection) => void
+  readonly onAssemblyError?: (message: string) => void
 }
 
 /** Connects independently owned viewer subsystems to the canvas and React callbacks. */
@@ -33,7 +38,15 @@ export class ViewerController {
   private semanticScene: SemanticSceneIndex | undefined
   private assembly: AssemblySystem | undefined
   private semanticPresentation: SemanticPresentation | undefined
-  private assemblyTransition: { from: number; to: number; started: number } | undefined
+  private context: AssemblyContext = { kind: 'assembled' }
+  private selection: Selection = null
+  private hover: Selection = null
+  private hoverPoint?: { x: number; y: number }
+  private readonly picker = new SemanticPicker()
+  private readonly gesture = new SelectionGesture()
+  private bounds: readonly BoundsSnapshot[] = []
+  private reference?: ReferenceView
+  private resizeTimer?: ReturnType<typeof setTimeout>
   private semanticMode: SemanticDisplayMode = 'all'
 
   constructor(private readonly canvas: HTMLCanvasElement, private readonly callbacks: ViewerCallbacks) {
@@ -54,6 +67,11 @@ export class ViewerController {
     this.models = new ModelHost(this.scene)
     this.hotspots = new HotspotSystem(callbacks.onHotspots)
     canvas.addEventListener('webglcontextlost', this.handleContextLost)
+    canvas.addEventListener('pointerdown', this.pointerDown)
+    window.addEventListener('pointermove', this.pointerMove)
+    window.addEventListener('pointerup', this.pointerUp)
+    window.addEventListener('pointercancel', this.pointerCancel)
+    canvas.addEventListener('pointerleave', this.pointerLeave)
     this.resizeObserver = new ResizeObserver(this.resize)
     this.resizeObserver.observe(canvas.parentElement ?? canvas)
     this.resize()
@@ -67,20 +85,23 @@ export class ViewerController {
     this.hotspots.clear()
     this.semanticPresentation?.dispose()
     this.semanticPresentation = undefined
-    this.assemblyTransition = undefined
+    this.context = { kind: 'assembled' }; this.selection = null; this.hover = null; this.hoverPoint = undefined
+    this.gesture.cancel(); this.reference = undefined; this.bounds = []; clearTimeout(this.resizeTimer)
     this.semanticMode = 'all'
     this.semanticScene = undefined
     this.assembly = undefined
-    this.canvas.dataset.assemblyAmount = '0'
+    this.canvas.dataset.assemblyContext = 'assembled'
     this.firstFramePending = true
     void this.models.load(exhibit, (loaded) => {
       if (exhibit.semantics) {
+        if (exhibit.assembly) validateAssembly(exhibit.assembly, exhibit.semantics)
         this.semanticScene = new SemanticSceneIndex(loaded.root, exhibit.semantics)
         this.assembly = new AssemblySystem(this.semanticScene)
         this.semanticPresentation = new SemanticPresentation(this.semanticScene)
+        this.bounds = snapshotBounds(this.semanticScene)
       }
       this.lighting.configure(exhibit, loaded.root, this.canvas)
-      this.hotspots.bind(loaded.root, exhibit, this.semanticScene)
+      if (!exhibit.semantics) this.hotspots.bind(loaded.root, exhibit)
       this.cameraRig.configure(exhibit)
       this.scheduler.invalidate()
     }).catch((error: unknown) => {
@@ -91,42 +112,77 @@ export class ViewerController {
 
   focusHotspot(hotspot: Hotspot): void {
     const entityId = hotspot.anchor?.entityId ?? hotspot.target?.entityId
-    if (entityId && this.semanticPresentation && this.assembly?.amount) this.cameraRig.focusPoint(this.semanticPresentation.getWorldPosition(entityId))
+    if (entityId && this.semanticPresentation && this.context.kind === 'layout') this.cameraRig.focusPoint(this.semanticPresentation.getWorldPosition(entityId))
     else this.cameraRig.focus(hotspot)
   }
-  reset(): void { this.cameraRig.reset() }
+  reset(): void { this.returnReference() }
 
-  setAssemblyAmount(amount: number): void {
-    this.assemblyTransition = undefined
-    this.applyAssemblyAmount(amount)
+  setSemanticState(selection: Selection, mode: DisplayMode, context: AssemblyContext): boolean {
+    const changed = JSON.stringify(context) !== JSON.stringify(this.context)
+    if (changed && !this.applyContext(context)) return false
+    this.selection = selection; this.semanticMode = selection ? mode : 'all'
+    this.semanticPresentation?.update(selection, this.semanticMode, this.context, this.exhibit?.assembly)
+    this.canvas.dataset.selection = selectionKey(selection)
+    this.lighting.setModelModified(this.context.kind === 'layout' || this.semanticMode !== 'all')
+    this.renderer.shadowMap.needsUpdate = true; this.scheduler.invalidate()
+    return true
   }
-
-  animateAssembly(amount: number): void {
-    if (!this.assembly) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { this.setAssemblyAmount(amount); return }
-    this.assemblyTransition = { from: this.assembly.amount, to: amount, started: performance.now() }
-    this.scheduler.invalidate()
+  private applyContext(context: AssemblyContext): boolean {
+    if (!this.assembly || !this.exhibit) return false
+    if (context.kind === 'assembled') {
+      this.assembly.animateTo({ offsets: new Map() }, performance.now(), window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      this.cameraRig.configure(this.exhibit); this.reference = undefined
+    } else {
+      const layout = this.exhibit.assembly?.layouts.find(layout => layout.id === context.layoutId)
+      if (!layout || !this.exhibit.assembly) return false
+      const result = new AssemblyLayoutSolver().solve({ objects: this.bounds, entities: this.exhibit.semantics!, layout,
+        referenceView: this.exhibit.assembly.referenceView, width: this.canvas.clientWidth, height: this.canvas.clientHeight })
+      if (!result.ok) { this.callbacks.onAssemblyError?.(result.error); return false }
+      this.assembly.animateTo(result.pose, performance.now(), window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      this.reference = result.view; this.showReference(result.view)
+      this.canvas.dataset.layoutDiagnostics = result.diagnostics.join(',')
+    }
+    this.context = context; this.hover = null; this.hoverPoint = undefined; this.semanticPresentation?.setHover(null)
+    this.canvas.dataset.assemblyContext = context.kind === 'assembled' ? 'assembled' : context.layoutId
+    return true
   }
-
-  selectEntity(entityId: string | null, mode: SemanticDisplayMode): void {
-    this.semanticMode = mode
-    this.semanticPresentation?.show(entityId, mode)
-    if (entityId && this.semanticPresentation) this.cameraRig.focusPoint(this.semanticPresentation.getWorldPosition(entityId))
-    this.lighting.setModelModified((this.assembly?.amount ?? 0) > 0 || mode !== 'all')
-    this.renderer.shadowMap.needsUpdate = true
-    this.scheduler.invalidate()
+  private showReference(view: ReferenceView): void {
+    const root = this.semanticScene?.root
+    root?.updateWorldMatrix(true, false)
+    this.cameraRig.showReference(root ? { cameraPosition: root.localToWorld(new Vector3().fromArray(view.cameraPosition)).toArray(), cameraTarget: root.localToWorld(new Vector3().fromArray(view.cameraTarget)).toArray() } : view)
   }
-
-  private applyAssemblyAmount(amount: number): void {
-    this.assembly?.setAmount(amount)
-    this.cameraRig.frameAssembly(this.assembly?.amount ?? 0)
-    this.canvas.dataset.assemblyAmount = String(this.assembly?.amount ?? 0)
-    this.lighting.setModelModified(amount > 0 || this.semanticMode !== 'all')
-    this.renderer.shadowMap.needsUpdate = true
-    this.scheduler.invalidate()
+  returnReference(): void { if (this.reference) this.showReference(this.reference); else this.cameraRig.reset() }
+  focusEntity(id: string): void {
+    if (!this.semanticScene) return
+    const anchor = this.semanticScene.getEntity(id).focusAnchor
+    this.cameraRig.focusPoint(anchor ? this.semanticScene.getWorldPoint(anchor) : this.semanticScene.getWorldPosition(id))
+  }
+  private pick(x: number, y: number): Selection {
+    if (!this.semanticScene || !this.semanticPresentation || this.lighting.comparing) return null
+    const id = this.picker.pick(x, y, this.canvas.getBoundingClientRect(), this.cameraRig.camera, this.semanticScene.root, this.semanticScene, this.semanticPresentation.policy)
+    return resolveSelection(id, this.context, this.semanticScene.definitions, this.exhibit?.assembly)
+  }
+  private readonly pointerDown = (event: PointerEvent): void => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    this.gesture.down(event.pointerId, event.clientX, event.clientY, event.pointerType)
+    this.pointerLeave()
+  }
+  private readonly pointerMove = (event: PointerEvent): void => {
+    this.gesture.move(event.pointerId, event.clientX, event.clientY)
+    if (!this.gesture.active && event.pointerType === 'mouse' && event.target === this.canvas) {
+      this.hoverPoint = { x: event.clientX, y: event.clientY }; this.scheduler.invalidate()
+    }
+  }
+  private readonly pointerUp = (event: PointerEvent): void => {
+    if (this.gesture.up(event.pointerId, event.clientX, event.clientY) && this.semanticScene) this.callbacks.onSelection?.(this.pick(event.clientX, event.clientY))
+  }
+  private readonly pointerCancel = (event: PointerEvent): void => { this.gesture.cancel(event.pointerId); this.pointerLeave() }
+  private readonly pointerLeave = (): void => {
+    this.hoverPoint = undefined; this.hover = null; this.semanticPresentation?.setHover(null); this.canvas.style.cursor = ''; this.scheduler.invalidate()
   }
 
   setScaleComparison(visible: boolean): void {
+    if (visible && this.assembly) { this.assembly.reset(); this.setSemanticState(null, 'all', { kind: 'assembled' }) }
     this.lighting.compare(visible)
     this.cameraRig.compare(visible)
     if (visible) this.callbacks.onHotspots([])
@@ -139,17 +195,23 @@ export class ViewerController {
     const height = Math.max(1, parent?.clientHeight ?? this.canvas.clientHeight)
     this.renderer.setSize(width, height, false)
     this.cameraRig.resize(width / height)
+    clearTimeout(this.resizeTimer)
+    if (this.context.kind === 'layout') this.resizeTimer = setTimeout(() => {
+      if (this.applyContext(this.context)) this.setSemanticState(this.selection, this.semanticMode, this.context)
+    }, 150)
     this.scheduler.invalidate()
   }
 
   private readonly render = (time: number): boolean => {
     if (this.disposed) return false
     const moving = this.cameraRig.update(time)
-    if (this.assemblyTransition) {
-      const transition = this.assemblyTransition
-      const t = Math.min(1, Math.max(0, (time - transition.started) / 550))
-      this.applyAssemblyAmount(transition.from + (transition.to - transition.from) * t * t * (3 - 2 * t))
-      if (t === 1) this.assemblyTransition = undefined
+    const assembling = this.assembly?.update(time) ?? false
+    this.canvas.dataset.assemblyAnimating = String(assembling)
+    if (this.hoverPoint && !this.gesture.active) {
+      const point = this.hoverPoint; this.hoverPoint = undefined
+      const hover = this.pick(point.x, point.y)
+      if (selectionKey(hover) !== selectionKey(this.hover)) { this.hover = hover; this.semanticPresentation?.setHover(hover) }
+      this.canvas.style.cursor = hover ? 'pointer' : ''
     }
     this.lighting.update(this.cameraRig.camera, this.exhibit, this.canvas)
     this.renderer.render(this.scene, this.cameraRig.camera)
@@ -157,8 +219,8 @@ export class ViewerController {
       this.firstFramePending = false
       this.callbacks.onReady()
     }
-    this.hotspots.project(this.cameraRig.camera, this.lighting.comparing)
-    return moving || !!this.assemblyTransition
+    if (!this.exhibit?.semantics) this.hotspots.project(this.cameraRig.camera, this.lighting.comparing)
+    return moving || assembling
   }
 
   private readonly handleContextLost = (event: Event): void => {
@@ -172,6 +234,12 @@ export class ViewerController {
     this.disposed = true
     this.scheduler.dispose()
     this.resizeObserver.disconnect()
+    clearTimeout(this.resizeTimer)
+    this.canvas.removeEventListener('pointerdown', this.pointerDown)
+    window.removeEventListener('pointermove', this.pointerMove)
+    window.removeEventListener('pointerup', this.pointerUp)
+    window.removeEventListener('pointercancel', this.pointerCancel)
+    this.canvas.removeEventListener('pointerleave', this.pointerLeave)
     this.canvas.removeEventListener('webglcontextlost', this.handleContextLost)
     this.cameraRig.dispose()
     this.hotspots.dispose()

@@ -15,6 +15,7 @@ const messages = {
     sourceNeedsReview: 'Требуется уточнение прав и происхождения', environmentNote: 'Фон экспозиции создан для визуальной среды и не является историческим источником.',
     preparing: 'Готовим 3D-экспонат…', viewerLabel: '3D-сцена. Перетаскивайте для вращения, используйте колесо для масштаба.',
     viewerUnavailable: 'Не удалось загрузить 3D-экспонат. Попробуйте перезагрузить страницу.',
+    assemblyUnavailable: 'Схема не помещается в доступную область. Предыдущий вид сохранён.',
     compareScale: 'Сравнить масштаб', reset: 'Сбросить ракурс', fullscreen: 'На весь экран', exhibitMode: 'Режим экспоната', exterior: 'Архитектура • внешний осмотр',
     draftMessage: 'Этот экспонат находится в исследовательском черновике. Исторические данные ещё не опубликованы.',
   },
@@ -30,6 +31,7 @@ const messages = {
     sourceNeedsReview: 'Rights and origin require review', environmentNote: 'The exhibit background is a visual environment, not a historical source.',
     preparing: 'Preparing the 3D exhibit…', viewerLabel: '3D stage. Drag to orbit and use the wheel to zoom.',
     viewerUnavailable: 'The 3D exhibit could not be loaded. Please reload the page.',
+    assemblyUnavailable: 'This diagram does not fit the available space. The previous view has been preserved.',
     compareScale: 'Compare scale', reset: 'Reset view', fullscreen: 'Fullscreen', exhibitMode: 'Exhibit mode', exterior: 'Architecture • exterior view',
     draftMessage: 'This exhibit is still a research draft. Historical content has not been published.',
   },
@@ -37,9 +39,11 @@ const messages = {
 
 export type UiMessages = typeof messages.ru | typeof messages.en
 const UiContext = createContext<UiMessages>(messages.ru)
+const LocaleContext = createContext<Locale>('ru')
 
 export function UiProvider({ locale, children }: { readonly locale: Locale; readonly children: ReactNode }) {
-  return <UiContext.Provider value={messages[locale]}>{children}</UiContext.Provider>
+  return <LocaleContext.Provider value={locale}><UiContext.Provider value={messages[locale]}>{children}</UiContext.Provider></LocaleContext.Provider>
 }
 
 export const useUi = () => useContext(UiContext)
+export const useLocale = () => useContext(LocaleContext)
